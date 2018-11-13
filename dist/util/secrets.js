@@ -11,19 +11,23 @@ if (fs_1.default.existsSync(".env")) {
     dotenv_1.default.config({ path: ".env" });
 }
 else {
-    logger_1.default.debug("Using .env.example file to supply config environment variables");
-    dotenv_1.default.config({ path: ".env.example" }); // you can delete this after you create your own .env file!
+    logger_1.default.debug(".env file missing");
 }
 exports.ENVIRONMENT = process.env.NODE_ENV;
 const prod = exports.ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 exports.SESSION_SECRET = process.env["SESSION_SECRET"];
 exports.MONGODB_URI = prod ? process.env["MONGODB_URI"] : process.env["MONGODB_URI_LOCAL"];
+exports.DISCORD_BOT_TOKEN = process.env["DISCORD_BOT_TOKEN"];
 if (!exports.SESSION_SECRET) {
     logger_1.default.error("No client secret. Set SESSION_SECRET environment variable.");
     process.exit(1);
 }
 if (!exports.MONGODB_URI) {
     logger_1.default.error("No mongo connection string. Set MONGODB_URI environment variable.");
+    process.exit(1);
+}
+if (!exports.DISCORD_BOT_TOKEN) {
+    logger_1.default.error("No Discord bot token string. Set DISCORD_BOT_TOKEN environment variable.");
     process.exit(1);
 }
 //# sourceMappingURL=secrets.js.map

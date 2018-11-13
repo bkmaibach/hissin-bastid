@@ -1,5 +1,5 @@
 import errorHandler from "errorhandler";
-
+import * as bot from "./bot";
 import app from "./app";
 
 /**
@@ -18,5 +18,7 @@ const server = app.listen(app.get("port"), () => {
   );
   console.log("  Press CTRL-C to stop\n");
 });
+
+bot.init();
 
 export default server;

@@ -23,7 +23,7 @@ var Colour;
 let myColour = Colour.Green;
 let car = "BMW";
 car = { brand: "BMW", series: 3 };
-let myName = "Keef";
+let myName = "Keith";
 // functions
 // Explicit return types
 function getMyName() {
