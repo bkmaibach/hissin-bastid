@@ -23,6 +23,7 @@ const helpers = __importStar(require("./helpers"));
 const config = __importStar(require("./config/bot"));
 const secrets_1 = require("./util/secrets");
 const assignments = __importStar(require("./responders/assignments"));
+const subscribers = __importStar(require("./responders/subscribers"));
 const client = new discord_js_1.default.Client();
 client.on("ready", () => {
     // This event will run if the bot starts, and logs in, successfully.
@@ -47,29 +48,43 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
     }
     if (command === "help") {
         message.channel.send(`Available commands:
-        \n~read - reads all assignments`);
+        \n${config.prefix}due - See all due items
+        \n${config.prefix}subscribe - Subscribe to reminders
+        \n${config.prefix}unsubscribe - Subscribe to reminders
+        \n${config.prefix}options - Set subscription options`);
     }
     if (command === "joke") {
         const joke = yield helpers.getJoke();
         message.channel.send(joke);
     }
-    // if (command === "create") {
-    //     if (args.length != 6) {
-    //         message.channel.send("Incorrect format");
-    //     } else {
-    //         console.log(message.author.id);
-    //         const name = args[0].replace("\"", "");
-    //         const dueDate = new Date(args[1]);
-    //         const percentOfGrade = parseInt(args[2]);
-    //         const url = args[3];
-    //         const type = args[4];
-    //         const note = args[5].replace("\"", "");
-    //         assignments.create(name, dueDate, percentOfGrade, url, type, note );
-    //     }
-    // }
-    if (command === "all") {
+    if (command === "due") {
         const docs = yield assignments.readAll();
-        message.channel.send(docs);
+        const now = new Date().valueOf();
+        // Throw out all assignment docs that are past due
+        const dueAssignments = docs.filter(doc => doc.dueDate.valueOf() > now);
+        // Sort assignments by due date
+        dueAssignments.sort((a, b) => {
+            const dueDateA = a.dueDate.valueOf();
+            const dueDateB = b.dueDate.valueOf();
+            if (dueDateA < dueDateB)
+                return -1;
+            if (dueDateA > dueDateB)
+                return 1;
+            return 0;
+        });
+        // Display each assignment to the channel
+        dueAssignments.forEach((doc) => {
+            message.channel.send("Course: " + doc.course + "\nName: " + doc.name + "\nDue date: " + doc.dueDate
+                + "\nURL: " + doc.url + "\nNote: " + doc.note + "\n-------------------------\n");
+        });
+    }
+    if (command === "subscribe") {
+        message.author.send("Thank you " + message.author + " for subscribing. To see your options, say " + config.prefix + "options");
+        message.author.send("If you would like to receive reminders by text message, simply say " +
+            config.prefix + "phone followed by your 10-digit phone number, for example:\n" + config.prefix + "phone 2508021111");
+        subscribers.create(message.author.id.toString());
+        // const user = await client.fetchUser(message.author.id);
+        // user.sendMessage("BLAH");
     }
 }));
 exports.init = function () {

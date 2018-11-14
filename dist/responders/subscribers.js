@@ -11,17 +11,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const assignment_1 = __importDefault(require("../models/assignment"));
-exports.create = function (name, dueDate, percentOfGrade, url, type, note) {
+const subscriber_1 = __importDefault(require("../models/subscriber"));
+exports.create = function (id, phone, options) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const assignment = new assignment_1.default({
-                name,
-                dueDate,
-                url,
-                note
+            const subscriber = new subscriber_1.default({
+                discordId: id,
+                subscribed: true,
+                phone,
+                options
             });
-            const doc = yield assignment.save();
+            const doc = yield subscriber.save();
             return doc;
         }
         catch (err) {
@@ -29,15 +29,4 @@ exports.create = function (name, dueDate, percentOfGrade, url, type, note) {
         }
     });
 };
-exports.readAll = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const allDocs = yield assignment_1.default.find();
-            return allDocs;
-        }
-        catch (err) {
-            console.log("Error in read operation: " + err);
-        }
-    });
-};
-//# sourceMappingURL=assignments.js.map
+//# sourceMappingURL=subscribers.js.map

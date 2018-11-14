@@ -1,6 +1,16 @@
-import { Schema, model }  from "mongoose";
+import { Schema, model, Document }  from "mongoose";
 
-const AssignmentSchema = new Schema( {
+export interface IAssignment extends Document {
+    course: string;
+    name: string;
+    // createdAt: Date;
+    // updatedAt: Date;
+    dueDate: Date;
+    url: string;
+    note: string;
+}
+
+const assignmentSchema = new Schema( {
     course: {
         type: String,
         required: true,
@@ -14,28 +24,19 @@ const AssignmentSchema = new Schema( {
         unique: true,
         trim: true
     },
-    createdAt: Date,
-    updatedAt: Date,
+    // updatedAt: Date,
     dueDate: {
         type: Date,
         required: true
-    },
-    percentOfGrade: {
-        type: Number
     },
     url: {
         type: String,
         required: true,
         trim: true
     },
-    type: {
-        type: String,
-        enum: ["report", "exam"],
-        required: true
-    },
     note: {
         type: String
     }
 });
 
-export default model("Assignment", AssignmentSchema);
+export default model("Assignment", assignmentSchema);

@@ -7,11 +7,8 @@ export const create = async function (name: string, dueDate: Date, percentOfGrad
 
         const assignment = new Assignment({
             name,
-            createdAt:  new Date(),
             dueDate,
-            percentOfGrade,
             url,
-            type,
             note
         });
 
