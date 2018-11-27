@@ -13,6 +13,7 @@ import passport from "passport";
 import expressValidator from "express-validator";
 import bluebird from "bluebird";
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
+import * as bot from "./bot";
 
 const MongoStore = mongo(session);
 
@@ -115,11 +116,26 @@ app.get("/api", apiController.getApi);
 app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 
 /**
+ * Assignment API routes.
+ */
+app.post("/api/assignments", assignmentsController.postAssignments);
+app.get("/api/assignments", assignmentsController.getAssignments);
+app.put("/api/assignments", assignmentsController.putAssignments);
+app.delete("/api/assignments", assignmentsController.deleteAssignments);
+
+
+/**
  * OAuth authentication routes. (Sign in)
  */
 app.get("/auth/facebook", passport.authenticate("facebook", { scope: ["email", "public_profile"] }));
 app.get("/auth/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login" }), (req, res) => {
   res.redirect(req.session.returnTo || "/");
 });
+
+/**
+ * OAuth authentication routes. (Sign in)
+ */
+bot.init();
+
 
 export default app;

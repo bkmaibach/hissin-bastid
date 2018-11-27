@@ -17,6 +17,34 @@ export let getApi = (req: Request, res: Response) => {
 };
 
 /**
+ * GET /api
+ * List of API examples.
+ */
+export let postAssignments = (req: Request, res: Response) => {
+  res.render("api/index", {
+    title: "API Examples"
+  });
+};
+
+export let getAssignments = (req: Request, res: Response) => {
+  res.render("api/index", {
+    title: "API Examples"
+  });
+};
+
+export let putAssignments = (req: Request, res: Response) => {
+  res.render("api/index", {
+    title: "API Examples"
+  });
+};
+
+export let deleteAssignments = (req: Request, res: Response) => {
+  res.render("api/index", {
+    title: "API Examples"
+  });
+};
+
+/**
  * GET /api/facebook
  * Facebook API example.
  */

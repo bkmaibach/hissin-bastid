@@ -2,8 +2,8 @@ import Discord, { Message } from "discord.js";
 import * as helpers from "./helpers";
 import * as config from "./config/bot";
 import { DISCORD_BOT_TOKEN } from "./util/secrets";
-import * as assignments from "./responders/assignments";
-import * as subscribers from "./responders/subscribers";
+import * as assignments from "./data/assignments";
+import * as subscribers from "./data/subscribers";
 import { IAssignment } from "./models/assignment";
 
 const client = new Discord.Client();
@@ -18,6 +18,51 @@ client.on("ready", () => {
   });
 
 client.on("message", async message => {
+
+        // Ignore other bots
+        if (message.author.bot) return;
+
+
+        if (message.content.indexOf("rip") > -1) {
+            message.channel.send("Your sacrifice will be remembered.");
+        }
+
+        if (message.content.indexOf("Dude!") > -1) {
+            message.channel.send("Sweet!");
+        }
+        if (message.content.indexOf("Sweet!") > -1) {
+            message.channel.send("Dude!");
+        }
+        if (message.content.indexOf("I didnt study") > -1) {
+            message.channel.send("May god have mercy on your soul.");
+        }
+        if (message.content.indexOf("propane") > -1) {
+            message.channel.send(`\`………………_„-,-~\'\'~\'\'\':::\'\':::\':::::\'\'::::\'\'...
+            ………._,-\'\':::::::::::::::::::::::::::::...
+            ………..,-\'::::::::::::::::::::::::::::::...
+            ………,-\'::::::::::::„:„„-~-~--\'~-\'~--~-~...
+            ……..,\'::::::::::,~\'\': : : : : : : : : : : : : : : : : : \'-|
+            ……..|::::::::,-\': : : : : : : : - -~\'\'\'\'¯¯\'\'-„: : : : :\
+            ……..|::::::::|: : : : : : : : : _„„--~\'\'\'\'\'~-„: : : : \'|
+            ……..\'|:::::::,\': : : : : : :_„„-: : : : : : : : ~--„_: |\'
+            ………|::::::|: : : „--~~\'\'\'~~\'\'\'\'\'\'\'\'-„…_..„~\'\'\'\'\'\'\'\'\'\'\'\'¯|
+            ………|:::::,\':_„„-|: : :_„---~: : :|\'\'¯¯\'\'\'\'|: ~---„_: ||
+            ……..,~-,_/\'\': : : |: :(_ o__): : |: : : :|:(_o__): \..|
+            ……../,\'-,: : : : : \'\'-,_______,-\'\': : : : \'\'-„_____|
+            ……..\: :|: : : : : : : : : : : : : :„: : : : :-,: : : : : : : :\
+            ………\',:\': : : : : : : : : : : : :,-\'__: : : :_\',: : : : ;: ,\'
+            ……….\'-,-\': : : : : :___„-: : :\'\': : ¯\'\'~~\'\': \': : ~--|\'
+            ………….|: ,: : : : : : : : : : : : : : : : : : : : : :: : :|
+            ………….\'|: \: : : : : : : : -,„_„„-~~--~--„_: :: |
+            …………..|: \: : : : : : : : : : : :-------~: : : : : |
+            …………..|: :\'\'-,: : : : : : : : : : : : : : : : : : : : :|
+            …………..\',: : :\'\'-, : : : : : : : : : : : : : : : : :: ,\'
+            ……………| : : : : : : : : :_ : : : : : : : : : : ,-\'
+            ……………|: : : : : : : : : : \'\'\'~----------~\'\'
+            …………._|: : : : : : : : : : : : : : : : : : : :|
+            ……….„-\'\'. \'-,_: : : : : : : : : : : : : : : : : ,\'
+            ……,-\'\'. . . . . \'\'\'~-„_: : : : : : : : : : : : :,-\'\'\'-„\``);
+        }
 
     // Ignore if not a prefix
     if (!message.content.startsWith(config.prefix)) return;
@@ -38,34 +83,76 @@ client.on("message", async message => {
         \n${config.prefix}due - See all due items
         \n${config.prefix}subscribe - Subscribe to reminders
         \n${config.prefix}unsubscribe - Subscribe to reminders
-        \n${config.prefix}options - Set subscription options`);
+        \n${config.prefix}options - Set subscription options
+        \n${config.prefix}mmm - ( ಠ ͜ʖ ಠ)`);
+    }
+
+    if (command === "say") {
+        // makes the bot say something and delete the message. As an example, it's open to anyone to use.
+        // To get the "message" itself we join the `args` back into a string with spaces:
+        const sayMessage = args.join(" ");
+        // Then we delete the command message (sneaky, right?). The catch just ignores the error with a cute smiley thing.
+        message.delete().catch(O_o => {
+            console.log(O_o);
+        });
+        // And we get the bot to say the thing:
+        message.channel.send(sayMessage);
+    }
+
+    if (command === "options") {
+        if (args.length != 3) {
+            message.channel.send(`Enter in subscription options in the following format:
+            \n${config.prefix}options X Y Z
+            \nwhere X is the number of days in advance of a due date you would like to be reminded (default 3),
+            \nY is the number of days you would like between reminders (default 1),
+            \nand Z is the hour of the day (0 - 23) that you would like to receive reminders`);
+        } else {
+            subscribers.updateOptions(message.author.id, parseInt(args[0]), parseInt(args[1]), parseInt(args[2]));
+        }
     }
 
     if (command === "joke") {
-        const joke = await helpers.getJoke();
+        let joke = "No joke for you";
+        try {
+            joke = await helpers.getJoke();
+            console.log(joke);
+        } catch (error) {
+            console.log(error);
+        }
         message.channel.send(joke);
     }
 
+    if (command === "tableflip") {
+        message.channel.send("\`(╯°□°）╯︵ ┻━┻\`");
+    }
+
+    if (command === "unflip") {
+        message.channel.send("\`┬─┬ ノ( ゜-゜ノ)\`");
+    }
+    if (command === "shrug") {
+        message.channel.send("\`¯\\_(ツ)_/¯\`");
+    }
+
+    if (command === "concern") {
+        message.channel.send("ಠ_ಠ");
+    }
+
+    if (command === "mmm") {
+        message.channel.send("( ಠ ͜ʖ ಠ)");
+    }
+
+    if (command === "dealwithit") {
+        message.channel.send("\`(•_•) ( •_•)>⌐■-■ (⌐■_■)\`");
+    }
+
     if (command === "due") {
-        const docs: IAssignment[] = <IAssignment[]>await assignments.readAll();
-        const now = new Date().valueOf();
-
-        // Throw out all assignment docs that are past due
-        const dueAssignments = docs.filter( doc => doc.dueDate.valueOf() > now);
-
-        // Sort assignments by due date
-        dueAssignments.sort( (a, b) => {
-            const dueDateA = a.dueDate.valueOf();
-            const dueDateB = b.dueDate.valueOf();
-            if (dueDateA < dueDateB) return -1;
-            if (dueDateA > dueDateB) return 1;
-            return 0;
-        });
+        const dueAssignments = await assignments.readAllDue();
 
         // Display each assignment to the channel
-        dueAssignments.forEach((doc) => {
+        dueAssignments.forEach((docWrapper) => {
+            const doc = <IAssignment>docWrapper.toObject();
             message.channel.send("Course: " + doc.course + "\nName: " + doc.name + "\nDue date: " + doc.dueDate
-             + "\nURL: " + doc.url + "\nNote: " + doc.note + "\n-------------------------\n");
+             + "\nURL: " + doc.url + "\nNote: " + doc.note + "</a>" + "\n-------------------------\n");
         });
     }
 
@@ -75,13 +162,18 @@ client.on("message", async message => {
          config.prefix + "phone followed by your 10-digit phone number, for example:\n" + config.prefix + "phone 2508021111");
 
         subscribers.create(message.author.id.toString());
-        // const user = await client.fetchUser(message.author.id);
-        // user.sendMessage("BLAH");
-
     }
 });
-
 export const init = function () {
     client.login(DISCORD_BOT_TOKEN);
 };
 
+export const sendDiscordMessage = async function (discordId: string, message: string): Promise<void> {
+    try {
+        const user = await client.fetchUser(discordId);
+        user.send(message);
+    } catch (err) {
+        console.log("error sending message to id " + discordId + ": " + err);
+    }
+
+};
