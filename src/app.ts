@@ -118,10 +118,10 @@ app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthor
 /**
  * Assignment API routes.
  */
-app.post("/api/assignments", assignmentsController.postAssignments);
-app.get("/api/assignments", assignmentsController.getAssignments);
-app.put("/api/assignments", assignmentsController.putAssignments);
-app.delete("/api/assignments", assignmentsController.deleteAssignments);
+app.post("/api/assignments", apiController.postAssignments);
+app.get("/api/assignments", apiController.getAssignments);
+app.put("/api/assignments", apiController.putAssignments);
+app.delete("/api/assignments", apiController.deleteAssignments);
 
 
 /**
