@@ -24,6 +24,7 @@ const passport_1 = __importDefault(require("passport"));
 const express_validator_1 = __importDefault(require("express-validator"));
 const bluebird_1 = __importDefault(require("bluebird"));
 const secrets_1 = require("./util/secrets");
+const bot = __importStar(require("./bot"));
 const MongoStore = connect_mongo_1.default(express_session_1.default);
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv_1.default.config({ path: ".env.example" });
@@ -111,11 +112,22 @@ app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userControl
 app.get("/api", apiController.getApi);
 app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 /**
+ * Assignment API routes.
+ */
+app.post("/api/assignments", apiController.postAssignments);
+app.get("/api/assignments", apiController.getAssignments);
+app.put("/api/assignments", apiController.putAssignments);
+app.delete("/api/assignments", apiController.deleteAssignments);
+/**
  * OAuth authentication routes. (Sign in)
  */
 app.get("/auth/facebook", passport_1.default.authenticate("facebook", { scope: ["email", "public_profile"] }));
 app.get("/auth/facebook/callback", passport_1.default.authenticate("facebook", { failureRedirect: "/login" }), (req, res) => {
     res.redirect(req.session.returnTo || "/");
 });
+/**
+ * OAuth authentication routes. (Sign in)
+ */
+bot.init();
 exports.default = app;
 //# sourceMappingURL=app.js.map
