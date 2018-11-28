@@ -14,6 +14,18 @@ exports.getApi = (req, res) => {
     });
 };
 /**
+ * /api/assignments
+ * Assignments API
+ */
+exports.postAssignments = (req, res) => {
+};
+exports.getAssignments = (req, res) => {
+};
+exports.putAssignments = (req, res) => {
+};
+exports.deleteAssignments = (req, res) => {
+};
+/**
  * GET /api/facebook
  * Facebook API example.
  */
