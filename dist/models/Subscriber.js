@@ -45,4 +45,4 @@ const subscriberSchema = new mongoose_1.Schema({
     }
 });
 exports.default = mongoose_1.model("Subscriber", subscriberSchema);
-//# sourceMappingURL=subscriber.js.map
+//# sourceMappingURL=Subscriber.js.map
