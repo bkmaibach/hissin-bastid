@@ -151,8 +151,12 @@ client.on("message", async message => {
         // Display each assignment to the channel
         dueAssignments.forEach((docWrapper) => {
             const doc = <IAssignment>docWrapper.toObject();
-            message.channel.send("Course: " + doc.course + "\nName: " + doc.name + "\nDue date: " + doc.dueDate
-             + "\nURL: " + doc.url + "\nNote: " + doc.note + "</a>" + "\n-------------------------\n");
+            message.channel.send("Course: " + doc.course
+            + "\nName: " + doc.name
+            + "\nDue date: " + doc.dueDate
+            + "\nURL: " + doc.url
+            + "\nNote: " + doc.note
+            + "\n-------------------------\n");
         });
     }
 

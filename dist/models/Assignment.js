@@ -23,6 +23,7 @@ const assignmentSchema = new mongoose_1.Schema({
     url: {
         type: String,
         required: true,
+        unique: true,
         trim: true
     },
     note: {

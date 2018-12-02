@@ -38,7 +38,7 @@ exports.postHome = (req, res, next) => __awaiter(this, void 0, void 0, function*
     }
     const course = req.body.course;
     const assignmentName = req.body.assignmentName;
-    const dueDate = new Date(Date.parse(req.body.dueDate + " " + req.body.dueTime));
+    const dueDate = new Date(Date.parse(req.body.dueDate + " " + req.body.dueTime + " PST"));
     const url = req.body.url;
     const note = req.body.note;
     try {

@@ -153,8 +153,12 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
         // Display each assignment to the channel
         dueAssignments.forEach((docWrapper) => {
             const doc = docWrapper.toObject();
-            message.channel.send("Course: " + doc.course + "\nName: " + doc.name + "\nDue date: " + doc.dueDate
-                + "\nURL: " + doc.url + "\nNote: " + doc.note + "</a>" + "\n-------------------------\n");
+            message.channel.send("Course: " + doc.course
+                + "\nName: " + doc.name
+                + "\nDue date: " + doc.dueDate
+                + "\nURL: " + doc.url
+                + "\nNote: " + doc.note
+                + "\n-------------------------\n");
         });
     }
     if (command === "subscribe") {

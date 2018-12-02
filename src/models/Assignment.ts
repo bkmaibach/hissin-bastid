@@ -32,6 +32,7 @@ const assignmentSchema = new Schema( {
     url: {
         type: String,
         required: true,
+        unique: true,
         trim: true
     },
     note: {
