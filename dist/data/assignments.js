@@ -9,30 +9,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const assignment_1 = __importDefault(require("../models/assignment"));
-exports.create = function (name, dueDate, percentOfGrade, url, type, note) {
+const Assignment_1 = __importDefault(require("../models/Assignment"));
+exports.create = function (course, name, dueDate, url, note) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const assignment = new assignment_1.default({
-                name,
-                dueDate,
-                url,
-                note
-            });
-            const doc = yield assignment.save();
-            return doc;
-        }
-        catch (err) {
-            console.log("Error in create operation: " + err);
-        }
+        const assignment = new Assignment_1.default({
+            course,
+            name,
+            dueDate,
+            url,
+            note
+        });
+        const doc = yield assignment.save();
+        return doc;
     });
 };
 exports.readAll = function () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const allDocs = assignment_1.default.find({}).exec();
+            const allDocs = Assignment_1.default.find({}).exec();
             return allDocs;
         }
         catch (err) {
@@ -45,7 +41,7 @@ exports.readAllDueSoon = function (howSoonInDays) {
         try {
             const now = new Date();
             const dateConsideredSoon = new Date(new Date().setTime(now.getTime() + howSoonInDays * 86400000));
-            const docs = assignment_1.default.find({ dueDate: { $gte: now, $lte: dateConsideredSoon } }).exec();
+            const docs = Assignment_1.default.find({ dueDate: { $gte: now, $lte: dateConsideredSoon } }).exec();
             return docs;
         }
         catch (err) {
@@ -57,7 +53,7 @@ exports.readAllDue = function () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const now = new Date();
-            const docs = assignment_1.default.find({ dueDate: { $gte: now } }).exec();
+            const docs = Assignment_1.default.find({ dueDate: { $gte: now } }).exec();
             return docs;
         }
         catch (err) {

@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const async_1 = __importDefault(require("async"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -9,7 +9,6 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const passport_1 = __importDefault(require("passport"));
 const User_1 = __importDefault(require("../models/User"));
 require("../config/passport");
-const request = require("express-validator");
 /**
  * GET /login
  * Login page.

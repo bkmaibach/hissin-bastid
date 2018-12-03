@@ -13,6 +13,7 @@ import passport from "passport";
 import expressValidator from "express-validator";
 import bluebird from "bluebird";
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
+import cookieParser from "cookie-parser";
 import * as bot from "./bot";
 
 const MongoStore = mongo(session);
@@ -25,6 +26,7 @@ import * as homeController from "./controllers/home";
 import * as userController from "./controllers/user";
 import * as apiController from "./controllers/api";
 import * as contactController from "./controllers/contact";
+import * as assignmentController from "./controllers/assignment";
 
 
 // API keys and Passport configuration
@@ -62,6 +64,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cookieParser("keyboard cat"));
 app.use(flash());
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
@@ -92,6 +95,8 @@ app.use(
  * Primary app routes.
  */
 app.get("/", homeController.index);
+app.post("/", passportConfig.isAuthenticated, assignmentController.postHome);
+
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);
 app.get("/logout", userController.logout);
@@ -109,19 +114,15 @@ app.post("/account/password", passportConfig.isAuthenticated, userController.pos
 app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
 
+
+
 /**
  * API examples routes.
  */
 app.get("/api", apiController.getApi);
 app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 
-/**
- * Assignment API routes.
- */
-app.post("/api/assignments", apiController.postAssignments);
-app.get("/api/assignments", apiController.getAssignments);
-app.put("/api/assignments", apiController.putAssignments);
-app.delete("/api/assignments", apiController.deleteAssignments);
+
 
 
 /**

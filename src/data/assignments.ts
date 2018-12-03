@@ -1,25 +1,19 @@
 import { ObjectID } from "mongodb";
 import { Document } from "mongoose";
-import Assignment from "../models/assignment";
-import { IAssignment } from "../models/assignment";
+import Assignment from "../models/Assignment";
+import { IAssignment } from "../models/Assignment";
 
-export const create = async function (name: string, dueDate: Date, percentOfGrade: number, url: string, type: string, note: string): Promise<IAssignment> {
-    try {
+export const create = async function (course: string, name: string, dueDate: Date, url: string, note: string): Promise<IAssignment> {
+    const assignment = new Assignment({
+        course,
+        name,
+        dueDate,
+        url,
+        note
+    });
 
-        const assignment = new Assignment({
-            name,
-            dueDate,
-            url,
-            note
-        });
-
-        const doc = <IAssignment>await assignment.save();
-        return doc;
-
-    } catch (err) {
-        console.log("Error in create operation: " + err);
-    }
-
+    const doc = <IAssignment>await assignment.save();
+    return doc;
 };
 
 export const readAll = async function (): Promise<Document[]> {

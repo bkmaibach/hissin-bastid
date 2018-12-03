@@ -17,26 +17,6 @@ export let getApi = (req: Request, res: Response) => {
 };
 
 /**
- * /api/assignments
- * Assignments API
- */
-export let postAssignments = (req: Request, res: Response) => {
-
-};
-
-export let getAssignments = (req: Request, res: Response) => {
-
-};
-
-export let putAssignments = (req: Request, res: Response) => {
-
-};
-
-export let deleteAssignments = (req: Request, res: Response) => {
-
-};
-
-/**
  * GET /api/facebook
  * Facebook API example.
  */

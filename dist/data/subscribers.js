@@ -9,13 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const subscriber_1 = __importDefault(require("../models/subscriber"));
+const Subscriber_1 = __importDefault(require("../models/Subscriber"));
 function create(id, phone, options) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const subscriber = new subscriber_1.default({
+            const subscriber = new Subscriber_1.default({
                 discordId: id,
                 subscribed: true,
                 phone,
@@ -32,7 +32,7 @@ function create(id, phone, options) {
 exports.create = create;
 function updateLastReminded(discordId, now) {
     try {
-        return subscriber_1.default.updateOne({ "discordId": discordId }, { $set: { lastReminded: now } }).exec();
+        return Subscriber_1.default.updateOne({ "discordId": discordId }, { $set: { lastReminded: now } }).exec();
     }
     catch (err) {
         console.log("Error in update operation: " + err);
@@ -41,7 +41,7 @@ function updateLastReminded(discordId, now) {
 exports.updateLastReminded = updateLastReminded;
 function updateOptions(discordId, daysPrior, daysInterval, timeOfDay) {
     try {
-        return subscriber_1.default.updateOne({ "discordId": discordId }, { $set: { options: { daysPrior, daysInterval, timeOfDay } } }).exec();
+        return Subscriber_1.default.updateOne({ "discordId": discordId }, { $set: { options: { daysPrior, daysInterval, timeOfDay } } }).exec();
     }
     catch (err) {
         console.log("Error in update operation: " + err);
@@ -50,7 +50,7 @@ function updateOptions(discordId, daysPrior, daysInterval, timeOfDay) {
 exports.updateOptions = updateOptions;
 function readAllSubscribed() {
     try {
-        const allDocs = subscriber_1.default.find({ subscribed: true }).exec();
+        const allDocs = Subscriber_1.default.find({ subscribed: true }).exec();
         return allDocs;
     }
     catch (err) {

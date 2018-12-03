@@ -30,4 +30,4 @@ const assignmentSchema = new mongoose_1.Schema({
     }
 });
 exports.default = mongoose_1.model("Assignment", assignmentSchema);
-//# sourceMappingURL=assignment.js.map
+//# sourceMappingURL=Assignment.js.map

@@ -1,7 +1,7 @@
 import { ObjectID } from "mongodb";
 import { Document } from "mongoose";
-import Subscriber from "../models/subscriber";
-import { ISubscriber } from "../models/subscriber";
+import Subscriber from "../models/Subscriber";
+import { ISubscriber } from "../models/Subscriber";
 
 export async function create(id: string, phone?: string, options?: {daysPrior: number, daysInterval: number, timeOfDay: number}): Promise<ISubscriber> {
     try {

@@ -1,14 +1,14 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
     if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
     result["default"] = mod;
     return result;
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const compression_1 = __importDefault(require("compression")); // compresses requests
@@ -24,6 +24,7 @@ const passport_1 = __importDefault(require("passport"));
 const express_validator_1 = __importDefault(require("express-validator"));
 const bluebird_1 = __importDefault(require("bluebird"));
 const secrets_1 = require("./util/secrets");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const bot = __importStar(require("./bot"));
 const MongoStore = connect_mongo_1.default(express_session_1.default);
 // Load environment variables from .env file, where API keys and passwords are configured
@@ -33,6 +34,7 @@ const homeController = __importStar(require("./controllers/home"));
 const userController = __importStar(require("./controllers/user"));
 const apiController = __importStar(require("./controllers/api"));
 const contactController = __importStar(require("./controllers/contact"));
+const assignmentController = __importStar(require("./controllers/assignment"));
 // API keys and Passport configuration
 const passportConfig = __importStar(require("./config/passport"));
 // Create Express server
@@ -63,6 +65,7 @@ app.use(express_session_1.default({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
+app.use(cookie_parser_1.default("keyboard cat"));
 app.use(express_flash_1.default());
 app.use(lusca_1.default.xframe("SAMEORIGIN"));
 app.use(lusca_1.default.xssProtection(true));
@@ -90,6 +93,7 @@ app.use(express_1.default.static(path_1.default.join(__dirname, "public"), { max
  * Primary app routes.
  */
 app.get("/", homeController.index);
+app.post("/", passportConfig.isAuthenticated, assignmentController.postHome);
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);
 app.get("/logout", userController.logout);
@@ -111,13 +115,6 @@ app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userControl
  */
 app.get("/api", apiController.getApi);
 app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
-/**
- * Assignment API routes.
- */
-app.post("/api/assignments", apiController.postAssignments);
-app.get("/api/assignments", apiController.getAssignments);
-app.put("/api/assignments", apiController.putAssignments);
-app.delete("/api/assignments", apiController.deleteAssignments);
 /**
  * OAuth authentication routes. (Sign in)
  */

@@ -1,8 +1,8 @@
 
 import * as subscribers from "./data/subscribers";
 import * as assignments from "./data/assignments";
-import { ISubscriber } from "./models/subscriber";
-import { IAssignment } from "./models/assignment";
+import { ISubscriber } from "./models/Subscriber";
+import { IAssignment } from "./models/Assignment";
 import { sendDiscordMessage } from "./bot";
 import { sendTwilioSms } from "./helpers";
 

@@ -4,7 +4,7 @@ import * as config from "./config/bot";
 import { DISCORD_BOT_TOKEN } from "./util/secrets";
 import * as assignments from "./data/assignments";
 import * as subscribers from "./data/subscribers";
-import { IAssignment } from "./models/assignment";
+import { IAssignment } from "./models/Assignment";
 
 const client = new Discord.Client();
 

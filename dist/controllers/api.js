@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fbgraph_1 = __importDefault(require("fbgraph"));
 /**
@@ -12,18 +12,6 @@ exports.getApi = (req, res) => {
     res.render("api/index", {
         title: "API Examples"
     });
-};
-/**
- * /api/assignments
- * Assignments API
- */
-exports.postAssignments = (req, res) => {
-};
-exports.getAssignments = (req, res) => {
-};
-exports.putAssignments = (req, res) => {
-};
-exports.deleteAssignments = (req, res) => {
 };
 /**
  * GET /api/facebook
