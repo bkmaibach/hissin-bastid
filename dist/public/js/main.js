@@ -1,13 +1,13 @@
 $(document).ready(function () {
     // Place JavaScript code here...
     console.log("Javascript ready");
-    bindAddAssignmentForm();
+    bindAddAssignmentSubmit();
     bindAllDueCheckbox();
 });
-function bindAddAssignmentForm() {
+function bindAddAssignmentSubmit() {
     if ($("#addAssignment")) {
+        console.log("in bindAddAssignmentSubmit");
         $("#addAssignment").on("submit", (event) => {
-            console.log("on submit");
             const dueDateStr = $("input[name=dueDate]").val();
             const dueDate = new Date(dueDateStr);
             const now = new Date();
@@ -31,14 +31,10 @@ function bindAllDueCheckbox() {
                 row.classList.add("pastDue");
             }
         });
+        // The callback only toggles the elements marked in the code directly above
         $("#dueOnly").change(() => {
             console.log("Checkbox change");
             $(".pastDue").toggle();
-            // if ($(this.checked)) {
-            //     $(".pastDue").hide();
-            // } else {
-            //     $(".pastDue").show();
-            // }
         });
     }
 }

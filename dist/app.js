@@ -25,7 +25,7 @@ const express_validator_1 = __importDefault(require("express-validator"));
 const bluebird_1 = __importDefault(require("bluebird"));
 const secrets_1 = require("./util/secrets");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const bot = __importStar(require("./bot"));
+const bot = __importStar(require("./bot/bot"));
 const MongoStore = connect_mongo_1.default(express_session_1.default);
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv_1.default.config({ path: ".env" });

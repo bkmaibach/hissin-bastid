@@ -1,15 +1,14 @@
 
-import * as subscribers from "../src/data/subscribers";
-import * as assignments from "../src/data/assignments";
-import { ISubscriber } from "../src/models/Subscriber";
-import { IAssignment } from "../src/models/Assignment";
+import * as subscribers from "../data/subscribers";
+import * as assignments from "../data/assignments";
+import { ISubscriber } from "../models/Subscriber";
+import { IAssignment } from "../models/Assignment";
 import { sendDiscordMessage } from "./bot";
-import { sendTwilioSms } from "../src/util/helpers";
+import { sendTwilioSms } from "../util/helpers";
 
 
 // Initialization function to be started from server
 export const init = function (): void {
-    // YELLOW! :D
     console.log("Background workers starting...");
 
     // Execute all the checks upon start
