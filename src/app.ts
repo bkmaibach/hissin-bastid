@@ -14,7 +14,7 @@ import expressValidator from "express-validator";
 import bluebird from "bluebird";
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
 import cookieParser from "cookie-parser";
-import * as bot from "./bot";
+import * as bot from "../bot/bot";
 
 const MongoStore = mongo(session);
 

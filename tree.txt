@@ -1,0 +1,45 @@
+/A [error opening dir]
+./src
+- ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)├── app.ts
+├── bot.ts
+├── config
+│   ├── bot.ts
+│   └── passport.ts
+├── controllers
+│   ├── assignment.ts
+│   ├── contact.ts
+│   ├── home.ts
+│   └── user.ts
+├── data
+│   ├── assignments.ts
+│   └── subscribers.ts
+├── db
+│   └── mongoose.ts
+├── models
+│   ├── Assignment.ts
+│   ├── Subscriber.ts
+│   └── User.ts
+├── public
+│   ├── css
+│   │   ├── lib
+│   │   │   ├── bootstrap/
+│   │   └── themes/
+│   ├── fonts/
+│   ├── images
+│   │   └── favicon.png
+│   └── js
+│       ├── lib
+│       │   ├── bootstrap.bundle.min.js
+│       │   └── jquery-3.1.1.min.js
+│       ├── main.ts
+├── server.ts
+├── types
+│   ├── express-flash.d.ts
+│   └── fbgraph.d.ts
+├── util
+│   ├── helpers.ts
+│   ├── logger.ts
+│   └── secrets.ts
+└── workers.ts
+
+40 directories, 179 files

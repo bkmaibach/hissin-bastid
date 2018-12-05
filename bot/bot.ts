@@ -1,10 +1,10 @@
 import Discord, { Message } from "discord.js";
-import * as helpers from "./util/helpers";
-import * as config from "./config/bot";
-import { DISCORD_BOT_TOKEN } from "./util/secrets";
-import * as assignments from "./data/assignments";
-import * as subscribers from "./data/subscribers";
-import { IAssignment } from "./models/Assignment";
+import * as helpers from "../src/util/helpers";
+import * as config from "./config";
+import { DISCORD_BOT_TOKEN } from "../src/util/secrets";
+import * as assignments from "../src/data/assignments";
+import * as subscribers from "../src/data/subscribers";
+import { IAssignment } from "../src/models/Assignment";
 
 const client = new Discord.Client();
 
@@ -18,26 +18,26 @@ client.on("ready", () => {
   });
 
 client.on("message", async message => {
-        const messageUpper = message.content.toUpperCase();
+        const messageLower = message.content.toUpperCase();
 
         // Ignore other bots
         if (message.author.bot) return;
 
 
-        if (messageUpper.indexOf("RIP") > -1) {
+        if (messageLower.indexOf("rip") > -1) {
             message.channel.send("Your sacrifice will be remembered.");
         }
 
-        if (messageUpper.indexOf("DUDE!") > -1) {
+        if (messageLower.indexOf("dude!") > -1) {
             message.channel.send("Sweet!");
         }
-        if (messageUpper.indexOf("SWEET!") > -1) {
+        if (messageLower.indexOf("sweet!") > -1) {
             message.channel.send("Dude!");
         }
-        if (messageUpper.indexOf("I DIDNT STUDY") > -1) {
+        if (messageLower.indexOf("i didnt study") > -1) {
             message.channel.send("May god have mercy on your soul.");
         }
-        if (messageUpper.toUpperCase().indexOf("PROPANE") > -1) {
+        if (messageLower.toUpperCase().indexOf("propane") > -1) {
             message.channel.send(`\`………………_„-,-~\'\'~\'\'\':::\'\':::\':::::\'\'::::\'\'...
             ………._,-\'\':::::::::::::::::::::::::::::...
             ………..,-\'::::::::::::::::::::::::::::::...
