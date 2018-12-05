@@ -4,7 +4,7 @@ import * as assignments from "./data/assignments";
 import { ISubscriber } from "./models/Subscriber";
 import { IAssignment } from "./models/Assignment";
 import { sendDiscordMessage } from "./bot";
-import { sendTwilioSms } from "./helpers";
+import { sendTwilioSms } from "./util/helpers";
 
 
 // Initialization function to be started from server
@@ -14,9 +14,7 @@ export const init = function (): void {
 
     // Execute all the checks upon start
     gatherAllSubscribers();
-
     loop();
-
 };
 
 let interval: number;

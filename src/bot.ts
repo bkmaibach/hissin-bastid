@@ -1,5 +1,5 @@
 import Discord, { Message } from "discord.js";
-import * as helpers from "./helpers";
+import * as helpers from "./util/helpers";
 import * as config from "./config/bot";
 import { DISCORD_BOT_TOKEN } from "./util/secrets";
 import * as assignments from "./data/assignments";
@@ -18,25 +18,26 @@ client.on("ready", () => {
   });
 
 client.on("message", async message => {
+        const messageUpper = message.content.toUpperCase();
 
         // Ignore other bots
         if (message.author.bot) return;
 
 
-        if (message.content.indexOf("rip") > -1) {
+        if (messageUpper.indexOf("RIP") > -1) {
             message.channel.send("Your sacrifice will be remembered.");
         }
 
-        if (message.content.indexOf("Dude!") > -1) {
+        if (messageUpper.indexOf("DUDE!") > -1) {
             message.channel.send("Sweet!");
         }
-        if (message.content.indexOf("Sweet!") > -1) {
+        if (messageUpper.indexOf("SWEET!") > -1) {
             message.channel.send("Dude!");
         }
-        if (message.content.indexOf("I didnt study") > -1) {
+        if (messageUpper.indexOf("I DIDNT STUDY") > -1) {
             message.channel.send("May god have mercy on your soul.");
         }
-        if (message.content.indexOf("propane") > -1) {
+        if (messageUpper.toUpperCase().indexOf("PROPANE") > -1) {
             message.channel.send(`\`………………_„-,-~\'\'~\'\'\':::\'\':::\':::::\'\'::::\'\'...
             ………._,-\'\':::::::::::::::::::::::::::::...
             ………..,-\'::::::::::::::::::::::::::::::...

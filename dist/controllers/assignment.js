@@ -20,7 +20,7 @@ const assignmentHelpers = __importStar(require("../data/assignments"));
  * /api/assignments
  * Assignments API
  */
-exports.postHome = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+exports.postHome = (req, res) => __awaiter(this, void 0, void 0, function* () {
     req.assert("course", "Invalid course").isIn(["ITAS155", "ITAS191", "ITAS167", "ITAS185"]);
     req.assert("assignmentName", "Assignment name invalid").isLength({ min: 1, max: 64 }).trim().withMessage("Name invalid");
     req.sanitize("assignmentName").trim();
@@ -53,8 +53,22 @@ exports.postHome = (req, res, next) => __awaiter(this, void 0, void 0, function*
         }
     }
     catch (err) {
-        return next(err);
+        req.flash("errors", { msg: err });
     }
+});
+/**
+ * GET /assignments
+ * Login page.
+ */
+exports.getAssignments = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    if (!req.user) {
+        return res.redirect("/login");
+    }
+    const assignments = yield assignmentHelpers.readAll();
+    res.render("assignments", {
+        title: "Assignments",
+        assignments
+    });
 });
 exports.readAssignments = (req, res, next) => {
 };

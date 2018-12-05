@@ -28,11 +28,10 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const bot = __importStar(require("./bot"));
 const MongoStore = connect_mongo_1.default(express_session_1.default);
 // Load environment variables from .env file, where API keys and passwords are configured
-dotenv_1.default.config({ path: ".env.example" });
+dotenv_1.default.config({ path: ".env" });
 // Controllers (route handlers)
 const homeController = __importStar(require("./controllers/home"));
 const userController = __importStar(require("./controllers/user"));
-const apiController = __importStar(require("./controllers/api"));
 const contactController = __importStar(require("./controllers/contact"));
 const assignmentController = __importStar(require("./controllers/assignment"));
 // API keys and Passport configuration
@@ -94,6 +93,7 @@ app.use(express_1.default.static(path_1.default.join(__dirname, "public"), { max
  */
 app.get("/", homeController.index);
 app.post("/", passportConfig.isAuthenticated, assignmentController.postHome);
+app.get("/assignments", assignmentController.getAssignments);
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);
 app.get("/logout", userController.logout);
@@ -110,11 +110,6 @@ app.post("/account/profile", passportConfig.isAuthenticated, userController.post
 app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userController.getOauthUnlink);
-/**
- * API examples routes.
- */
-app.get("/api", apiController.getApi);
-app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 /**
  * OAuth authentication routes. (Sign in)
  */

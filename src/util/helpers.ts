@@ -2,9 +2,9 @@ import axios from "axios";
 import * as crypto from "crypto";
 import * as querystring from "querystring";
 import * as https from "https";
-import { TWILIO_FROM_PHONE } from "./util/secrets";
-import { TWILIO_ACCOUNT_SID } from "./util/secrets";
-import { TWILIO_AUTH_TOKEN } from "./util/secrets";
+import { TWILIO_FROM_PHONE } from "./secrets";
+import { TWILIO_ACCOUNT_SID } from "./secrets";
+import { TWILIO_AUTH_TOKEN } from "./secrets";
 
 export const getJoke = async () => {
     const config = {

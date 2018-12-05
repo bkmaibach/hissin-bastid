@@ -2,7 +2,7 @@ extends ../layout
 
 block content
   .page-header
-    h3 Profile Information
+    h3 Profile Information (UNDER CONSTRUCTION)
 
   form.form-horizontal(action='/account/profile', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
@@ -83,5 +83,5 @@ block content
         if user.facebook
           p: a.text-danger(href='/account/unlink/facebook') Unlink your Facebook account
         else
-          p: a(href='/auth/facebook') Link your Facebook account
+          p: a(href='/auth/facebook') Link your Discord account
 

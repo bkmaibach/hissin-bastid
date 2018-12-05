@@ -1,0 +1,31 @@
+extends layout
+
+block content
+    h1 Assignments
+    .row
+        .col-sm-6
+            p.lead All assignments are listed below
+        .col-sm-6
+            .form-check.form-check-inline
+                input.form-check-input(type="checkbox", id="dueOnly")
+                label.form-check-label(for="dueOnly") Show only due assignments
+        hr
+        table.table
+            thead
+                tr
+                    th(scope="col") Name
+                    th(scope="col") Course
+                    th(scope="col") Due
+                    th(scope="col") Page
+                    th(scope="col") Note
+            tbody
+                for assignment in assignments
+                    tr.assignmentRow
+                        th(scope="row")= assignment.name
+                        td.course= assignment.course
+                        td.dueDate= assignment.dueDate.toLocaleString()
+                        td.url
+                            a(href=assignment.url) Link
+                        td.note= assignment.note
+
+

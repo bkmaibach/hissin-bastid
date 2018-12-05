@@ -8,7 +8,7 @@ import * as assignmentHelpers from "../data/assignments";
  * /api/assignments
  * Assignments API
  */
-export let postHome = async (req: Request, res: Response, next: NextFunction) => {
+export let postHome = async (req: Request, res: Response) => {
     req.assert("course", "Invalid course").isIn(["ITAS155", "ITAS191", "ITAS167", "ITAS185"]);
 
     req.assert("assignmentName", "Assignment name invalid").isLength({ min: 1, max: 64 }).trim().withMessage("Name invalid");
@@ -48,8 +48,23 @@ export let postHome = async (req: Request, res: Response, next: NextFunction) =>
           return res.redirect("/");
         }
     } catch (err) {
-        return next(err);
+        req.flash("errors", {msg: err});
     }
+};
+
+/**
+ * GET /assignments
+ * Login page.
+ */
+export let getAssignments = async (req: Request, res: Response) => {
+    if (!req.user) {
+      return res.redirect("/login");
+    }
+    const assignments = await assignmentHelpers.readAll();
+    res.render("assignments", {
+      title: "Assignments",
+      assignments
+    });
   };
 
 export let readAssignments = (req: Request, res: Response, next: NextFunction) => {
