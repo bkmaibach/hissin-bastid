@@ -20,7 +20,7 @@ This project uses NodeJS, Typescript, Bootstrap 4, Bootswatch themes, JQuery, Pu
 
 - ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)  -  Written entirely or almost entirely by me
 
-./src
+#### ./src
 
 ├── app.ts ![#c5f015](https://placehold.it/15/c5f015/000000?text=+) - Primary code for the Express server; registers middleware and defines server routes
 
@@ -103,7 +103,7 @@ This project uses NodeJS, Typescript, Bootstrap 4, Bootswatch themes, JQuery, Pu
 |   └── secrets.ts ![#c5f015](https://placehold.it/15/c5f015/000000?text=+) - Sets environment variables using .env file and makes sure these secret keys are present
 
 
-./views
+#### ./views
 
 ├── account/ ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) - (folder) All views for actions relating to user accounts (logging in etc)
 
