@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const async_1 = __importDefault(require("async"));
-const crypto_1 = __importDefault(require("crypto"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const passport_1 = __importDefault(require("passport"));
 const User_1 = __importDefault(require("../models/User"));
@@ -31,7 +30,7 @@ exports.postLogin = (req, res, next) => {
     req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
     const errors = req.validationErrors();
     if (errors) {
-        req.flash("errors", errors);
+        req.flash("errors", { msg: errors });
         return res.redirect("/login");
     }
     passport_1.default.authenticate("local", (err, user, info) => {
@@ -39,7 +38,7 @@ exports.postLogin = (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            req.flash("errors", info.message);
+            req.flash("errors", { msg: info.message });
             return res.redirect("/login");
         }
         req.logIn(user, (err) => {
@@ -77,7 +76,7 @@ exports.getSignup = (req, res) => {
  */
 exports.postSignup = (req, res, next) => {
     req.assert("email", "Email is not valid").isEmail();
-    req.assert("password", "Password must be at least 4 characters long").len({ min: 4 });
+    req.assert("password", "Password must be at least 8 characters long").len({ min: 8 });
     req.assert("confirmPassword", "Passwords do not match").equals(req.body.password);
     req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
     const errors = req.validationErrors();
@@ -128,7 +127,7 @@ exports.postUpdateProfile = (req, res, next) => {
     req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
     const errors = req.validationErrors();
     if (errors) {
-        req.flash("errors", errors);
+        req.flash("errors", { msg: errors });
         return res.redirect("/account");
     }
     User_1.default.findById(req.user.id, (err, user) => {
@@ -162,7 +161,7 @@ exports.postUpdatePassword = (req, res, next) => {
     req.assert("confirmPassword", "Passwords do not match").equals(req.body.password);
     const errors = req.validationErrors();
     if (errors) {
-        req.flash("errors", errors);
+        req.flash("errors", { msg: errors });
         return res.redirect("/account");
     }
     User_1.default.findById(req.user.id, (err, user) => {
@@ -247,7 +246,7 @@ exports.postReset = (req, res, next) => {
     req.assert("confirm", "Passwords must match.").equals(req.body.password);
     const errors = req.validationErrors();
     if (errors) {
-        req.flash("errors", errors);
+        req.flash("errors", { msg: errors });
         return res.redirect("back");
     }
     async_1.default.waterfall([
@@ -319,63 +318,59 @@ exports.getForgot = (req, res) => {
  * Create a random token, then the send user an email with a reset link.
  */
 exports.postForgot = (req, res, next) => {
-    req.assert("email", "Please enter a valid email address.").isEmail();
-    req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
-    const errors = req.validationErrors();
-    if (errors) {
-        req.flash("errors", errors);
-        return res.redirect("/forgot");
-    }
-    async_1.default.waterfall([
-        function createRandomToken(done) {
-            crypto_1.default.randomBytes(16, (err, buf) => {
-                const token = buf.toString("hex");
-                done(err, token);
-            });
-        },
-        function setRandomToken(token, done) {
-            User_1.default.findOne({ email: req.body.email }, (err, user) => {
-                if (err) {
-                    return done(err);
-                }
-                if (!user) {
-                    req.flash("errors", { msg: "Account with that email address does not exist." });
-                    return res.redirect("/forgot");
-                }
-                user.passwordResetToken = token;
-                user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-                user.save((err) => {
-                    done(err, token, user);
-                });
-            });
-        },
-        function sendForgotPasswordEmail(token, user, done) {
-            const transporter = nodemailer_1.default.createTransport({
-                service: "SendGrid",
-                auth: {
-                    user: process.env.SENDGRID_USER,
-                    pass: process.env.SENDGRID_PASSWORD
-                }
-            });
-            const mailOptions = {
-                to: user.email,
-                from: "hackathon@starter.com",
-                subject: "Reset your password on Hackathon Starter",
-                text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
-          Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset/${token}\n\n
-          If you did not request this, please ignore this email and your password will remain unchanged.\n`
-            };
-            transporter.sendMail(mailOptions, (err) => {
-                req.flash("info", { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
-                done(err);
-            });
-        }
-    ], (err) => {
-        if (err) {
-            return next(err);
-        }
-        res.redirect("/forgot");
-    });
+    // req.assert("email", "Please enter a valid email address.").isEmail();
+    // req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
+    // const errors = req.validationErrors();
+    // if (errors) {
+    //   req.flash("errors", errors);
+    //   return res.redirect("/forgot");
+    // }
+    // async.waterfall([
+    //   function createRandomToken(done: Function) {
+    //     crypto.randomBytes(16, (err, buf) => {
+    //       const token = buf.toString("hex");
+    //       done(err, token);
+    //     });
+    //   },
+    //   function setRandomToken(token: AuthToken, done: Function) {
+    //     User.findOne({ email: req.body.email }, (err, user: any) => {
+    //       if (err) { return done(err); }
+    //       if (!user) {
+    //         req.flash("errors", { msg: "Account with that email address does not exist." });
+    //         return res.redirect("/forgot");
+    //       }
+    //       user.passwordResetToken = token;
+    //       user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+    //       user.save((err: WriteError) => {
+    //         done(err, token, user);
+    //       });
+    //     });
+    //   },
+    //   function sendForgotPasswordEmail(token: AuthToken, user: UserModel, done: Function) {
+    //     const transporter = nodemailer.createTransport({
+    //       service: "Mailgun",
+    //       auth: {
+    //         api_key: secrets.MAILGUN_DOMAIN,
+    //         domain: secrets.MAILGUN_API_KEY
+    //       }
+    //     });
+    //     const mailOptions = {
+    //       to: user.email,
+    //       from: "admin@hatis.life",
+    //       subject: "Reset your password on ProfessorBot",
+    //       text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+    //         Please click on the following link, or paste this into your browser to complete the process:\n\n
+    //         http://${req.headers.host}/reset/${token}\n\n
+    //         If you did not request this, please ignore this email and your password will remain unchanged.\n`
+    //     };
+    //     transporter.sendMail(mailOptions, (err) => {
+    //       req.flash("info", { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+    //       done(err);
+    //     });
+    //   }
+    // ], (err) => {
+    //   if (err) { return next(err); }
+    //   res.redirect("/forgot");
+    // });
 };
 //# sourceMappingURL=user.js.map

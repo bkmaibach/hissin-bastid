@@ -1,6 +1,36 @@
 extends layout
 
 block content
+    .overlay
+        .col-md-12
+            form#editAssignment(method="PUT")
+            input(type='hidden', name='_csrf', value=_csrf)
+            .form-group
+            label(for="course") Course:
+            select.form-control(id="course", name="course", autofocus, required)
+                option ITAS155
+                option ITAS191
+                option ITAS167
+                option ITAS185
+            .form-group
+            label(for="assignmentName") Assignment name:
+            input.form-control(type="text", id="assignmentName", name="assignmentName", placeholder="In Class Lab 4", required)
+            .form-group
+            label(for="dueDate") Due date:
+            input.form-control(type="date", id="dueDate", name="dueDate", required)
+            .form-group
+            label(for="dueTime") by what time:
+            input.form-control(type="time", id="dueTime", name="dueTime", required)
+            .form-group
+            label(for="url") Assignment URL:
+            input.form-control(type="url", id="url", name="url", required)
+            .form-group
+            label(for="note") Special note (optional):
+            textarea.form-control(type="textarea", rows="3", id="note", name="note")
+            hr
+            .accept-cancel
+                button.btn.btn-success.accept-edit-btn Accept
+                button.btn.btn-danger.cancel-btn Cancel
     h1 Assignments
     .row
         .col-sm-6
@@ -18,14 +48,21 @@ block content
                     th(scope="col") Due
                     th(scope="col") Page
                     th(scope="col") Note
+                    th(scope="col") Edit/Delete
             tbody
                 for assignment in assignments
                     tr.assignmentRow
-                        th(scope="row")= assignment.name
+                        th.name(scope="row")= assignment.name
                         td.course= assignment.course
                         td.dueDate= assignment.dueDate.toLocaleString()
                         td.url
-                            a(href=assignment.url) Link
+                            a.assignment-url-anchor(href=assignment.url) Link
                         td.note= assignment.note
+                        td
+                            button.btn.btn-info.edit-btn
+                                i.fa.fa-edit
+                            button.btn.btn-danger.delete-btn
+                                i.fa.fa-trash
+
 
 

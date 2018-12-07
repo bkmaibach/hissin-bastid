@@ -19,6 +19,9 @@ export const  DISCORD_BOT_TOKEN = process.env["DISCORD_BOT_TOKEN"];
 export const TWILIO_FROM_PHONE = process.env["TWILIO_FROM_PHONE"];
 export const TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];
 export const TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
+export const MAILGUN_API_KEY = process.env["MAILGUN_API_KEY"];
+export const MAILGUN_DOMAIN = process.env["MAILGUN_DOMAIN"];
+
 
 if (!SESSION_SECRET) {
     logger.error("No client secret. Set SESSION_SECRET environment variable.");
@@ -47,5 +50,15 @@ if (!TWILIO_ACCOUNT_SID) {
 
 if (!TWILIO_AUTH_TOKEN) {
     logger.error("No Discord bot token string. Set TWILIO_AUTH_TOKEN environment variable.");
+    process.exit(1);
+}
+
+if (!MAILGUN_API_KEY) {
+    logger.error("No Mailgun API Key string. Set MAILGUN_API_KEY environment variable.");
+    process.exit(1);
+}
+
+if (!MAILGUN_DOMAIN) {
+    logger.error("No Mailgun domain string. Set MAILGUN_DOMAIN environment variable.");
     process.exit(1);
 }

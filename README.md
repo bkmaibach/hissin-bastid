@@ -3,15 +3,15 @@
 A web service that operates both a web page and Discord bot for alerting ITAS students to assignment deadlines/test dates. This project is currently [deployed](http://professorbot-prod.7r6myjvvzx.us-east-2.elasticbeanstalk.com ) on AWS Elastic Beanstalk.
 
 ## Usage
-There are two primary means of interacting with this software. The first is by sending messages that can be read by a Discord bot that appears as a user within a Discord chat room and is operated within this program. The bot is currently live on my personal Discord server but is intended to eventually run in the 2020 ITAS room. A user may decide to subscribe to assignment reminders via the ~subscribe command, which by default will have the bot message the user three, two, and one day before an assignment due date at noon. This behaviour may be customized by the user to send reminders earlier or later, at different intervals, and/or at a different time of the day.
+There are two primary means of interacting with this software. The first is by sending messages that can be read by a Discord bot that appears as a user within a Discord chat room and is operated within this program. The bot is currently live on my personal Discord server but is intended to eventually run in the 2020 ITAS room. A user may decide to subscribe to assignment reminders via the ~subscribe command, which by default will have the bot message the user three, two, and then one day before an assignment due date at noon. This behaviour may be customized by the user to send reminders earlier or later, at different intervals, and/or at a different time of the day.
 
 The second means of interacting with this software is of course through the web server that runs in the same process. This web site allows users to add and view assignment data once they are signed up. This provides a more friendly means of adding assignments to the system eliminating the need to access the database through the provider. In the future a web scraper may be developed within this codebase to add assignment data automatically.
 
 ## Technologies Implemented
-This project uses NodeJS, Typescript, Bootstrap 4, Bootswatch themes, JQuery, Pug, MongoDB/Mongoose, Express server + middleware and other various node modules. A fork of [Microsoft's TypeScript-Node-Starter Github repository](https://github.com/Microsoft/TypeScript-Node-Starter) was used as a starting point an a free-tier cloud database was provided by [MLab](https://mlab.com/) for production.
+This project uses NodeJS, Typescript, Bootstrap 4, Bootswatch themes, JQuery, Pug, MongoDB/Mongoose, Express server + middleware and other various node modules. A fork of [Microsoft's TypeScript-Node-Starter Github repository](https://github.com/Microsoft/TypeScript-Node-Starter) was used as a starting point an a free-tier cloud database was provided by [MLab](https://mlab.com/) for production. [Pug templating](https://pugjs.org/api/getting-started.html) is used to generate the HTML that appears in the user's browser. [Bootstrap](https://getbootstrap.com/) and [Bootswatch](https://bootswatch.com/) were updated to their latest versions and provide a and modern look and feel as well as responsive design. Pug views were updated to support the updated Bootstrap syntax where necessary. The project must be built (*press ctrl+shift+b in VSCode*) prior to running, during which Typescript is transpiled into ES6 Javascript and Sass files are used to generate CSS all of which ends up in the dist folder. Once built the process is started using the command *npm start*.
 
 ## Project Structure
- This is a full stack project including both front end and back end code and uses a Model View Controller (MVC) architecture. All of the production project-specific code exists in the src and view directories, and the contents of these directories are colour coded below to indicate what work was done by myself. The project must be built (*press ctrl+shift+b in VSCode*) prior to running, during which Typescript is transpiled into ES6 Javascript and Sass files are used to generate CSS all of which ends up in the dist folder. [Pug templating](https://pugjs.org/api/getting-started.html) is used to generate the HTML that appears in the user's browser. [Bootstrap 4](https://getbootstrap.com/) and [Bootswatch](https://bootswatch.com/) were updated to their latest versions and provide a and modern look and feel as well as responsive design. Pug views were updated to support the updated Bootstrap syntax where necessary. Once built the process is started using the command *npm start*.
+ This is a full stack project including both front end and back end code and uses a Model View Controller (MVC) architecture. All of the production project-specific code exists in the src and view directories, and the contents of these directories are colour coded below to indicate what work was done by myself.
 
 ### LEGEND:
 - ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)  -  Not written by me
@@ -44,7 +44,7 @@ This project uses NodeJS, Typescript, Bootstrap 4, Bootswatch themes, JQuery, Pu
 
 │   ├── home.ts ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) - Controller for home screen (minus the adding assignment functionality)
 
-│   └── user.ts ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) - Controller for accepting logins and other user related actions
+│   └── user.ts ![#c5f015](https://placehold.it/15/c5f015/000000?text=+) - Controller for accepting logins and other user related actions - modified only the mailer used
 
 ├── data
 
