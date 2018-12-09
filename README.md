@@ -88,7 +88,7 @@ This project uses NodeJS, Typescript, Bootstrap 4, Bootswatch themes, JQuery, Pu
 
 │       │   └── jquery-3.1.1.min.js ![#f03c15](https://placehold.it/15/f03c15/000000?text=+)  - Hosted JQuery bundle resource; opted to host this file rather than use CDN
 
-│       ├── main.ts ![#1589F0](https://placehold.it/15/1589F0/000000?text=+) - Front-end javascript; currently verifies that entered dates are future dates and can manipulate the past due assignments in table
+│       ├── main.ts ![#1589F0](https://placehold.it/15/1589F0/000000?text=+) - Front-end javascript; currently verifies that entered dates are future dates and, allows separating out past due assignments, and enables editing/deleteing.
 
 ├── server.ts ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) - Server initialization file
 
