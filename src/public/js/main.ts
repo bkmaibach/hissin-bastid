@@ -66,12 +66,14 @@ function bindAllEditButtons(): void {
             const dueDateTime = new Date(dueDateTimeStr);
             const dueYear = dueDateTime.getFullYear();
             const dueMonth = (dueDateTime.getMonth() + 1) > 9 ? (dueDateTime.getMonth() + 1).toString() : "0" + (dueDateTime.getMonth() + 1).toString();
-            console.log("dueMonth: " + dueMonth);
             const dueDay = dueDateTime.getDate() > 9 ? dueDateTime.getDate().toString() : "0" + dueDateTime.getDate().toString();
-            console.log("dueDay: " + dueDay);
 
             const dueHours = dueDateTime.getHours() > 9 ? dueDateTime.getHours() : "0" + dueDateTime.getHours().toString();
+            // console.log("dueDateTime.getHours() = " + dueDateTime.getHours());
+            // console.log("dueHours = " + dueHours);
             const dueMinutes = dueDateTime.getMinutes() > 9 ? dueDateTime.getMinutes() : "0" + dueDateTime.getMinutes().toString();
+            // console.log("dueDateTime.getMinutes() = " + dueDateTime.getMinutes());
+            // console.log("dueMinutes = " + dueMinutes);
 
             const dueDate =  dueYear + "-" + dueMonth + "-" + dueDay;
             const dueTime = dueHours + ":" + dueMinutes;

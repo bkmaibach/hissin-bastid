@@ -8663,7 +8663,7 @@ footer {
   right: 50%; }
 
 .btn, .navbar-brand {
-  margin: 10px; }
+  margin: 0px 10px; }
 
 textarea {
   resize: vertical; }
