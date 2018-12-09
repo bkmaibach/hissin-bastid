@@ -7,6 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -15,6 +18,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Assignment_1 = __importDefault(require("../models/Assignment"));
 const assignmentHelpers = __importStar(require("../data/assignments"));
 /**
  * /api/assignments
@@ -45,7 +49,7 @@ exports.postHome = (req, res) => __awaiter(this, void 0, void 0, function* () {
         const result = yield assignmentHelpers.create(course, assignmentName, dueDate, url, note);
         if (result) {
             req.flash("success", { msg: "Assignment created successfully" });
-            res.redirect(req.session.returnTo || "/");
+            res.redirect("/");
         }
         else {
             req.flash("errors", { msg: "Assignment creation failed" });
@@ -70,10 +74,31 @@ exports.getAssignments = (req, res) => __awaiter(this, void 0, void 0, function*
         assignments
     });
 });
-exports.readAssignments = (req, res, next) => {
+exports.putAssignment = (req, res, next) => {
+    console.log("in putAssignment");
+    console.log(req.query.name);
+    const name = req.query.name;
+    const course = req.body.course;
+    const assignmentName = req.body.assignmentName;
+    const dueDate = new Date(Date.parse(req.body.dueDate + " " + req.body.dueTime + " PST"));
+    const url = req.body.url;
+    const note = req.body.note;
+    console.log(name);
+    Assignment_1.default.findOneAndUpdate({ name }, { $set: { name, course, assignmentName, dueDate, url, note } }, (err, doc) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(400);
+        }
+        else {
+            console.log("successfully updated assignment");
+            res.sendStatus(200);
+        }
+    });
 };
-exports.updateAssignments = (req, res, next) => {
-};
-exports.deleteAssignments = (req, res, next) => {
+exports.deleteAssignment = (req, res, next) => {
+    console.log("in deleteAssignment");
+    Assignment_1.default.findOneAndRemove({ name: req.query.name }, (result) => {
+        res.sendStatus(200);
+    });
 };
 //# sourceMappingURL=assignment.js.map

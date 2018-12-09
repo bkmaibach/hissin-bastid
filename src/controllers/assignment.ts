@@ -42,7 +42,7 @@ export let postHome = async (req: Request, res: Response) => {
         const result = await assignmentHelpers.create(course, assignmentName, dueDate, url, note);
         if (result) {
           req.flash("success", {msg: "Assignment created successfully"});
-          res.redirect(req.session.returnTo || "/");
+          res.redirect("/");
         } else {
           req.flash("errors", {msg: "Assignment creation failed"});
           return res.redirect("/");
@@ -57,24 +57,42 @@ export let postHome = async (req: Request, res: Response) => {
  * Login page.
  */
 export let getAssignments = async (req: Request, res: Response) => {
-    if (!req.user) {
-      return res.redirect("/login");
+  if (!req.user) {
+    return res.redirect("/login");
+  }
+  const assignments = await assignmentHelpers.readAll();
+  res.render("assignments", {
+    title: "Assignments",
+    assignments
+  });
+};
+
+export let putAssignment = (req: Request, res: Response, next: NextFunction) => {
+  console.log("in putAssignment");
+  console.log(req.query.name);
+
+  const name = req.query.name;
+  const course = req.body.course;
+  const assignmentName = req.body.assignmentName;
+  const dueDate = new Date(Date.parse(req.body.dueDate + " " + req.body.dueTime + " PST"));
+  const url = req.body.url;
+  const note = req.body.note;
+  console.log(name);
+
+  Assignment.findOneAndUpdate({name}, {$set: {name, course, assignmentName, dueDate, url, note}}, (err, doc) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      console.log("successfully updated assignment");
+      res.sendStatus(200);
     }
-    const assignments = await assignmentHelpers.readAll();
-    res.render("assignments", {
-      title: "Assignments",
-      assignments
-    });
-  };
-
-export let readAssignments = (req: Request, res: Response, next: NextFunction) => {
-
+  });
 };
 
-export let updateAssignments = (req: Request, res: Response, next: NextFunction) => {
-
-};
-
-export let deleteAssignments = (req: Request, res: Response, next: NextFunction) => {
-
+export let deleteAssignment = (req: Request, res: Response, next: NextFunction) => {
+  console.log("in deleteAssignment");
+  Assignment.findOneAndRemove({name: req.query.name}, (result) => {
+    res.sendStatus(200);
+  });
 };

@@ -94,9 +94,11 @@ app.use(
  * Primary app routes.
  */
 app.get("/", homeController.index);
-app.post("/", passportConfig.isAuthenticated, assignmentController.postHome);
 
+app.post("/", passportConfig.isAuthenticated, assignmentController.postHome);
 app.get("/assignments", assignmentController.getAssignments);
+app.delete("/assignments", assignmentController.deleteAssignment);
+app.put("/assignments", assignmentController.putAssignment);
 
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);

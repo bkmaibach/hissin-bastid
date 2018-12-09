@@ -2,35 +2,47 @@ extends layout
 
 block content
     .overlay
-        .col-md-12
-            form#editAssignment(method="PUT")
-            input(type='hidden', name='_csrf', value=_csrf)
-            .form-group
-            label(for="course") Course:
-            select.form-control(id="course", name="course", autofocus, required)
-                option ITAS155
-                option ITAS191
-                option ITAS167
-                option ITAS185
-            .form-group
-            label(for="assignmentName") Assignment name:
-            input.form-control(type="text", id="assignmentName", name="assignmentName", placeholder="In Class Lab 4", required)
-            .form-group
-            label(for="dueDate") Due date:
-            input.form-control(type="date", id="dueDate", name="dueDate", required)
-            .form-group
-            label(for="dueTime") by what time:
-            input.form-control(type="time", id="dueTime", name="dueTime", required)
-            .form-group
-            label(for="url") Assignment URL:
-            input.form-control(type="url", id="url", name="url", required)
-            .form-group
-            label(for="note") Special note (optional):
-            textarea.form-control(type="textarea", rows="3", id="note", name="note")
+        .col-md-12(id="editAssignmentContainer")
+            h2#assignmentToEdit
             hr
-            .accept-cancel
-                button.btn.btn-success.accept-edit-btn Accept
-                button.btn.btn-danger.cancel-btn Cancel
+            form#editAssignment(method="PUT")
+                input(type='hidden', name='_csrf', value=_csrf)
+                .form-group
+                label(for="assignmentName") Assignment name:
+                input.form-control(type="text", id="assignmentName", name="assignmentName", placeholder="In Class Lab 4", required)
+                .form-group
+                label(for="course") Course:
+                select.form-control(id="course", name="course", autofocus, required)
+                    option ITAS155
+                    option ITAS191
+                    option ITAS167
+                    option ITAS185
+                .form-group
+                label(for="dueDate") Due date:
+                input.form-control(type="date", id="dueDate", name="dueDate", required)
+                .form-group
+                label(for="dueTime") by what time:
+                input.form-control(type="time", id="dueTime", name="dueTime", required)
+                .form-group
+                label(for="url") Assignment URL:
+                input.form-control(type="url", id="url", name="url", required)
+                .form-group
+                label(for="note") Special note (optional):
+                textarea.form-control(type="textarea", rows="3", id="note", name="note")
+                hr
+                .accept-cancel-edit
+                    button.btn.btn-success.accept-edit-btn(type="submit") Accept
+                    button.btn.btn-danger.cancel-edit-btn(type="button") Cancel
+        .col-md-12(id="deleteAssignmentContainer")
+            .confirmationMessage 
+                h2 Are you sure you want to delete 
+                    #assignmentToDelete
+            hr
+            .accept-cancel-delete
+                button.btn.btn-success.accept-delete-btn Accept
+                button.btn.btn-danger.cancel-delete-btn Cancel
+
+
     h1 Assignments
     .row
         .col-sm-6

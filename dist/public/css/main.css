@@ -8634,7 +8634,8 @@ footer {
   background-color: black;
   background-color: rgba(0, 0, 0, 0.9);
   overflow-x: hidden;
-  transition: 0.5s; }
+  transition: 0.5s;
+  color: #ccc; }
 
 .overlay-content {
   position: relative;
@@ -8647,32 +8648,21 @@ footer {
   padding: 8px;
   text-decoration: none;
   font-size: 36px;
-  color: #818181;
+  color: #f5f5f5;
   display: block;
   transition: 0.3s; }
+
+.overlay h2 {
+  margin: 16px; }
 
 .overlay a:hover, .overlay a:focus {
   color: #f1f1f1; }
 
-.overlay .closebtn {
-  position: absolute;
-  top: 20px;
-  right: 45px;
-  font-size: 60px; }
-
-@media screen and (max-height: 450px) {
-  .overlay a {
-    font-size: 20px; }
-  .overlay .closebtn {
-    font-size: 40px;
-    top: 15px;
-    right: 35px; } }
-
-.accept-cancel {
+.accept-cancel-edit, .accept-cancel-delete {
   position: absolute;
   right: 50%; }
 
-.btn {
+.btn, .navbar-brand {
   margin: 10px; }
 
 textarea {

@@ -94,6 +94,8 @@ app.use(express_1.default.static(path_1.default.join(__dirname, "public"), { max
 app.get("/", homeController.index);
 app.post("/", passportConfig.isAuthenticated, assignmentController.postHome);
 app.get("/assignments", assignmentController.getAssignments);
+app.delete("/assignments", assignmentController.deleteAssignment);
+app.put("/assignments", assignmentController.putAssignment);
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);
 app.get("/logout", userController.logout);
