@@ -58,26 +58,24 @@ function bindAllEditButtons(): void {
             const assignmentName = $(this).closest(".assignmentRow")[0].querySelector(".name").innerHTML;
             const course = $(this).closest(".assignmentRow")[0].querySelector(".course").innerHTML;
             const dueDateTimeStr = $(this).closest(".assignmentRow")[0].querySelector(".dueDate").innerHTML;
+            console.log("dueDateTimeStr: " + dueDateTimeStr);
+
             const url = $(this).closest(".assignmentRow")[0].querySelector(".assignment-url-anchor").getAttribute("href");
             const note = $(this).closest(".assignmentRow")[0].querySelector(".note").innerHTML;
 
             const dueDateTime = new Date(dueDateTimeStr);
             const dueYear = dueDateTime.getFullYear();
-            const dueMonth = dueDateTime.getMonth() > 9 ? dueDateTime.getMonth() : "0" + dueDateTime.getMonth();
-            const dueDay = dueDateTime.getDay() > 9 ? dueDateTime.getDay() : "0" + dueDateTime.getDay();
+            const dueMonth = (dueDateTime.getMonth() + 1) > 9 ? (dueDateTime.getMonth() + 1).toString() : "0" + (dueDateTime.getMonth() + 1).toString();
+            console.log("dueMonth: " + dueMonth);
+            const dueDay = dueDateTime.getDate() > 9 ? dueDateTime.getDate().toString() : "0" + dueDateTime.getDate().toString();
+            console.log("dueDay: " + dueDay);
 
-            const dueHours = dueDateTime.getHours() > 9 ? dueDateTime.getHours() : "0" + dueDateTime.getHours();
-            const dueMinutes = dueDateTime.getMinutes() > 9 ? dueDateTime.getMinutes() : "0" + dueDateTime.getMinutes();
+            const dueHours = dueDateTime.getHours() > 9 ? dueDateTime.getHours() : "0" + dueDateTime.getHours().toString();
+            const dueMinutes = dueDateTime.getMinutes() > 9 ? dueDateTime.getMinutes() : "0" + dueDateTime.getMinutes().toString();
 
             const dueDate =  dueYear + "-" + dueMonth + "-" + dueDay;
             const dueTime = dueHours + ":" + dueMinutes;
 
-            console.log(assignmentName);
-            console.log(course);
-            console.log(dueDate);
-            console.log(dueTime);
-            console.log(url);
-            console.log(note);
             $("#assignmentToEdit").html(assignmentName);
             $("#assignmentName").val(assignmentName);
             $("#course").val(course);
@@ -111,6 +109,7 @@ function bindSubmitEditEvent(): void {
             event.preventDefault();
             const toEdit = $("#assignmentToEdit").html();
             console.log("Editing " + toEdit);
+            console.log($(this).serialize());
             $.ajax({
                 url: `/assignments?name=${toEdit}`,
                 type: "PUT",

@@ -77,14 +77,16 @@ exports.getAssignments = (req, res) => __awaiter(this, void 0, void 0, function*
 exports.putAssignment = (req, res, next) => {
     console.log("in putAssignment");
     console.log(req.query.name);
-    const name = req.query.name;
+    const oldName = req.query.name;
+    const newName = req.body.assignmentName;
     const course = req.body.course;
     const assignmentName = req.body.assignmentName;
     const dueDate = new Date(Date.parse(req.body.dueDate + " " + req.body.dueTime + " PST"));
     const url = req.body.url;
     const note = req.body.note;
-    console.log(name);
-    Assignment_1.default.findOneAndUpdate({ name }, { $set: { name, course, assignmentName, dueDate, url, note } }, (err, doc) => {
+    console.log("Old name: " + oldName);
+    console.log("New name: " + newName);
+    Assignment_1.default.findOneAndUpdate({ name: oldName }, { $set: { name: newName, course, assignmentName, dueDate, url, note } }, (err, doc) => {
         if (err) {
             console.log(err);
             res.sendStatus(400);
