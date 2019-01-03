@@ -53,7 +53,7 @@ export const sendTwilioSms = async (phone: string, message: string) => {
                 let buffer = "";
                 res.on("data", (data) => {
                     buffer += data;
-                    console.log(buffer);
+                    // console.log(buffer);
                 });
 
                 // Return success if the request went through

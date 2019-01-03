@@ -1,4 +1,5 @@
 import errorHandler from "errorhandler";
+import { init } from "./bot/workers";
 import app from "./app";
 
 /**
@@ -17,5 +18,10 @@ const server = app.listen(app.get("port"), () => {
   );
   console.log("  Press CTRL-C to stop\n");
 });
+
+/**
+ * Start Bot Worker.
+ */
+init();
 
 export default server;

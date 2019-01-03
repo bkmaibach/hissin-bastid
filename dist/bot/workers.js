@@ -21,22 +21,25 @@ const bot_1 = require("./bot");
 const helpers_1 = require("../util/helpers");
 // Initialization function to be started from server
 exports.init = function () {
-    console.log("Background workers starting...");
-    // Execute all the checks upon start
-    gatherAllSubscribers();
-    loop();
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("Background workers starting...");
+        let interval;
+        if (process.env.NODE_ENV == "production") {
+            interval = 15 * 60 * 1000;
+        }
+        else {
+            interval = 3 * 1000;
+            yield assignments.setTestState();
+            yield subscribers.setTestState();
+        }
+        // Execute all the checks upon start
+        loop(interval);
+    });
 };
-let interval;
-if (process.env.NODE_ENV == "production") {
-    interval = 15 * 60;
-}
-else {
-    interval = 3;
-}
-const loop = () => {
+const loop = (interval) => {
     setInterval(() => {
         gatherAllSubscribers();
-    }, 1000 * interval);
+    }, interval);
 };
 const gatherAllSubscribers = function () {
     return __awaiter(this, void 0, void 0, function* () {
@@ -73,7 +76,8 @@ const processReminder = function (sub) {
                 let message = "The following due/exam dates are fast approaching:";
                 dueSoon.forEach((assignmentWrapper) => {
                     const assignment = assignmentWrapper.toObject();
-                    message = message + "\n" + assignment.course + " - " + assignment.name + ": due " + assignment.dueDate.toDateString();
+                    message = message + "\n" + assignment.course + " - " + assignment.name + ": due " + assignment.dueDate.toDateString()
+                        + "\n" + assignment.url;
                 });
                 bot_1.sendDiscordMessage(sub.discordId, message);
                 if (sub.phone)

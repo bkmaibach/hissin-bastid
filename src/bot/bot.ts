@@ -2,6 +2,7 @@ import Discord, { Message } from "discord.js";
 import * as helpers from "../util/helpers";
 import * as config from "./config";
 import { DISCORD_BOT_TOKEN } from "../util/secrets";
+import { DISCORD_BOT_TOKEN_DEV } from "../util/secrets";
 import * as assignments from "../data/assignments";
 import * as subscribers from "../data/subscribers";
 import { IAssignment } from "../models/Assignment";
@@ -14,7 +15,7 @@ client.on("ready", () => {
     // Example of changing the bot's playing game to something useful. `client.user` is what the
     // docs refer to as the "ClientUser".
     // client.user.setActivity(`Serving ${client.guilds.size} servers`);
-    client.user.setActivity("Try ~help");
+    client.user.setActivity("Try " + config.prefix + "help");
   });
 
 client.on("message", async message => {
@@ -34,10 +35,10 @@ client.on("message", async message => {
         if (messageLower.indexOf("sweet!") > -1) {
             message.channel.send("Dude!");
         }
-        if (messageLower.indexOf("i didnt study") > -1) {
+        if (messageLower.toLowerCase().indexOf("i didnt study") > -1) {
             message.channel.send("May god have mercy on your soul.");
         }
-        if (messageLower.toUpperCase().indexOf("propane") > -1) {
+        if (messageLower.toLowerCase().indexOf("propane") > -1) {
             message.channel.send(`\`………………_„-,-~\'\'~\'\'\':::\'\':::\':::::\'\'::::\'\'...
             ………._,-\'\':::::::::::::::::::::::::::::...
             ………..,-\'::::::::::::::::::::::::::::::...
@@ -161,6 +162,10 @@ client.on("message", async message => {
         });
     }
 
+    if (command === "id") {
+        message.channel.send(message.author.id);
+    }
+
     if (command === "subscribe") {
         message.author.send("Thank you " + message.author + " for subscribing. To see your options, say " + config.prefix + "options");
         message.author.send("If you would like to receive reminders by text message, simply say " +
@@ -170,7 +175,8 @@ client.on("message", async message => {
     }
 });
 export const init = function () {
-    client.login(DISCORD_BOT_TOKEN);
+    const token = process.env.NODE_ENV == "production" ? DISCORD_BOT_TOKEN : DISCORD_BOT_TOKEN_DEV;
+    client.login(token);
 };
 
 export const sendDiscordMessage = async function (discordId: string, message: string): Promise<void> {

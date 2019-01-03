@@ -9,7 +9,7 @@ import * as assignmentHelpers from "../data/assignments";
  * Assignments API
  */
 export let postHome = async (req: Request, res: Response) => {
-    req.assert("course", "Invalid course").isIn(["ITAS155", "ITAS191", "ITAS167", "ITAS185"]);
+    req.assert("course", "Invalid course").isIn(["ITAS175", "ITAS181", "ITAS164", "ITAS186"]);
 
     req.assert("assignmentName", "Assignment name invalid").isLength({ min: 1, max: 64 }).trim().withMessage("Name invalid");
     req.sanitize("assignmentName").trim();

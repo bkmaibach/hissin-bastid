@@ -5,7 +5,7 @@ const assignmentSchema = new mongoose_1.Schema({
     course: {
         type: String,
         required: true,
-        enum: ["ITAS155", "ITAS191", "ITAS167", "ITAS185"],
+        enum: ["ITAS175", "ITAS181", "ITAS164", "ITAS186"],
         trim: true
     },
     name: {

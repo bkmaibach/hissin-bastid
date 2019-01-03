@@ -58,4 +58,27 @@ function readAllSubscribed() {
     }
 }
 exports.readAllSubscribed = readAllSubscribed;
+function setTestState() {
+    return __awaiter(this, void 0, void 0, function* () {
+        Subscriber_1.default.deleteMany({ subscribed: true }, () => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const subscriber = new Subscriber_1.default({
+                    discordId: process.env.TEST_DISCORD_ID,
+                    subscribed: true,
+                    phone: process.env.TEST_PHONE,
+                    options: {
+                        daysPrior: 1,
+                        daysInterval: 1,
+                        timeOfDay: new Date().getHours()
+                    }
+                });
+                yield subscriber.save();
+            }
+            catch (err) {
+                console.log("Error in create operation: " + err);
+            }
+        }));
+    });
+}
+exports.setTestState = setTestState;
 //# sourceMappingURL=subscribers.js.map

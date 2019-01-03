@@ -8,24 +8,27 @@ import { sendTwilioSms } from "../util/helpers";
 
 
 // Initialization function to be started from server
-export const init = function (): void {
+export const init = async function (): Promise<void> {
     console.log("Background workers starting...");
+    let interval: number;
+    if (process.env.NODE_ENV == "production") {
+        interval = 15 * 60 * 1000;
+    } else {
+        interval = 3 * 1000;
+        await assignments.setTestState();
+        await subscribers.setTestState();
+    }
 
     // Execute all the checks upon start
-    gatherAllSubscribers();
-    loop();
+    loop(interval);
 };
 
-let interval: number;
-if (process.env.NODE_ENV == "production") {
-    interval = 15 * 60;
-} else {
-    interval = 3;
-}
-const loop = () => {
+
+
+const loop = (interval: number) => {
     setInterval( () => {
         gatherAllSubscribers();
-    }, 1000 * interval);
+    }, interval);
 };
 
 const gatherAllSubscribers = async function (): Promise<void> {
@@ -63,7 +66,8 @@ const processReminder = async function (sub: ISubscriber): Promise<void> {
             let message = "The following due/exam dates are fast approaching:";
             dueSoon.forEach((assignmentWrapper) => {
                 const assignment = <IAssignment>assignmentWrapper.toObject();
-                message = message + "\n" + assignment.course + " - " + assignment.name + ": due " + assignment.dueDate.toDateString();
+                message = message + "\n" + assignment.course + " - " + assignment.name + ": due " + assignment.dueDate.toDateString()
+                    + "\n" + assignment.url;
             });
             sendDiscordMessage(sub.discordId, message);
             if (sub.phone) sendTwilioSms(sub.phone, message);

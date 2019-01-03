@@ -61,4 +61,26 @@ exports.readAllDue = function () {
         }
     });
 };
+function setTestState() {
+    return __awaiter(this, void 0, void 0, function* () {
+        Assignment_1.default.deleteMany({ name: /.*/ }, () => __awaiter(this, void 0, void 0, function* () {
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 1);
+            try {
+                const assignment = new Assignment_1.default({
+                    course: "ITAS164",
+                    name: "TEST",
+                    dueDate,
+                    url: "https://stackoverflow.com",
+                    note: "TEST"
+                });
+                const doc = yield assignment.save();
+            }
+            catch (err) {
+                console.log("Error in create operation: " + err);
+            }
+        }));
+    });
+}
+exports.setTestState = setTestState;
 //# sourceMappingURL=assignments.js.map

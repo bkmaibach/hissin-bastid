@@ -18,11 +18,14 @@ const prod = exports.ENVIRONMENT === "production"; // Anything else is treated a
 exports.SESSION_SECRET = process.env["SESSION_SECRET"];
 exports.MONGODB_URI = prod ? process.env["MONGODB_URI"] : process.env["MONGODB_URI_LOCAL"];
 exports.DISCORD_BOT_TOKEN = process.env["DISCORD_BOT_TOKEN"];
+exports.DISCORD_BOT_TOKEN_DEV = process.env["DISCORD_BOT_TOKEN_DEV"];
 exports.TWILIO_FROM_PHONE = process.env["TWILIO_FROM_PHONE"];
 exports.TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];
 exports.TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
 exports.MAILGUN_API_KEY = process.env["MAILGUN_API_KEY"];
 exports.MAILGUN_DOMAIN = process.env["MAILGUN_DOMAIN"];
+exports.TEST_DISCORD_ID = process.env["TEST_DISCORD_ID"];
+exports.TEST_PHONE = process.env["TEST_PHONE"];
 if (!exports.SESSION_SECRET) {
     logger_1.default.error("No client secret. Set SESSION_SECRET environment variable.");
     process.exit(1);
@@ -33,6 +36,10 @@ if (!exports.MONGODB_URI) {
 }
 if (!exports.DISCORD_BOT_TOKEN) {
     logger_1.default.error("No Discord bot token string. Set DISCORD_BOT_TOKEN environment variable.");
+    process.exit(1);
+}
+if (!exports.DISCORD_BOT_TOKEN_DEV) {
+    logger_1.default.error("No DEV Discord bot token string. Set DISCORD_BOT_TOKEN_DEV environment variable.");
     process.exit(1);
 }
 if (!exports.TWILIO_FROM_PHONE) {
@@ -53,6 +60,14 @@ if (!exports.MAILGUN_API_KEY) {
 }
 if (!exports.MAILGUN_DOMAIN) {
     logger_1.default.error("No Mailgun domain string. Set MAILGUN_DOMAIN environment variable.");
+    process.exit(1);
+}
+if (!exports.TEST_DISCORD_ID) {
+    logger_1.default.error("No test Discord ID string. Set TEST_DISCORD_ID environment variable.");
+    process.exit(1);
+}
+if (!exports.TEST_PHONE) {
+    logger_1.default.error("No test phone string. Set TEST_PHONE environment variable.");
     process.exit(1);
 }
 //# sourceMappingURL=secrets.js.map

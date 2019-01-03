@@ -25,7 +25,7 @@ const assignmentHelpers = __importStar(require("../data/assignments"));
  * Assignments API
  */
 exports.postHome = (req, res) => __awaiter(this, void 0, void 0, function* () {
-    req.assert("course", "Invalid course").isIn(["ITAS155", "ITAS191", "ITAS167", "ITAS185"]);
+    req.assert("course", "Invalid course").isIn(["ITAS175", "ITAS181", "ITAS164", "ITAS186"]);
     req.assert("assignmentName", "Assignment name invalid").isLength({ min: 1, max: 64 }).trim().withMessage("Name invalid");
     req.sanitize("assignmentName").trim();
     req.sanitize("assignmentName").escape();

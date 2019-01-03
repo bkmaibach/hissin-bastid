@@ -45,3 +45,24 @@ export const readAllDue = async function (): Promise<Document[]> {
         console.log("Error in read operation: " + err);
     }
 };
+
+export async function setTestState(): Promise<void> {
+Assignment.deleteMany({ name: /.*/ }, async () => {
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 1);
+        try {
+
+            const assignment = new Assignment({
+                course: "ITAS164",
+                name: "TEST",
+                dueDate,
+                url: "https://stackoverflow.com",
+                note: "TEST"
+            });
+            const doc = <IAssignment>await assignment.save();
+
+        } catch (err) {
+        console.log("Error in create operation: " + err);
+        }
+    });
+}

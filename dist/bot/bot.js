@@ -22,6 +22,7 @@ const discord_js_1 = __importDefault(require("discord.js"));
 const helpers = __importStar(require("../util/helpers"));
 const config = __importStar(require("./config"));
 const secrets_1 = require("../util/secrets");
+const secrets_2 = require("../util/secrets");
 const assignments = __importStar(require("../data/assignments"));
 const subscribers = __importStar(require("../data/subscribers"));
 const client = new discord_js_1.default.Client();
@@ -31,7 +32,7 @@ client.on("ready", () => {
     // Example of changing the bot's playing game to something useful. `client.user` is what the
     // docs refer to as the "ClientUser".
     // client.user.setActivity(`Serving ${client.guilds.size} servers`);
-    client.user.setActivity("Try ~help");
+    client.user.setActivity("Try " + config.prefix + "help");
 });
 client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
     const messageLower = message.content.toUpperCase();
@@ -47,10 +48,10 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
     if (messageLower.indexOf("sweet!") > -1) {
         message.channel.send("Dude!");
     }
-    if (messageLower.indexOf("i didnt study") > -1) {
+    if (messageLower.toLowerCase().indexOf("i didnt study") > -1) {
         message.channel.send("May god have mercy on your soul.");
     }
-    if (messageLower.toUpperCase().indexOf("propane") > -1) {
+    if (messageLower.toLowerCase().indexOf("propane") > -1) {
         message.channel.send(`\`………………_„-,-~\'\'~\'\'\':::\'\':::\':::::\'\'::::\'\'...
             ………._,-\'\':::::::::::::::::::::::::::::...
             ………..,-\'::::::::::::::::::::::::::::::...
@@ -162,6 +163,9 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
                 + "\n-------------------------\n");
         });
     }
+    if (command === "id") {
+        message.channel.send(message.author.id);
+    }
     if (command === "subscribe") {
         message.author.send("Thank you " + message.author + " for subscribing. To see your options, say " + config.prefix + "options");
         message.author.send("If you would like to receive reminders by text message, simply say " +
@@ -170,7 +174,8 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
     }
 }));
 exports.init = function () {
-    client.login(secrets_1.DISCORD_BOT_TOKEN);
+    const token = process.env.NODE_ENV == "production" ? secrets_1.DISCORD_BOT_TOKEN : secrets_2.DISCORD_BOT_TOKEN_DEV;
+    client.login(token);
 };
 exports.sendDiscordMessage = function (discordId, message) {
     return __awaiter(this, void 0, void 0, function* () {

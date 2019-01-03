@@ -68,7 +68,7 @@ exports.sendTwilioSms = (phone, message) => __awaiter(this, void 0, void 0, func
                 let buffer = "";
                 res.on("data", (data) => {
                     buffer += data;
-                    console.log(buffer);
+                    // console.log(buffer);
                 });
                 // Return success if the request went through
                 if (status >= 200 && status < 300) {

@@ -45,3 +45,27 @@ export function readAllSubscribed(): Promise<Document[]> {
         console.log("Error in read operation: " + err);
     }
 }
+
+
+export async function setTestState(): Promise<void> {
+    Subscriber.deleteMany({ subscribed: true }, async () => {
+        try {
+
+            const subscriber = new Subscriber({
+                discordId: process.env.TEST_DISCORD_ID,
+                subscribed: true,
+                phone: process.env.TEST_PHONE,
+                options: {
+                    daysPrior: 1,
+                    daysInterval: 1,
+                    timeOfDay: new Date().getHours()
+                }
+            });
+
+        await subscriber.save();
+
+        } catch (err) {
+        console.log("Error in create operation: " + err);
+        }
+    });
+}
