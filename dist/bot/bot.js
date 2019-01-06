@@ -113,6 +113,7 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
     if (command === "request") {
         exports.sendDiscordMessage(secrets_3.BOTWRANGLER_ID, message.author + " has made the following request: \n"
             + message.content);
+        message.channel.send("Thank you for your feedback. Your message has been forwarded to the botwrangler");
     }
     if (command === "options") {
         const daysAdvanceArg = parseInt(args[0]);
