@@ -106,9 +106,9 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
         \n${config.prefix}tableflip - \`(╯°□°）╯︵ ┻━┻\`
         \n${config.prefix}unflip - \`┬─┬ ノ( ゜-゜ノ)\`
         \n${config.prefix}shrug - \`¯\\_(ツ)_/¯\`
-        \n${config.prefix}concern - ಠ_ಠ
+        \n${config.prefix}concern - \`ಠ_ಠ\`
         \n${config.prefix}dealwithit - \`(•_•) ( •_•)>⌐■-■ (⌐■_■)\`
-        \n${config.prefix}mmm - ( ಠ ͜ʖ ಠ)`);
+        \n${config.prefix}mmm - \`( ಠ ͜ʖ ಠ)\``);
     }
     if (command === "request") {
         exports.sendDiscordMessage(secrets_3.BOTWRANGLER_ID, message.author + " has made the following request: \n"
@@ -137,7 +137,8 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
                 message.channel.send("Thank you " + message.author + ", your options have been updated");
             }
             catch (_a) {
-                message.channel.send("Sorry " + message.author + ", there was a problem updating your options. Please contact the botwrangler.");
+                message.channel.send("Sorry " + message.author + ", there was a problem updating your options. The botwrangler has been notified.");
+                exports.sendDiscordMessage(secrets_3.BOTWRANGLER_ID, message.author + " encountered an error updating their subscription options.");
             }
         }
     }

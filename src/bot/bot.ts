@@ -97,9 +97,9 @@ client.on("message", async message => {
         \n${config.prefix}tableflip - \`(╯°□°）╯︵ ┻━┻\`
         \n${config.prefix}unflip - \`┬─┬ ノ( ゜-゜ノ)\`
         \n${config.prefix}shrug - \`¯\\_(ツ)_/¯\`
-        \n${config.prefix}concern - ಠ_ಠ
+        \n${config.prefix}concern - \`ಠ_ಠ\`
         \n${config.prefix}dealwithit - \`(•_•) ( •_•)>⌐■-■ (⌐■_■)\`
-        \n${config.prefix}mmm - ( ಠ ͜ʖ ಠ)`);
+        \n${config.prefix}mmm - \`( ಠ ͜ʖ ಠ)\``);
     }
 
     if (command === "request") {
