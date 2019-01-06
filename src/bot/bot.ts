@@ -3,6 +3,7 @@ import * as helpers from "../util/helpers";
 import * as config from "./config";
 import { DISCORD_BOT_TOKEN } from "../util/secrets";
 import { DISCORD_BOT_TOKEN_DEV } from "../util/secrets";
+import { BOTWRANGLER_ID } from "../util/secrets";
 import * as assignments from "../data/assignments";
 import * as subscribers from "../data/subscribers";
 import { IAssignment } from "../models/Assignment";
@@ -82,34 +83,55 @@ client.on("message", async message => {
 
     if (command === "help") {
         message.channel.send(`Available commands:
-        \n${config.prefix}due - See all due items
-        \n${config.prefix}subscribe - Subscribe to reminders
-        \n${config.prefix}unsubscribe - Subscribe to reminders
+        \n${config.prefix}due - See all due assignments
+        \n${config.prefix}subscribe - Subscribe to assignment reminders
+        \n${config.prefix}unsubscribe - Unsubscribe from assignment reminders
         \n${config.prefix}options - Set subscription options
+        \n${config.prefix}request - Request a new feature from the botwrangler
+        \n${config.prefix}more - See more commands`);
+    }
+
+    if (command === "more") {
+        message.channel.send(`More fun commands:
+        \n${config.prefix}joke - maek lol
+        \n${config.prefix}tableflip - \`(╯°□°）╯︵ ┻━┻\`
+        \n${config.prefix}unflip - \`┬─┬ ノ( ゜-゜ノ)\`
+        \n${config.prefix}shrug - \`¯\\_(ツ)_/¯\`
+        \n${config.prefix}concern - ಠ_ಠ
+        \n${config.prefix}dealwithit - \`(•_•) ( •_•)>⌐■-■ (⌐■_■)\`
         \n${config.prefix}mmm - ( ಠ ͜ʖ ಠ)`);
     }
 
-    if (command === "say") {
-        // makes the bot say something and delete the message. As an example, it's open to anyone to use.
-        // To get the "message" itself we join the `args` back into a string with spaces:
-        const sayMessage = args.join(" ");
-        // Then we delete the command message (sneaky, right?). The catch just ignores the error with a cute smiley thing.
-        message.delete().catch(O_o => {
-            console.log(O_o);
-        });
-        // And we get the bot to say the thing:
-        message.channel.send(sayMessage);
+    if (command === "request") {
+        sendDiscordMessage(BOTWRANGLER_ID, message.author + " has made the following request: \n"
+        + args[0]);
     }
 
     if (command === "options") {
-        if (args.length != 3) {
+        const daysAdvanceArg = parseInt(args[0]);
+        const daysBetweenArg = parseInt(args[1]);
+        const hourOfDayArg = parseInt(args[2]);
+
+        if (args.length != 3
+            || typeof daysAdvanceArg != "number"
+            || typeof daysBetweenArg != "number"
+            || typeof hourOfDayArg != "number"
+            || daysAdvanceArg < 0 || daysAdvanceArg > 120
+            || daysBetweenArg < 1 || daysBetweenArg > 21
+            || hourOfDayArg < 0 || hourOfDayArg > 23) {
             message.channel.send(`Enter in subscription options in the following format:
             \n${config.prefix}options X Y Z
-            \nwhere X is the number of days in advance of a due date you would like to be reminded (default 3),
-            \nY is the number of days you would like between reminders (default 1),
-            \nand Z is the hour of the day (0 - 23) that you would like to receive reminders`);
+            \nwhere X is the number of days in advance (0-120) of a due date you would like to be reminded (default 3),
+            \nY is the number of days (1-21) you would like between reminders (default 1),
+            \nand Z is the hour of the day (0 - 23) that you would like to receive reminders (default 12)`);
         } else {
-            subscribers.updateOptions(message.author.id, parseInt(args[0]), parseInt(args[1]), parseInt(args[2]));
+            try {
+                await subscribers.updateOptions(message.author.id, daysAdvanceArg, daysBetweenArg, hourOfDayArg);
+                message.channel.send("Thank you " + message.author + ", your options have been updated");
+            } catch {
+                message.channel.send("Sorry " + message.author + ", there was a problem updating your options. The botwrangler has been notified.");
+                sendDiscordMessage(BOTWRANGLER_ID, message.author + " encountered an error updating their subscription options.");
+            }
         }
     }
 
@@ -171,7 +193,11 @@ client.on("message", async message => {
         message.author.send("If you would like to receive reminders by text message, simply say " +
          config.prefix + "phone followed by your 10-digit phone number, for example:\n" + config.prefix + "phone 2508021111");
 
-        subscribers.create(message.author.id.toString());
+        subscribers.createOrSubscribe(message.author.id.toString());
+    }
+    if (command === "unsubscribe") {
+        subscribers.unsubscribe(message.author.id.toString());
+        message.author.send("You have been unsubscribed.");
     }
 });
 export const init = function () {

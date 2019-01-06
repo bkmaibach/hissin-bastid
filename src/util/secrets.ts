@@ -22,6 +22,8 @@ export const MAILGUN_DOMAIN = process.env["MAILGUN_DOMAIN"];
 export const TEST_DISCORD_ID = process.env["TEST_DISCORD_ID"];
 export const TEST_PHONE = process.env["TEST_PHONE"];
 
+export const BOTWRANGLER_ID = process.env["BOTWRANGLER_ID"];
+
 
 if (!SESSION_SECRET) {
     logger.error("No client secret. Set SESSION_SECRET environment variable.");
@@ -75,5 +77,10 @@ if (!TEST_DISCORD_ID) {
 
 if (!TEST_PHONE) {
     logger.error("No test phone string. Set TEST_PHONE environment variable.");
+    process.exit(1);
+}
+
+if (!BOTWRANGLER_ID) {
+    logger.error("No developer discord id. Set BOTWRANGLER_ID environment variable.");
     process.exit(1);
 }

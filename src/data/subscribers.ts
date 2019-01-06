@@ -3,11 +3,16 @@ import { Document } from "mongoose";
 import Subscriber from "../models/Subscriber";
 import { ISubscriber } from "../models/Subscriber";
 
-export async function create(id: string, phone?: string, options?: {daysPrior: number, daysInterval: number, timeOfDay: number}): Promise<ISubscriber> {
+export async function createOrSubscribe(discordId: string, phone?: string, options?: {daysPrior: number, daysInterval: number, timeOfDay: number}): Promise<ISubscriber> {
     try {
+        const alreadyExists = <ISubscriber>await Subscriber.findOneAndUpdate({"discordId": discordId}, { $set: {subscribed: true }}).exec();
+
+        if (alreadyExists) {
+            return alreadyExists;
+        }
 
         const subscriber = new Subscriber({
-            discordId: id,
+            discordId: discordId,
             subscribed: true,
             phone,
             options
@@ -17,7 +22,22 @@ export async function create(id: string, phone?: string, options?: {daysPrior: n
         return doc;
 
     } catch (err) {
-        console.log("Error in create operation: " + err);
+        console.log("Error in create/subscribe operation: " + err);
+    }
+}
+
+export async function unsubscribe(discordId: string): Promise<ISubscriber> {
+    try {
+        const documentUpdated = <ISubscriber>await Subscriber.findOneAndUpdate({"discordId": discordId}, { $set: {subscribed: false }}).exec();
+
+        if (documentUpdated) {
+            return documentUpdated;
+        } else {
+            throw "Subscriber does not exist";
+        }
+
+    } catch (err) {
+        console.log("Error in unsubscribe operation: " + err);
     }
 }
 
@@ -29,12 +49,8 @@ export function updateLastReminded(discordId: string, now: Date): Promise<number
     }
 }
 
-export function updateOptions(discordId: string, daysPrior: number, daysInterval: number, timeOfDay: number): Promise<number> {
-    try {
-        return Subscriber.updateOne({"discordId": discordId}, { $set: {options: {daysPrior, daysInterval, timeOfDay} } }).exec();
-    } catch (err) {
-        console.log("Error in update operation: " + err);
-    }
+export async function updateOptions(discordId: string, daysPrior: number, daysInterval: number, timeOfDay: number): Promise<number> {
+    return Subscriber.updateOne({"discordId": discordId}, { $set: {options: {daysPrior, daysInterval, timeOfDay} } }).exec();
 }
 
 export function readAllSubscribed(): Promise<Document[]> {
@@ -45,7 +61,6 @@ export function readAllSubscribed(): Promise<Document[]> {
         console.log("Error in read operation: " + err);
     }
 }
-
 
 export async function setTestState(): Promise<void> {
     Subscriber.deleteMany({ subscribed: true }, async () => {

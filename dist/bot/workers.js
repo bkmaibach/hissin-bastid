@@ -77,7 +77,7 @@ const processReminder = function (sub) {
                 dueSoon.forEach((assignmentWrapper) => {
                     const assignment = assignmentWrapper.toObject();
                     message = message + "\n" + assignment.course + " - " + assignment.name + ": due " + assignment.dueDate.toDateString()
-                        + "\n" + assignment.url;
+                        + "\n" + assignment.url + "\n-------------------------\n";
                 });
                 bot_1.sendDiscordMessage(sub.discordId, message);
                 if (sub.phone)

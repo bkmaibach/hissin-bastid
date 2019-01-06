@@ -12,11 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Subscriber_1 = __importDefault(require("../models/Subscriber"));
-function create(id, phone, options) {
+function createOrSubscribe(discordId, phone, options) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const alreadyExists = yield Subscriber_1.default.findOneAndUpdate({ "discordId": discordId }, { $set: { subscribed: true } }).exec();
+            if (alreadyExists) {
+                return alreadyExists;
+            }
             const subscriber = new Subscriber_1.default({
-                discordId: id,
+                discordId: discordId,
                 subscribed: true,
                 phone,
                 options
@@ -25,11 +29,28 @@ function create(id, phone, options) {
             return doc;
         }
         catch (err) {
-            console.log("Error in create operation: " + err);
+            console.log("Error in create/subscribe operation: " + err);
         }
     });
 }
-exports.create = create;
+exports.createOrSubscribe = createOrSubscribe;
+function unsubscribe(discordId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const documentUpdated = yield Subscriber_1.default.findOneAndUpdate({ "discordId": discordId }, { $set: { subscribed: false } }).exec();
+            if (documentUpdated) {
+                return documentUpdated;
+            }
+            else {
+                throw "Subscriber does not exist";
+            }
+        }
+        catch (err) {
+            console.log("Error in unsubscribe operation: " + err);
+        }
+    });
+}
+exports.unsubscribe = unsubscribe;
 function updateLastReminded(discordId, now) {
     try {
         return Subscriber_1.default.updateOne({ "discordId": discordId }, { $set: { lastReminded: now } }).exec();
@@ -40,12 +61,9 @@ function updateLastReminded(discordId, now) {
 }
 exports.updateLastReminded = updateLastReminded;
 function updateOptions(discordId, daysPrior, daysInterval, timeOfDay) {
-    try {
+    return __awaiter(this, void 0, void 0, function* () {
         return Subscriber_1.default.updateOne({ "discordId": discordId }, { $set: { options: { daysPrior, daysInterval, timeOfDay } } }).exec();
-    }
-    catch (err) {
-        console.log("Error in update operation: " + err);
-    }
+    });
 }
 exports.updateOptions = updateOptions;
 function readAllSubscribed() {

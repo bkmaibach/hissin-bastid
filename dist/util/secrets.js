@@ -26,6 +26,7 @@ exports.MAILGUN_API_KEY = process.env["MAILGUN_API_KEY"];
 exports.MAILGUN_DOMAIN = process.env["MAILGUN_DOMAIN"];
 exports.TEST_DISCORD_ID = process.env["TEST_DISCORD_ID"];
 exports.TEST_PHONE = process.env["TEST_PHONE"];
+exports.BOTWRANGLER_ID = process.env["BOTWRANGLER_ID"];
 if (!exports.SESSION_SECRET) {
     logger_1.default.error("No client secret. Set SESSION_SECRET environment variable.");
     process.exit(1);
@@ -68,6 +69,10 @@ if (!exports.TEST_DISCORD_ID) {
 }
 if (!exports.TEST_PHONE) {
     logger_1.default.error("No test phone string. Set TEST_PHONE environment variable.");
+    process.exit(1);
+}
+if (!exports.BOTWRANGLER_ID) {
+    logger_1.default.error("No developer discord id. Set BOTWRANGLER_ID environment variable.");
     process.exit(1);
 }
 //# sourceMappingURL=secrets.js.map

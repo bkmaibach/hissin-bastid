@@ -67,7 +67,7 @@ const processReminder = async function (sub: ISubscriber): Promise<void> {
             dueSoon.forEach((assignmentWrapper) => {
                 const assignment = <IAssignment>assignmentWrapper.toObject();
                 message = message + "\n" + assignment.course + " - " + assignment.name + ": due " + assignment.dueDate.toDateString()
-                    + "\n" + assignment.url;
+                    + "\n" + assignment.url + "\n-------------------------\n";
             });
             sendDiscordMessage(sub.discordId, message);
             if (sub.phone) sendTwilioSms(sub.phone, message);
