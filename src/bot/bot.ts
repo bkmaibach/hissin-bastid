@@ -105,6 +105,7 @@ client.on("message", async message => {
     if (command === "request") {
         sendDiscordMessage(BOTWRANGLER_ID, message.author + " has made the following request: \n"
         + message.content);
+        message.channel.send("Thank you for your feedback. Your message has been forwarded to the botwrangler");
     }
 
     if (command === "options") {
