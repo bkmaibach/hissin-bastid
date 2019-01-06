@@ -104,7 +104,7 @@ client.on("message", async message => {
 
     if (command === "request") {
         sendDiscordMessage(BOTWRANGLER_ID, message.author + " has made the following request: \n"
-        + args[0]);
+        + message.content);
     }
 
     if (command === "options") {
