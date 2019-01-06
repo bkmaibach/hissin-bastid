@@ -87,7 +87,7 @@ client.on("message", async message => {
         \n${config.prefix}subscribe - Subscribe to assignment reminders
         \n${config.prefix}unsubscribe - Unsubscribe from assignment reminders
         \n${config.prefix}options - Set subscription options
-        \n${config.prefix}request - Request a new feature from the botwrangler
+        \n${config.prefix}request (message) - Request a new feature from the botwrangler
         \n${config.prefix}more - See more commands`);
     }
 

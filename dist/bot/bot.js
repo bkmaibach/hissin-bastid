@@ -97,7 +97,7 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
         \n${config.prefix}subscribe - Subscribe to assignment reminders
         \n${config.prefix}unsubscribe - Unsubscribe from assignment reminders
         \n${config.prefix}options - Set subscription options
-        \n${config.prefix}request - Request a new feature from the botwrangler
+        \n${config.prefix}request (message) - Request a new feature from the botwrangler
         \n${config.prefix}more - See more commands`);
     }
     if (command === "more") {
@@ -112,7 +112,7 @@ client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
     }
     if (command === "request") {
         exports.sendDiscordMessage(secrets_3.BOTWRANGLER_ID, message.author + " has made the following request: \n"
-            + args[0]);
+            + message.content);
     }
     if (command === "options") {
         const daysAdvanceArg = parseInt(args[0]);
