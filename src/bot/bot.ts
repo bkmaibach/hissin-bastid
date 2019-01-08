@@ -20,7 +20,7 @@ client.on("ready", () => {
   });
 
 client.on("message", async message => {
-        const messageLower = message.content.toUpperCase();
+        const messageLower = message.content.toLowerCase();
 
         // Ignore other bots
         if (message.author.bot) return;
