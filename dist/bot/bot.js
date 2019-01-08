@@ -36,7 +36,7 @@ client.on("ready", () => {
     client.user.setActivity("Try " + config.prefix + "help");
 });
 client.on("message", (message) => __awaiter(this, void 0, void 0, function* () {
-    const messageLower = message.content.toUpperCase();
+    const messageLower = message.content.toLowerCase();
     // Ignore other bots
     if (message.author.bot)
         return;
