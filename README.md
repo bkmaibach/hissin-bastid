@@ -1,6 +1,6 @@
-# ProfessorBot - ITAS191 Final Project
+# hissin-bastid - ITAS191 Final Project
 
-A web service that operates both a web page and Discord bot for alerting ITAS students to assignment deadlines/test dates. This project is currently [deployed](http://professorbot-prod.7r6myjvvzx.us-east-2.elasticbeanstalk.com ) on AWS Elastic Beanstalk.
+A web service that operates both a web page and Discord bot for alerting ITAS students to assignment deadlines/test dates. This project is currently [deployed](http://hissin-bastid-prod.7r6myjvvzx.us-east-2.elasticbeanstalk.com ) on AWS Elastic Beanstalk.
 
 ## Usage
 There are two primary means of interacting with this software. The first is by sending messages that can be read by a Discord bot that appears as a user within a Discord chat room and is processed within this program. The bot is currently live on personal Discord server but is intended to eventually run in the 2020 ITAS room. A user may decide to subscribe to assignment reminders via the ~subscribe command, which by default will have the bot message the user three, two, and one day before an assignment due date at noon. This behaviour may be customized by the user to send reminders earlier or later, at different intervals, and/or at a different time of the day.
