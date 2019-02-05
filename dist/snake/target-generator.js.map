@@ -1,0 +1,1 @@
+{"version":3,"file":"target-generator.js","sourceRoot":"","sources":["../../src/snake/target-generator.ts"],"names":[],"mappings":";;AAAA,mDAAgD;AACnC,QAAA,eAAe,GAAG;IAE3B;IAEA,CAAC;IAED,gBAAgB;QACZ,OAAO,6BAAa,CAAC,aAAa,EAAE,CAAC;IACzC,CAAC;CACJ,CAAC;AAEF,MAAM,CAAC,OAAO,GAAG;IACb,eAAe,EAAf,uBAAe;CACjB,CAAC"}

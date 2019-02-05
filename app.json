@@ -1,0 +1,8 @@
+{
+    "name": "hissin-bastid",
+    "description": "NodeJS Typescript BattleSnake",
+    "repository": "http://github.com/bkmaibach/hissin-bastid",
+    "logo": "http://node-js-sample.herokuapp.com/node.svg",
+    "keywords": ["itas", "battlesnake"]
+  } 
+  

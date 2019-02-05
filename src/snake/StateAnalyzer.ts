@@ -1,4 +1,4 @@
-import { IGameState,  EMoveTypes, IMoveInfo, EMoveDirections, IPoint, ISnake } from "./Interfaces";
+import { IGameState,  EMoveTypes, IMoveInfo, EMoveDirections, IPoint, ISnake } from "./types";
 import { getIndexOfValue } from "./util";
 import * as _ from "lodash";
 
