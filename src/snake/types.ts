@@ -14,7 +14,7 @@ export enum EMoveDirections {
 }
 
 export interface IMoveInfo {
-    type: EMoveTypes;
+    status: EMoveTypes;
     head?: boolean;
     food?: boolean;
     snakeLengths?: number[];
