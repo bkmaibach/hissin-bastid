@@ -29,7 +29,7 @@ export class StateAnalyzer {
     }
 
     // What turn is it?
-    static getTurn() {
+    static getTurnNumber() {
         return StateAnalyzer.gameState.turn;
     }
 
@@ -122,7 +122,7 @@ export class StateAnalyzer {
         // The XY that we are looking at has been determined using "left" or whatever
         // Logging checkpoint
 
-        console.log(this.getTurn());
+        console.log(this.getTurnNumber());
         console.log("My position: " + JSON.stringify(this.getMyPosition()));
         console.log("considering spot: " + JSON.stringify(newXY));
 
