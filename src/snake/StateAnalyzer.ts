@@ -19,7 +19,7 @@ export class StateAnalyzer {
     // The current game state (same shape as request body, ie IGameState)
     static gameState: IGameState;
 
-    private constructor(){
+    private constructor() {
 
     }
 
@@ -43,7 +43,7 @@ export class StateAnalyzer {
         return StateAnalyzer.gameState.you.name;
     }
 
-    // Give me an array of objects, each object contains all info on a snake ie health 
+    // Give me an array of objects, each object contains all info on a snake ie health
     static getSnakes() {
         return StateAnalyzer.gameState.board.snakes;
     }
@@ -173,7 +173,7 @@ export class StateAnalyzer {
         }
         });
 
-        // If we still haven't changed it from unknown, the status 
+        // If we still haven't changed it from unknown, the status
         if (returnVal.status == EMoveTypes.unknown) {
         returnVal.status = EMoveTypes.uncontested;
         console.log("Move is free and uncontested");
@@ -248,7 +248,7 @@ export class StateAnalyzer {
             return moves[i];
         }
         }
-    
+
         // AAAAAAAAAHHH! ( I added a special move info property called head to make this work )
         for (let i = 0; i < 4; i++) {
         if (moveInfos[i].head) {
@@ -314,5 +314,10 @@ export class StateAnalyzer {
     static pointIsTaken(point: IPoint) {
         const takenPoints = StateAnalyzer.getTakenPoints();
         return (getIndexOfValue(takenPoints, point) > -1);
+    }
+
+    static getMyTailTip(): IPoint {
+        const last = StateAnalyzer.gameState.you.body.length;
+        return StateAnalyzer.gameState.you.body[last];
     }
 }

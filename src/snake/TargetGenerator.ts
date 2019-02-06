@@ -6,10 +6,9 @@ export const TargetGenerator = class {
     }
 
     getSortedTargets () {
-        return StateAnalyzer.getFoodPoints();
+        const tailTip = StateAnalyzer.getMyTailTip();
+        const food = StateAnalyzer.getFoodPoints();
+        food.push(tailTip);
+        return food;
     }
 };
-
-module.exports = {
-    TargetGenerator
- };
