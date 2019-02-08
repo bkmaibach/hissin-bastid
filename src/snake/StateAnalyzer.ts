@@ -358,4 +358,8 @@ export class StateAnalyzer {
         const last = StateAnalyzer.getCurrentState().you.body.length - 1;
         return StateAnalyzer.getCurrentState().you.body[last];
     }
+
+    static getFinishedGameData() {
+        StateAnalyzer.gameStates.forEach(() => {});
+    }
 }

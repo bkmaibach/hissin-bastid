@@ -24,7 +24,7 @@ app.post("/start", (request, response) => {
     StateAnalyzer_1.StateAnalyzer.update(request.body);
     let hexString;
     if (process.env.NODE_ENV == "production") {
-        hexString = "11FF11";
+        hexString = "11FF55";
     }
     else {
         // Random hex string

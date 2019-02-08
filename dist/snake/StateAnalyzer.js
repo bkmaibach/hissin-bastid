@@ -310,6 +310,9 @@ class StateAnalyzer {
         const last = StateAnalyzer.getCurrentState().you.body.length - 1;
         return StateAnalyzer.getCurrentState().you.body[last];
     }
+    static getFinishedGameData() {
+        StateAnalyzer.gameStates.forEach(() => { });
+    }
 }
 // The current game state (same shape as request body, ie IGameState)
 StateAnalyzer.gameStates = [];
