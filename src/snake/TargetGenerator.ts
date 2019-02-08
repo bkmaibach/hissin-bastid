@@ -7,8 +7,8 @@ export const TargetGenerator = class {
 
     getSortedTargets () {
         const tailTip = StateAnalyzer.getMyTailTip();
-        const food = StateAnalyzer.getFoodPoints();
-        food.push(tailTip);
-        return food;
+        const targets = StateAnalyzer.getFoodPoints();
+        targets.push(tailTip);
+        return targets;
     }
 };

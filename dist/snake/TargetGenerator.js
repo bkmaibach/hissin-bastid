@@ -5,10 +5,10 @@ exports.TargetGenerator = class {
     constructor() {
     }
     getSortedTargets() {
-        return StateAnalyzer_1.StateAnalyzer.getFoodPoints();
+        const tailTip = StateAnalyzer_1.StateAnalyzer.getMyTailTip();
+        const targets = StateAnalyzer_1.StateAnalyzer.getFoodPoints();
+        targets.push(tailTip);
+        return targets;
     }
-};
-module.exports = {
-    TargetGenerator: exports.TargetGenerator
 };
 //# sourceMappingURL=TargetGenerator.js.map
