@@ -134,7 +134,7 @@ export const TailDodger = class {
             return this.getShortestPath(endXY);
         }
 
-        //Finally return and update steps found
+        // Finally return and update steps found
         this.steps = steps;
         return steps;
     }

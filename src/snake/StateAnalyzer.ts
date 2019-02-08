@@ -58,6 +58,17 @@ export class StateAnalyzer {
         return StateAnalyzer.gameState.board.food;
     }
 
+    // return false if no food on board
+    static isThereFood() {
+        if (StateAnalyzer.gameState.board.food[0] == undefined) {
+            console.log("There is no food");
+            return false;
+        } else {
+            console.log("Food is here: " + StateAnalyzer.gameState.board.food[0]);
+            return true;
+        }
+    }
+
     // How tall is the board?
     static getBoardHeight = () => {
         return StateAnalyzer.gameState.board.height;

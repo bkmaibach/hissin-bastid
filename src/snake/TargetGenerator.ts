@@ -1,4 +1,5 @@
 import { StateAnalyzer } from "./StateAnalyzer";
+import { request } from "http";
 export const TargetGenerator = class {
 
     constructor() {
@@ -8,7 +9,11 @@ export const TargetGenerator = class {
     getSortedTargets () {
         const tailTip = StateAnalyzer.getMyTailTip();
         const food = StateAnalyzer.getFoodPoints();
-        food.push(tailTip);
+        // If there is no food on board then run following code
+        if (!StateAnalyzer.isThereFood()) {
+            console.log("There is no food");
+            return [tailTip];
+        }
         return food;
     }
 };
