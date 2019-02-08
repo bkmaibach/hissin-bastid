@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var EMoveTypes;
-(function (EMoveTypes) {
-    EMoveTypes[EMoveTypes["wall"] = 0] = "wall";
-    EMoveTypes[EMoveTypes["body"] = 1] = "body";
-    EMoveTypes[EMoveTypes["contested"] = 2] = "contested";
-    EMoveTypes[EMoveTypes["uncontested"] = 3] = "uncontested";
-    EMoveTypes[EMoveTypes["unknown"] = 4] = "unknown";
-})(EMoveTypes = exports.EMoveTypes || (exports.EMoveTypes = {}));
+var ECellContents;
+(function (ECellContents) {
+    ECellContents[ECellContents["wall"] = 0] = "wall";
+    ECellContents[ECellContents["body"] = 1] = "body";
+    ECellContents[ECellContents["empty"] = 2] = "empty";
+    ECellContents[ECellContents["unknown"] = 3] = "unknown";
+})(ECellContents = exports.ECellContents || (exports.ECellContents = {}));
 var EMoveDirections;
 (function (EMoveDirections) {
     EMoveDirections["up"] = "up";
