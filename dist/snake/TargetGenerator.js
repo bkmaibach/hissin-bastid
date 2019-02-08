@@ -6,13 +6,9 @@ exports.TargetGenerator = class {
     }
     getSortedTargets() {
         const tailTip = StateAnalyzer_1.StateAnalyzer.getMyTailTip();
-        const food = StateAnalyzer_1.StateAnalyzer.getFoodPoints();
-        // If there is no food on board then run following code
-        if (!StateAnalyzer_1.StateAnalyzer.isThereFood()) {
-            console.log("There is no food, returning [ " + tailTip + "]");
-            return [tailTip];
-        }
-        return food;
+        const targets = StateAnalyzer_1.StateAnalyzer.getFoodPoints();
+        targets.push(tailTip);
+        return targets;
     }
 };
 //# sourceMappingURL=TargetGenerator.js.map

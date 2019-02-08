@@ -111,6 +111,7 @@ export const TailDodger = class {
                         for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
                             this.addCollisionPoint(headToCollisionSection[k]);
                         }
+
                         return this.getShortestPath(endXY);
                     } else {
                         // Mark the entire tail-side section of this point as safe in this else clase where taildodge is true
