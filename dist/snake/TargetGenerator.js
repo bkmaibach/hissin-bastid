@@ -5,10 +5,14 @@ exports.TargetGenerator = class {
     constructor() {
     }
     getSortedTargets() {
-        return StateAnalyzer_1.StateAnalyzer.getFoodPoints();
+        const tailTip = StateAnalyzer_1.StateAnalyzer.getMyTailTip();
+        const food = StateAnalyzer_1.StateAnalyzer.getFoodPoints();
+        // If there is no food on board then run following code
+        if (!StateAnalyzer_1.StateAnalyzer.isThereFood()) {
+            console.log("There is no food");
+            return [tailTip];
+        }
+        return food;
     }
-};
-module.exports = {
-    TargetGenerator: exports.TargetGenerator
 };
 //# sourceMappingURL=TargetGenerator.js.map
