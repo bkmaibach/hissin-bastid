@@ -1,4 +1,4 @@
-import { IGameState,  EMoveTypes, IMoveInfo, EMoveDirections, IPoint } from "./types";
+import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint } from "./types";
 import { getIndexOfValue } from "./util";
 import { StateAnalyzer } from "./StateAnalyzer";
 import * as _ from "lodash";

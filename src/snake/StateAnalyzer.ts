@@ -1,4 +1,4 @@
-import { IGameState,  EMoveTypes, IMoveInfo, EMoveDirections, IPoint, ISnake } from "./types";
+import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake } from "./types";
 import { getIndexOfValue } from "./util";
 import * as _ from "lodash";
 
@@ -118,7 +118,7 @@ export class StateAnalyzer {
 
         // The return value of this function is defined first as unknown. It will only ever return unknown as the type
         // If theres a bug
-        const returnVal: IMoveInfo = { status: EMoveTypes.unknown };
+        const returnVal: IMoveInfo = { contents: ECellContents.unknown, snakeLengths: [0] };
 
         const snake = StateAnalyzer.getCurrentState().board.snakes.filter((snake: ISnake) => snake.name == snakeName)[0];
         const { x, y } = snake.body[0];
@@ -147,7 +147,7 @@ export class StateAnalyzer {
         || newX < 0
         || newY >= StateAnalyzer.getCurrentState().board.height
         || newY < 0) {
-            if (returnVal.status == EMoveTypes.unknown) returnVal.status = EMoveTypes.wall;
+            if (returnVal.contents == ECellContents.unknown) returnVal.contents = ECellContents.wall;
             console.log("Move found to collide with wall");
         }
 
@@ -155,14 +155,24 @@ export class StateAnalyzer {
         StateAnalyzer.getCurrentState().board.snakes.forEach((boardSnake: ISnake) => {
         for (let i = 0; i < boardSnake.body.length; i++) {
         if (_.isEqual(boardSnake.body[i], newXY)) {
-            if (returnVal.status == EMoveTypes.unknown) {
-                returnVal.status = EMoveTypes.body;
+            if (returnVal.contents == ECellContents.unknown) {
+                console.log("Move found to contain the body of snake: " + boardSnake.name);
+                returnVal.contents = ECellContents.body;
             }
             if (i == 0) {
                 // special note that body point is a head
                 returnVal.head = true;
+                console.log("It contains this snakes head");
             }
-            console.log("Move found to collide with body of snake: " + boardSnake.name);
+            if (i == boardSnake.body.length - 1) {
+                returnVal.tip = true;
+                console.log("It contains a snake tip");
+                if (!StateAnalyzer.nextToFood(boardSnake.body[0])
+                || boardSnake.name == StateAnalyzer.getMyName()) {
+                    console.log("But it is a safeTip");
+                    returnVal.safeTip = true;
+                }
+            }
         }
         }
         });
@@ -179,20 +189,22 @@ export class StateAnalyzer {
             // console.log("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
             if (getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
                 console.log("Move found to be contested by: " + boardSnake.name);
-                if (returnVal.status == EMoveTypes.unknown) returnVal.status = EMoveTypes.contested;
+                returnVal.contested = true;
                 if (!returnVal.snakeLengths) {
                     returnVal.snakeLengths = [];
                 }
                 returnVal.snakeLengths.push(boardSnake.body.length);
                 console.log("returnVal.snakeLengths == " + returnVal.snakeLengths);
+            } else {
+                returnVal.contested = false;
             }
         }
         });
 
         // If we still haven't changed it from unknown, the status
-        if (returnVal.status == EMoveTypes.unknown) {
-        returnVal.status = EMoveTypes.uncontested;
-        console.log("Move is free and uncontested");
+        if (returnVal.contents == ECellContents.unknown) {
+        returnVal.contents = ECellContents.empty;
+        console.log("Move destination is free");
         }
 
         // Also put in if the point is in the food list.
@@ -221,10 +233,10 @@ export class StateAnalyzer {
     // Another fun one. This function suggests a move that our snake could do based on the current board.
     // It will suggest moves in the following priority:
     // 1. A spot that a smaller snake is looking at or could also move to
-    // 2. An empty, uncontested spot
-    // 3. A spot that is contested... D:
-    // 4. An enemy snakes head, if he he's trapped he might do the same and we can take a bastard down with us.
-    // 5. ...up?  good luck
+    // 3. An empty, uncontested spot
+    // 4. A spot that is contested... D:
+    // 5. An enemy snakes head, if he he's trapped he might do the same and we can take a bastard down with us.
+    // 6. ...up?  good luck
     static safeMove(): EMoveDirections {
         console.log("SAFEMOVE DEFAULT ENGAGED");
         const myName = StateAnalyzer.getMyName();
@@ -238,7 +250,8 @@ export class StateAnalyzer {
 
         // Check the move infos multiple times over, return out and finish if we find something
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].status == EMoveTypes.contested) {
+        if (moveInfos[i].contents == ECellContents.empty
+            || (moveInfos[i].safeTip)) {
             if (StateAnalyzer.getMyLength() > Math.max(...moveInfos[i].snakeLengths)) {
                 console.log("Taking point contested by smaller snake by moving: " + moves[i]);
                 // Best pickins
@@ -249,17 +262,26 @@ export class StateAnalyzer {
 
         // Check the moves again for a second-best options
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].status == EMoveTypes.uncontested) {
-            console.log("Taking uncontested point by moving: " + moves[i]);
+        if (!moveInfos[i].contested && (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip)) {
+            console.log("Taking empty or safe tip point by moving: " + moves[i]);
             // Will do fine
             return moves[i];
         }
         }
 
-        // Oh shit we still haven't found something?
+        // Taking empty or safetip spot, possibly contested
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].status == EMoveTypes.contested) {
-            console.log("Taking contested point that might not end so well: " + moves[i]);
+        if (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip) {
+            console.log("Taking empty point that might not end so well: " + moves[i]);
+            // Scraping the bottom of the barrell...
+            return moves[i];
+        }
+        }
+
+                // Taking empty or safetip spot, possibly contested
+        for (let i = 0; i < 4; i++) {
+        if (moveInfos[i].tip) {
+            console.log("Taking a not-so-safe tip: " + moves[i]);
             // Scraping the bottom of the barrell...
             return moves[i];
         }

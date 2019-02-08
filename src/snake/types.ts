@@ -1,8 +1,7 @@
-export enum EMoveTypes {
+export enum ECellContents {
     wall,
     body,
-    contested,
-    uncontested,
+    empty,
     unknown
 }
 
@@ -14,8 +13,12 @@ export enum EMoveDirections {
 }
 
 export interface IMoveInfo {
-    status: EMoveTypes;
+    contents: ECellContents;
+    contested?: boolean;
     head?: boolean;
+    tip?: boolean;
+    safeTip?: boolean;
+    me?: boolean;
     food?: boolean;
     snakeLengths?: number[];
 
