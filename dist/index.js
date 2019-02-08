@@ -63,7 +63,7 @@ app.post("/move", (request, response) => {
         const targets = targetGen.getSortedTargets();
         const dodger = new TailDodger_1.TailDodger(myPosition);
         // Notice that this for-loop tries to get paths to each of the points in the sorted array. It will consider a path to any of these
-        // Points and get the move for the first step on this path if available. 
+        // Points and get the move for the first step on this path if available
         for (let i = 0; i < targets.length; i++) {
             targetXY = targets[i];
             path = dodger.getShortestPath(targetXY);

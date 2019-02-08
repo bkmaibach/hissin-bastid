@@ -69,7 +69,7 @@ exports.TailDodger = class {
         const planner = l1_path_finder_1.default(this.knownCollisions);
         // Init path as empty array.
         const path = [];
-        // distance of the path is the reutn value, but the path variable is no longer empty after this 
+        // distance of the path is the reutn value, but the path variable is no longer empty after this
         // function runs
         const dist = planner.search((this.snakeHead.x), (this.snakeHead.y), (endXY.x), (endXY.y), path);
         const steps = this.stepsInPath(path);
@@ -105,7 +105,6 @@ exports.TailDodger = class {
                         for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
                             this.addCollisionPoint(headToCollisionSection[k]);
                         }
-                        // 
                         return this.getShortestPath(endXY);
                     }
                     else {

@@ -53,9 +53,9 @@ class StateAnalyzer {
     static getFoodPoints() {
         return StateAnalyzer.gameState.board.food;
     }
-    //return false if no food on board
+    // return false if no food on board
     static isThereFood() {
-        if (StateAnalyzer.gameState.board.food[0] == null) {
+        if (StateAnalyzer.gameState.board.food[0] == undefined) {
             console.log("There is no food");
             return false;
         }
@@ -282,7 +282,7 @@ class StateAnalyzer {
         return (util_1.getIndexOfValue(takenPoints, point) > -1);
     }
     static getMyTailTip() {
-        const last = StateAnalyzer.gameState.you.body.length;
+        const last = StateAnalyzer.gameState.you.body.length - 1;
         return StateAnalyzer.gameState.you.body[last];
     }
 }

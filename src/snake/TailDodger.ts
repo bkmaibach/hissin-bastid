@@ -20,7 +20,7 @@ import createPlanner from "l1-path-finder";
     before it returns with its final answer.
 
     Finding a snake body in a hypothetical path does not always mean that there will be a wall drawn there. If the hypothetical
-    collision point is far enough away (farther than it is from its owners tail) then it won't be a collision, now will it? 
+    collision point is far enough away (farther than it is from its owners tail) then it won't be a collision, now will it?
     Take note of this point and all the points from there along to its owner's tail as safe places that shouldn't be considered as a wall
     on subsequent attempts.
 
@@ -71,7 +71,7 @@ export const TailDodger = class {
 
         // Init path as empty array.
         const path: number[] = [];
-        // distance of the path is the reutn value, but the path variable is no longer empty after this 
+        // distance of the path is the reutn value, but the path variable is no longer empty after this
         // function runs
         const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
         const steps = this.stepsInPath(path);
@@ -111,7 +111,6 @@ export const TailDodger = class {
                         for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
                             this.addCollisionPoint(headToCollisionSection[k]);
                         }
-                        // 
                         return this.getShortestPath(endXY);
                     } else {
                         // Mark the entire tail-side section of this point as safe in this else clase where taildodge is true

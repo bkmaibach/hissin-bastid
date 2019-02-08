@@ -9,7 +9,7 @@ exports.TargetGenerator = class {
         const food = StateAnalyzer_1.StateAnalyzer.getFoodPoints();
         // If there is no food on board then run following code
         if (!StateAnalyzer_1.StateAnalyzer.isThereFood()) {
-            console.log("There is no food");
+            console.log("There is no food, returning [ " + tailTip + "]");
             return [tailTip];
         }
         return food;

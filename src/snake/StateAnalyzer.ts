@@ -328,7 +328,7 @@ export class StateAnalyzer {
     }
 
     static getMyTailTip(): IPoint {
-        const last = StateAnalyzer.gameState.you.body.length;
+        const last = StateAnalyzer.gameState.you.body.length - 1;
         return StateAnalyzer.gameState.you.body[last];
     }
 }
