@@ -1,4 +1,4 @@
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake } from "./types";
+import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
 import { getIndexOfValue } from "./util";
 import * as _ from "lodash";
 
@@ -360,12 +360,11 @@ export class StateAnalyzer {
         return StateAnalyzer.getCurrentState().you.body[last];
     }
 
-    static getFinishedGameData() {
-        // TODO
-        const returnVal = {
-
-        };
-
-        StateAnalyzer.gameStates.forEach((state) => {});
+    static getGameStatesAndReset(): IGameState[] {
+        // TODO - compress the game data?
+        const returnVal = _.clone(StateAnalyzer.gameStates);
+        StateAnalyzer.gameStates = [];
+        return returnVal;
     }
+
 }
