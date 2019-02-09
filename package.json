@@ -30,6 +30,7 @@
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
+    "bson": "^4.0.1",
     "connect-mongo": "^2.0.3",
     "dotenv": "^4.0.0",
     "errorhandler": "^1.5.0",
@@ -38,7 +39,8 @@
     "lodash": "^4.17.5",
     "mongoose": "^4.13.17",
     "ndarray": "^1.0.18",
-    "winston": "^2.4.4"
+    "winston": "^2.4.4",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@types/async": "^2.0.50",

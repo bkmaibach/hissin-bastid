@@ -56,3 +56,10 @@ export interface IGameState {
     board: IBoard;
     you: ISnake;
 }
+
+export interface IGameState {
+    game: IGame;
+    turn: number;
+    board: IBoard;
+    you: ISnake;
+}

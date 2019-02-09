@@ -1,5 +1,6 @@
-import { IPoint } from "./types";
+import { IPoint, IGameState } from "./types";
 import * as _ from "lodash";
+
 // Similar to array.indexOf but works on value not reference
 export function getIndexOfValue(array: IPoint[], entry: IPoint) {
     for (let i = 0; i < array.length; i++) {

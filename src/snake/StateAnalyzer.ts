@@ -250,50 +250,51 @@ export class StateAnalyzer {
 
         // Check the move infos multiple times over, return out and finish if we find something
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].contents == ECellContents.empty
-            || (moveInfos[i].safeTip)) {
-            if (StateAnalyzer.getMyLength() > Math.max(...moveInfos[i].snakeLengths)) {
-                console.log("Taking point contested by smaller snake by moving: " + moves[i]);
-                // Best pickins
-                return moves[i];
+            if (moveInfos[i].contents == ECellContents.empty
+                || (moveInfos[i].safeTip)) {
+                if (moveInfos[i].contested && StateAnalyzer.getMyLength() > Math.max(...moveInfos[i].snakeLengths)) {
+                    console.log("Taking point contested by smaller snake by moving: " + moves[i]);
+                    // Best pickins
+                    return moves[i];
+                }
             }
-        }
         }
 
         // Check the moves again for a second-best options
         for (let i = 0; i < 4; i++) {
-        if (!moveInfos[i].contested && (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip)) {
-            console.log("Taking empty or safe tip point by moving: " + moves[i]);
-            // Will do fine
-            return moves[i];
-        }
+            if (!moveInfos[i].contested && (moveInfos[i].contents == ECellContents.empty
+                || moveInfos[i].safeTip)) {
+                console.log("Taking empty or safe tip point by moving: " + moves[i]);
+                // Will do fine
+                return moves[i];
+            }
         }
 
         // Taking empty or safetip spot, possibly contested
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip) {
-            console.log("Taking empty point that might not end so well: " + moves[i]);
-            // Scraping the bottom of the barrell...
-            return moves[i];
-        }
+            if (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip) {
+                console.log("Taking empty point that might not end so well: " + moves[i]);
+                // Scraping the bottom of the barrell...
+                return moves[i];
+            }
         }
 
-                // Taking empty or safetip spot, possibly contested
+        // Taking tip spot
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].tip) {
-            console.log("Taking a not-so-safe tip: " + moves[i]);
-            // Scraping the bottom of the barrell...
-            return moves[i];
-        }
+            if (moveInfos[i].tip) {
+                console.log("Taking a not-so-safe tip: " + moves[i]);
+                // Scraping the bottom of the barrel...
+                return moves[i];
+            }
         }
 
         // AAAAAAAAAHHH! ( I added a special move info property called head to make this work )
         for (let i = 0; i < 4; i++) {
-        if (moveInfos[i].head) {
-            // AAAAAAAAAAAAAAAAAAAHHH!!!
-            console.log("Last resort kamikaze move into another snake head: " + moves[i]);
-            return moves[i];
-        }
+            if (moveInfos[i].head) {
+                // AAAAAAAAAAAAAAAAAAAHHH!!!
+                console.log("Last resort kamikaze move into another snake head: " + moves[i]);
+                return moves[i];
+            }
         }
 
         // Welp!
@@ -339,7 +340,7 @@ export class StateAnalyzer {
         return returnVal;
     }
 
-    // Juse give me all the snake body points concatted together in one array for my convenience please
+    // Just give me all the snake body points concatted together in one array for my convenience please
     static getTakenPoints() {
         let returnArr: IPoint[] = [];
         StateAnalyzer.getSnakes().forEach((snake) => {
@@ -360,6 +361,11 @@ export class StateAnalyzer {
     }
 
     static getFinishedGameData() {
-        StateAnalyzer.gameStates.forEach(() => {});
+        // TODO
+        const returnVal = {
+
+        };
+
+        StateAnalyzer.gameStates.forEach((state) => {});
     }
 }
