@@ -29,6 +29,7 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
+    "@types/app-root-path": "^1.2.4",
     "app-root-path": "^2.1.0",
     "async": "^2.6.1",
     "bcrypt-nodejs": "^0.0.3",

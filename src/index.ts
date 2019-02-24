@@ -1,6 +1,5 @@
 import bodyParser from "body-parser";
 import express from "express";
-import logger from "./util/logger";
 
 import { fallbackHandler,
   notFoundHandler,
@@ -12,6 +11,7 @@ import * as _ from "lodash";
 import { TailDodger } from "./snake/TailDodger" ;
 import { TargetGenerator } from "./snake/TargetGenerator";
 import { IPoint, EMoveDirections } from "./snake/types";
+import { logger } from "../winston";
 
 const app = express();
 
