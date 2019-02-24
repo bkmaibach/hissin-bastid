@@ -12,6 +12,9 @@
     "start": "npm run serve",
     "start4": "PORT=9001 npm run serve & PORT=9002 npm run serve & PORT=9003 npm run serve & PORT=9004 npm run serve &",
     "stop4": "fuser -k 9001/tcp & fuser -k 9002/tcp & fuser -k 9003/tcp & fuser -k 9004/tcp",
+    "setup-board": "npm run start4 && $GOPATH/bin/start_engine.sh & cd ~/code/board && npm start &",
+    "takedown-board": "npm run stop4 & fuser -k 3000/tcp & fuser -k 3004/tcp && fuser -k 3005/tcp",
+    "game": "$GOPATH/bin/new_game.sh",
     "build": "npm run build-ts && npm run tslint",
     "serve": "node dist/index.js",
     "watch-node": "nodemon dist/index.js",
@@ -26,6 +29,7 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "async": "^2.6.1",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.3",

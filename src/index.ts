@@ -128,5 +128,5 @@ app.use(notFoundHandler);
 app.use(genericErrorHandler);
 
 app.listen(app.get("port"), () => {
-  console.log("Server listening on port %s", app.get("port"));
+  console.log("Snake listening on port %s", app.get("port"));
 });
