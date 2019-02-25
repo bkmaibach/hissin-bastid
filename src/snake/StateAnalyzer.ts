@@ -24,9 +24,9 @@ export class StateAnalyzer {
 
     }
 
-    static getCurrentState() {
-        const last = StateAnalyzer.gameStates.length - 1;
-        return StateAnalyzer.gameStates[last];
+    static getState(turnsAgo: number) {
+        const index = (StateAnalyzer.gameStates.length - 1) - turnsAgo ;
+        return StateAnalyzer.gameStates[index];
     }
 
     // Call this method right away when you know about a new game state
@@ -34,60 +34,78 @@ export class StateAnalyzer {
         StateAnalyzer.gameStates.push(newState);
     }
 
+    static isSnakeDigesting(snakeName: string) {
+        // const current = this.getState(0);
+        // const previous = this.getState(1);
+        const snakeHeadBefore = this.snakeHead(snakeName, 1);
+        const wasNextToFood = this.nextToFood(snakeHeadBefore, 1);
+        if (!wasNextToFood) {
+            return false;
+        } // TODO
+
+    }
+
+    static snakeHead(snakeName: string, turnsAgo: number): IPoint {
+        const state = this.getState(turnsAgo);
+        const snakeArray = state.board.snakes;
+        const snake = snakeArray.filter((snake) => snake.name == snakeName )[0];
+        return snake.body[0];
+    }
+
     // What turn is it?
     static getTurnNumber() {
-        return StateAnalyzer.getCurrentState().turn;
+        return StateAnalyzer.getState(0).turn;
     }
 
     // Where is my snake's head? What IPoint?
     static getMyPosition() {
-        return StateAnalyzer.getCurrentState().you.body[0];
+        return StateAnalyzer.getState(0).you.body[0];
     }
 
     // What is the name of my snake?
     static getMyName() {
-        return StateAnalyzer.getCurrentState().you.name;
+        return StateAnalyzer.getState(0).you.name;
     }
 
     // Give me an array of objects, each object contains all info on a snake ie health
     static getSnakes() {
-        return StateAnalyzer.getCurrentState().board.snakes;
+        return StateAnalyzer.getState(0).board.snakes;
     }
 
     // How long am I?
     static getMyLength() {
-        return StateAnalyzer.getCurrentState().you.body.length;
+        return StateAnalyzer.getState(0).you.body.length;
     }
 
     // Give me an array of all the points containing food
-    static getFoodPoints() {
-        return StateAnalyzer.getCurrentState().board.food;
+    static getFoodPoints(turnsAgo: number) {
+        return StateAnalyzer.getState(turnsAgo).board.food;
     }
 
     // return false if no food on board
     static isThereFood() {
-        if (StateAnalyzer.getCurrentState().board.food[0] == undefined) {
+        if (StateAnalyzer.getState(0).board.food[0] == undefined) {
             console.log("There is no food");
             return false;
         } else {
-            console.log("Food is here: " + StateAnalyzer.getCurrentState().board.food[0]);
+            console.log("Food is here: " + StateAnalyzer.getState(0).board.food[0]);
             return true;
         }
     }
 
     // How tall is the board?
     static getBoardHeight = () => {
-        return StateAnalyzer.getCurrentState().board.height;
+        return StateAnalyzer.getState(0).board.height;
     }
 
     // How wide?
     static getBoardWidth = () => {
-        return StateAnalyzer.getCurrentState().board.width;
+        return StateAnalyzer.getState(0).board.width;
     }
 
     // How long is a snake?
     static getSnakeLength = (name: string) => {
-        const snake = StateAnalyzer.getCurrentState().board.snakes.filter((snake: ISnake) => snake.name == name)[0];
+        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.name == name)[0];
         return snake.body.length;
     }
 
@@ -121,7 +139,7 @@ export class StateAnalyzer {
         // If theres a bug
         const returnVal: IMoveInfo = { contents: ECellContents.unknown, snakeLengths: [0] };
 
-        const snake = StateAnalyzer.getCurrentState().board.snakes.filter((snake: ISnake) => snake.name == snakeName)[0];
+        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.name == snakeName)[0];
         const { x, y } = snake.body[0];
 
         const newXY = move == "up" ? {x, y: y - 1} :
@@ -144,16 +162,16 @@ export class StateAnalyzer {
         console.log("considering spot: " + JSON.stringify(newXY));
 
         // Check if its a wall
-        if (newX >= StateAnalyzer.getCurrentState().board.width
+        if (newX >= StateAnalyzer.getState(0).board.width
         || newX < 0
-        || newY >= StateAnalyzer.getCurrentState().board.height
+        || newY >= StateAnalyzer.getState(0).board.height
         || newY < 0) {
             if (returnVal.contents == ECellContents.unknown) returnVal.contents = ECellContents.wall;
             console.log("Move found to collide with wall");
         }
 
         // Check if it's a part of any snake body
-        StateAnalyzer.getCurrentState().board.snakes.forEach((boardSnake: ISnake) => {
+        StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
         for (let i = 0; i < boardSnake.body.length; i++) {
         if (_.isEqual(boardSnake.body[i], newXY)) {
             if (returnVal.contents == ECellContents.unknown) {
@@ -168,7 +186,7 @@ export class StateAnalyzer {
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
                 console.log("It contains a snake tip");
-                if (!StateAnalyzer.nextToFood(boardSnake.body[0])
+                if (!StateAnalyzer.nextToFood(boardSnake.body[0], 0)
                 || boardSnake.name == StateAnalyzer.getMyName()) {
                     console.log("But it is a safeTip");
                     returnVal.safeTip = true;
@@ -181,7 +199,7 @@ export class StateAnalyzer {
         // Check if it's contested
         const neighbors = StateAnalyzer.getRectilinearNeighbors(newXY);
 
-        StateAnalyzer.getCurrentState().board.snakes.forEach((boardSnake: ISnake) => {
+        StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
         if (boardSnake.name != snakeName) {
             // console.log("Checking snake " + boardSnake.name);
             // console.log("Considering point " + JSON.stringify(newXY));
@@ -210,7 +228,7 @@ export class StateAnalyzer {
 
         // Also put in if the point is in the food list.
         // Notice the getIndexOfValue function returns -1 when it can't find the index in the list
-        returnVal.food = getIndexOfValue(StateAnalyzer.getCurrentState().board.food, newXY) > -1;
+        returnVal.food = getIndexOfValue(StateAnalyzer.getState(0).board.food, newXY) > -1;
 
         return returnVal;
     }
@@ -304,8 +322,8 @@ export class StateAnalyzer {
     }
 
     // Is this point next to food?
-    static nextToFood(point: IPoint): boolean {
-        const foodPoints = StateAnalyzer.getFoodPoints();
+    static nextToFood(point: IPoint, turnsAgo: number): boolean {
+        const foodPoints = StateAnalyzer.getFoodPoints(turnsAgo);
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
         // For each neighboring point is it in the food list blah blah
@@ -357,8 +375,8 @@ export class StateAnalyzer {
     }
 
     static getMyTailTip(): IPoint {
-        const last = StateAnalyzer.getCurrentState().you.body.length - 1;
-        return StateAnalyzer.getCurrentState().you.body[last];
+        const last = StateAnalyzer.getState(0).you.body.length - 1;
+        return StateAnalyzer.getState(0).you.body[last];
     }
 
     static getGameStatesAndReset(): IGameState[] {

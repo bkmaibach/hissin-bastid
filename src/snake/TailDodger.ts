@@ -20,9 +20,8 @@ import { logger } from "../../winston";
     that snake between the collision point and the head. The function will typically make many attempts to find a path to the destination
     before it returns with its final answer.
 
-    Finding a snake body in a hy
-pothetical path does not always mean that there will be a wall drawn there. If the hypothetical
-    collision point is far enoug
+    Finding a snake body in a hypothetical path does not always mean that there will be a wall drawn there. If the hypothetical
+    collision point is far enough away
 h away (farther than it is from its owners tail) then it won't be a collision, now will it?
     Take note of this point and
 all the points from there along to its owner's tail as safe places that shouldn't be considered as a wall
