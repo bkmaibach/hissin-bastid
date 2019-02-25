@@ -1,0 +1,23 @@
+{
+    "width": 11,
+    "height": 11,
+    "food": 3,
+    "snakes": [
+      {
+        "name": "Snek1",
+        "url": "http://localhost:9001"
+      },
+      {
+        "name": "Snek2",
+        "url": "http://localhost:9002"
+      },
+      {
+        "name": "Snek3",
+        "url": "http://localhost:9003"
+      },
+      {
+        "name": "Snek4",
+        "url": "http://localhost:9004"
+      }
+    ]
+}

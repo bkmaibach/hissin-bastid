@@ -94,18 +94,18 @@ app.post("/move", (request, response) => {
     }
 
     // Console logging break
-    logger.verbose("turn: " + JSON.stringify(turn));
-    logger.verbose("current xy: " + JSON.stringify(myPosition));
-    logger.verbose("target xy: " + JSON.stringify(targetXY));
-    logger.verbose("path projection: " + JSON.stringify(path));
-    logger.verbose("move: " + JSON.stringify(move));
-    logger.verbose("\n");
+    console.log("turn: " + JSON.stringify(turn));
+    console.log("current xy: " + JSON.stringify(myPosition));
+    console.log("target xy: " + JSON.stringify(targetXY));
+    console.log("path projection: " + JSON.stringify(path));
+    console.log("move: " + JSON.stringify(move));
+    console.log("\n");
 
     // Response data
     return response.json({move});
 
   } catch (e) {
-    logger.verbose(e);
+    console.log(e);
   }
 
 });
@@ -130,5 +130,5 @@ app.use(notFoundHandler);
 app.use(genericErrorHandler);
 
 app.listen(app.get("port"), () => {
-  logger.verbose("Snake listening on port %s", app.get("port"));
+  console.log("Snake listening on port %s", app.get("port"));
 });

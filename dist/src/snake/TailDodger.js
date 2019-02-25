@@ -15,7 +15,6 @@ const StateAnalyzer_1 = require("./StateAnalyzer");
 const _ = __importStar(require("lodash"));
 const ndarray_1 = __importDefault(require("ndarray"));
 const l1_path_finder_1 = __importDefault(require("l1-path-finder"));
-const winston_1 = require("../../winston");
 /*
     Okay. This is where the magic happens. The tail dodger is a sophisticated path drawing tool that provides one main public
     function. This function draws paths. The paths ignore snake tails when they are far enough away to be vacated by the time we get there.
@@ -91,7 +90,7 @@ exports.TailDodger = class {
                     // It's gonna take an extra step to vacate this spot if the snake who it belongs to
                     // is about to eat food. This is a quick preventative measure.
                     if (StateAnalyzer_1.StateAnalyzer.nextToFood(snakes[j].body[0])) {
-                        winston_1.logger.verbose("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
+                        console.log("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
                         stepsToVacate++;
                     }
                     // Is it a tail dodge?
@@ -126,7 +125,7 @@ exports.TailDodger = class {
         }
         // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
         if (StateAnalyzer_1.StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
-            winston_1.logger.verbose("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
+            console.log("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
             this.addCollisionPoint(steps[1]);
             return this.getShortestPath(endXY);
         }

@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
 const util_1 = require("./util");
 const _ = __importStar(require("lodash"));
-const winston_1 = require("../../winston");
 /*
 Every time our app is asked for a move, we receive a "request body" that contains all the information about the board
 at that time. This request body takes the form of a Javascript literal as text. (JSON).
@@ -61,11 +60,11 @@ class StateAnalyzer {
     // return false if no food on board
     static isThereFood() {
         if (StateAnalyzer.getCurrentState().board.food[0] == undefined) {
-            winston_1.logger.verbose("There is no food");
+            console.log("There is no food");
             return false;
         }
         else {
-            winston_1.logger.verbose("Food is here: " + StateAnalyzer.getCurrentState().board.food[0]);
+            console.log("Food is here: " + StateAnalyzer.getCurrentState().board.food[0]);
             return true;
         }
     }
@@ -107,9 +106,9 @@ class StateAnalyzer {
         const newY = newXY.y;
         // The XY that we are looking at has been determined using "left" or whatever
         // Logging checkpoint
-        winston_1.logger.verbose(this.getTurnNumber().toString());
-        winston_1.logger.verbose("My position: " + JSON.stringify(this.getMyPosition()));
-        winston_1.logger.verbose("considering spot: " + JSON.stringify(newXY));
+        console.log(this.getTurnNumber().toString());
+        console.log("My position: " + JSON.stringify(this.getMyPosition()));
+        console.log("considering spot: " + JSON.stringify(newXY));
         // Check if its a wall
         if (newX >= StateAnalyzer.getCurrentState().board.width
             || newX < 0
@@ -117,27 +116,27 @@ class StateAnalyzer {
             || newY < 0) {
             if (returnVal.contents == types_1.ECellContents.unknown)
                 returnVal.contents = types_1.ECellContents.wall;
-            winston_1.logger.verbose("Move found to collide with wall");
+            console.log("Move found to collide with wall");
         }
         // Check if it's a part of any snake body
         StateAnalyzer.getCurrentState().board.snakes.forEach((boardSnake) => {
             for (let i = 0; i < boardSnake.body.length; i++) {
                 if (_.isEqual(boardSnake.body[i], newXY)) {
                     if (returnVal.contents == types_1.ECellContents.unknown) {
-                        winston_1.logger.verbose("Move found to contain the body of snake: " + boardSnake.name);
+                        console.log("Move found to contain the body of snake: " + boardSnake.name);
                         returnVal.contents = types_1.ECellContents.body;
                     }
                     if (i == 0) {
                         // special note that body point is a head
                         returnVal.head = true;
-                        winston_1.logger.verbose("It contains this snakes head");
+                        console.log("It contains this snakes head");
                     }
                     if (i == boardSnake.body.length - 1) {
                         returnVal.tip = true;
-                        winston_1.logger.verbose("It contains a snake tip");
+                        console.log("It contains a snake tip");
                         if (!StateAnalyzer.nextToFood(boardSnake.body[0])
                             || boardSnake.name == StateAnalyzer.getMyName()) {
-                            winston_1.logger.verbose("But it is a safeTip");
+                            console.log("But it is a safeTip");
                             returnVal.safeTip = true;
                         }
                     }
@@ -148,19 +147,19 @@ class StateAnalyzer {
         const neighbors = StateAnalyzer.getRectilinearNeighbors(newXY);
         StateAnalyzer.getCurrentState().board.snakes.forEach((boardSnake) => {
             if (boardSnake.name != snakeName) {
-                // logger.verbose("Checking snake " + boardSnake.name);
-                // logger.verbose("Considering point " + JSON.stringify(newXY));
-                // logger.verbose("neighbors of this point: " + JSON.stringify(neighbors));
-                // logger.verbose("Snake head is at" + JSON.stringify(boardSnake.body[0]));
-                // logger.verbose("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
+                // console.log("Checking snake " + boardSnake.name);
+                // console.log("Considering point " + JSON.stringify(newXY));
+                // console.log("neighbors of this point: " + JSON.stringify(neighbors));
+                // console.log("Snake head is at" + JSON.stringify(boardSnake.body[0]));
+                // console.log("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
                 if (util_1.getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
-                    winston_1.logger.verbose("Move found to be contested by: " + boardSnake.name);
+                    console.log("Move found to be contested by: " + boardSnake.name);
                     returnVal.contested = true;
                     if (!returnVal.snakeLengths) {
                         returnVal.snakeLengths = [];
                     }
                     returnVal.snakeLengths.push(boardSnake.body.length);
-                    winston_1.logger.verbose("returnVal.snakeLengths == " + returnVal.snakeLengths);
+                    console.log("returnVal.snakeLengths == " + returnVal.snakeLengths);
                 }
                 else {
                     returnVal.contested = false;
@@ -170,7 +169,7 @@ class StateAnalyzer {
         // If we still haven't changed it from unknown, the status
         if (returnVal.contents == types_1.ECellContents.unknown) {
             returnVal.contents = types_1.ECellContents.empty;
-            winston_1.logger.verbose("Move destination is free");
+            console.log("Move destination is free");
         }
         // Also put in if the point is in the food list.
         // Notice the getIndexOfValue function returns -1 when it can't find the index in the list
@@ -203,7 +202,7 @@ class StateAnalyzer {
     // 5. An enemy snakes head, if he he's trapped he might do the same and we can take a bastard down with us.
     // 6. ...up?  good luck
     static safeMove() {
-        winston_1.logger.verbose("SAFEMOVE DEFAULT ENGAGED");
+        console.log("SAFEMOVE DEFAULT ENGAGED");
         const myName = StateAnalyzer.getMyName();
         const moves = [types_1.EMoveDirections.left, types_1.EMoveDirections.right, types_1.EMoveDirections.up, types_1.EMoveDirections.down];
         const moveInfos = [];
@@ -216,7 +215,7 @@ class StateAnalyzer {
             if (moveInfos[i].contents == types_1.ECellContents.empty
                 || (moveInfos[i].safeTip)) {
                 if (moveInfos[i].contested && StateAnalyzer.getMyLength() > Math.max(...moveInfos[i].snakeLengths)) {
-                    winston_1.logger.verbose("Taking point contested by smaller snake by moving: " + moves[i]);
+                    console.log("Taking point contested by smaller snake by moving: " + moves[i]);
                     // Best pickins
                     return moves[i];
                 }
@@ -226,7 +225,7 @@ class StateAnalyzer {
         for (let i = 0; i < 4; i++) {
             if (!moveInfos[i].contested && (moveInfos[i].contents == types_1.ECellContents.empty
                 || moveInfos[i].safeTip)) {
-                winston_1.logger.verbose("Taking empty or safe tip point by moving: " + moves[i]);
+                console.log("Taking empty or safe tip point by moving: " + moves[i]);
                 // Will do fine
                 return moves[i];
             }
@@ -234,7 +233,7 @@ class StateAnalyzer {
         // Taking empty or safetip spot, possibly contested
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].contents == types_1.ECellContents.empty || moveInfos[i].safeTip) {
-                winston_1.logger.verbose("Taking empty point that might not end so well: " + moves[i]);
+                console.log("Taking empty point that might not end so well: " + moves[i]);
                 // Scraping the bottom of the barrell...
                 return moves[i];
             }
@@ -242,7 +241,7 @@ class StateAnalyzer {
         // Taking tip spot
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].tip) {
-                winston_1.logger.verbose("Taking a not-so-safe tip: " + moves[i]);
+                console.log("Taking a not-so-safe tip: " + moves[i]);
                 // Scraping the bottom of the barrel...
                 return moves[i];
             }
@@ -251,12 +250,12 @@ class StateAnalyzer {
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].head) {
                 // AAAAAAAAAAAAAAAAAAAHHH!!!
-                winston_1.logger.verbose("Last resort kamikaze move into another snake head: " + moves[i]);
+                console.log("Last resort kamikaze move into another snake head: " + moves[i]);
                 return moves[i];
             }
         }
         // Welp!
-        winston_1.logger.verbose("No safe move could be found, defaulting to up. Sorry snakey :[");
+        console.log("No safe move could be found, defaulting to up. Sorry snakey :[");
         return types_1.EMoveDirections.up;
     }
     // Is this point next to food?
@@ -280,13 +279,13 @@ class StateAnalyzer {
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
             if (snake.name != myName) {
-                // logger.verbose("checking snake " + snake.name);
-                // logger.verbose("point neighbors are" + JSON.stringify(neighbors));
-                // logger.verbose("snake head is at " + JSON.stringify(snake.body[0]));
+                // console.log("checking snake " + snake.name);
+                // console.log("point neighbors are" + JSON.stringify(neighbors));
+                // console.log("snake head is at " + JSON.stringify(snake.body[0]));
                 if (util_1.getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                    winston_1.logger.verbose("snake head was found in neighbor list");
+                    console.log("snake head was found in neighbor list");
                     if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                        winston_1.logger.verbose("snake is too large to ignore");
+                        console.log("snake is too large to ignore");
                         returnVal = true;
                         return;
                     }

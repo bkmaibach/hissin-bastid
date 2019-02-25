@@ -80,17 +80,17 @@ app.post("/move", (request, response) => {
             move = StateAnalyzer_1.StateAnalyzer.safeMove();
         }
         // Console logging break
-        winston_1.logger.verbose("turn: " + JSON.stringify(turn));
-        winston_1.logger.verbose("current xy: " + JSON.stringify(myPosition));
-        winston_1.logger.verbose("target xy: " + JSON.stringify(targetXY));
-        winston_1.logger.verbose("path projection: " + JSON.stringify(path));
-        winston_1.logger.verbose("move: " + JSON.stringify(move));
-        winston_1.logger.verbose("\n");
+        console.log("turn: " + JSON.stringify(turn));
+        console.log("current xy: " + JSON.stringify(myPosition));
+        console.log("target xy: " + JSON.stringify(targetXY));
+        console.log("path projection: " + JSON.stringify(path));
+        console.log("move: " + JSON.stringify(move));
+        console.log("\n");
         // Response data
         return response.json({ move });
     }
     catch (e) {
-        winston_1.logger.verbose(e);
+        console.log(e);
     }
 });
 app.post("/end", (request, response) => {
@@ -108,6 +108,6 @@ app.use("*", handlers_1.fallbackHandler);
 app.use(handlers_1.notFoundHandler);
 app.use(handlers_1.genericErrorHandler);
 app.listen(app.get("port"), () => {
-    winston_1.logger.verbose("Snake listening on port %s", app.get("port"));
+    console.log("Snake listening on port %s", app.get("port"));
 });
 //# sourceMappingURL=index.js.map
