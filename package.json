@@ -12,6 +12,7 @@
     "start": "npm run serve",
     "start4": "PORT=9001 npm run serve & PORT=9002 npm run serve & PORT=9003 npm run serve & PORT=9004 npm run serve &",
     "stop4": "fuser -k 9001/tcp & fuser -k 9002/tcp & fuser -k 9003/tcp & fuser -k 9004/tcp",
+    "build-engine": "cd $GOPATH/src/github.com/battlesnakeio/engine && make run",
     "setup-board": "npm run start4 && $GOPATH/bin/engine server & cd $CODEPATH/board && npm start &",
     "takedown-board": "npm run stop4 & fuser -k 3000/tcp & fuser -k 3004/tcp && fuser -k 3005/tcp",
     "1game": "scripts/new_game.sh",

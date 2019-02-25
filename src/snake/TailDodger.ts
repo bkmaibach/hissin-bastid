@@ -1,5 +1,5 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint } from "./types";
-import { getIndexOfValue } from "./util";
+import { getIndexOfValue } from "../util/helpers";
 import { StateAnalyzer } from "./StateAnalyzer";
 import * as _ from "lodash";
 import ndarray from "ndarray";

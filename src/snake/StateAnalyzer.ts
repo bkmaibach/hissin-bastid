@@ -1,5 +1,5 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
-import { getIndexOfValue } from "./util";
+import { getIndexOfValue } from "../util/helpers";
 import * as _ from "lodash";
 import { logger } from "../../winston";
 

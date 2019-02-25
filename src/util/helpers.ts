@@ -1,4 +1,4 @@
-import { IPoint, IGameState } from "./types";
+import { IPoint, IGameState } from "../snake/types";
 import * as _ from "lodash";
 
 // Similar to array.indexOf but works on value not reference
@@ -25,5 +25,13 @@ export function shuffle(array: any[]) {
       temporaryValue = array[currentIndex];
       array[currentIndex] = array[randomIndex];
       array[randomIndex] = temporaryValue;
+    }
+}
+
+export function parseStringToObject(str: string) {
+    try {
+        return JSON.parse(str);
+    } catch (err) {
+        return {};
     }
 }
