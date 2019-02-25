@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 
 // Handle POST request to "/start"
 app.post("/start", (request, response) => {
+  logger.info("Enter /start");
   // forward the initial request to the state analyzer upon start
   // All this part serves to do is choose our colour. If the program sees its on heroku (production)
   // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
@@ -56,6 +57,7 @@ let targetXY: IPoint;
 const targetGen = new TargetGenerator();
 
 app.post("/move", (request, response) => {
+  logger.info("Enter /move");
   // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
   try {
     // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
@@ -92,18 +94,18 @@ app.post("/move", (request, response) => {
     }
 
     // Console logging break
-    console.log("turn: " + JSON.stringify(turn));
-    console.log("current xy: " + JSON.stringify(myPosition));
-    console.log("target xy: " + JSON.stringify(targetXY));
-    console.log("path projection: " + JSON.stringify(path));
-    console.log("move: " + JSON.stringify(move));
-    console.log("\n");
+    logger.verbose("turn: " + JSON.stringify(turn));
+    logger.verbose("current xy: " + JSON.stringify(myPosition));
+    logger.verbose("target xy: " + JSON.stringify(targetXY));
+    logger.verbose("path projection: " + JSON.stringify(path));
+    logger.verbose("move: " + JSON.stringify(move));
+    logger.verbose("\n");
 
     // Response data
     return response.json({move});
 
   } catch (e) {
-    console.log(e);
+    logger.verbose(e);
   }
 
 });
@@ -128,5 +130,5 @@ app.use(notFoundHandler);
 app.use(genericErrorHandler);
 
 app.listen(app.get("port"), () => {
-  console.log("Snake listening on port %s", app.get("port"));
+  logger.verbose("Snake listening on port %s", app.get("port"));
 });

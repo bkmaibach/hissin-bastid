@@ -1,11 +1,21 @@
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint } from "./types";
-import { getIndexOfValue } from "./util";
-import { StateAnalyzer } from "./StateAnalyzer";
-import * as _ from "lodash";
-import ndarray from "ndarray";
-import createPlanner from "l1-path-finder";
-import { logger } from "../../winston";
-
+"use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const util_1 = require("./util");
+const StateAnalyzer_1 = require("./StateAnalyzer");
+const _ = __importStar(require("lodash"));
+const ndarray_1 = __importDefault(require("ndarray"));
+const l1_path_finder_1 = __importDefault(require("l1-path-finder"));
+const winston_1 = require("../../winston");
 /*
     Okay. This is where the magic happens. The tail dodger is a sophisticated path drawing tool that provides one main public
     function. This function draws paths. The paths ignore snake tails when they are far enough away to be vacated by the time we get there.
@@ -32,74 +42,58 @@ all the points from there along to its owner's tail as safe places that shouldn'
     This array's 0th entry is the start point that was initially povided to the objects constructor.
 
 */
-
-export const TailDodger = class {
-    snakeHead: IPoint;
-    state: StateAnalyzer;
-    steps: IPoint[];
-    knownCollisions: ndarray;
-    knownTailDodges: IPoint[];
-
+exports.TailDodger = class {
     // Construct the object. This object is good for the current frame only but gets more efficient
     // the more you use it.
-    constructor(xy: IPoint) {
-
+    constructor(xy) {
         // You gotta create an array of 0's to start the maze as wall-less
         // The ndarray thing takes width x height 0's in one array and the maze dimensions
         // in a second array. this ndarray is then used to create our actual maze dealy that pumps
         // out hypothetical path's to check
         this.snakeHead = xy;
         this.steps = [];
-        const height = StateAnalyzer.getBoardHeight();
-        const width = StateAnalyzer.getBoardWidth();
+        const height = StateAnalyzer_1.StateAnalyzer.getBoardHeight();
+        const width = StateAnalyzer_1.StateAnalyzer.getBoardWidth();
         const numCells = height * width;
         const ndArrayParam = [];
         // The ND array requires an array of width * height 0's to start
         for (let i = 0; i < numCells; i++) {
             ndArrayParam.push(0);
         }
-
         // We call the maze-making parameter "known collisions" cuz its a collection of places where we will eventually
         // know are places we cannot traverse. This will get added to as we find points we can't traverse, and used
         // in creating new mazes to solve on each call of the getShortestPath function
-        this.knownCollisions = ndarray(ndArrayParam, [height, width]);
-
+        this.knownCollisions = ndarray_1.default(ndArrayParam, [height, width]);
         // Known tail dodges are just an array of points to check when considering if a point is safe.
         this.knownTailDodges = [];
     }
-
-    getShortestPath ( endXY: IPoint ): IPoint[] {
+    getShortestPath(endXY) {
         // Create path planner (which is a maze that pumps out paths in an inconventient format)
         // Define the walls, with the thing that was at first made with those height x width 0's arrays
-        const planner = createPlanner(this.knownCollisions);
-
+        const planner = l1_path_finder_1.default(this.knownCollisions);
         // Init path as empty array.
-        const path: number[] = [];
+        const path = [];
         // distance of the path is the reutn value, but the path variable is no longer empty after this
         // function runs
-        const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
+        const dist = planner.search((this.snakeHead.x), (this.snakeHead.y), (endXY.x), (endXY.y), path);
         const steps = this.stepsInPath(path);
-
-        const snakes = StateAnalyzer.getSnakes();
+        const snakes = StateAnalyzer_1.StateAnalyzer.getSnakes();
         for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
             // Each step in our supposed path will be considered. If its not a good step
             // Then the function restarts with this knowledge in mind.
             for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
-                const possibleCollisionIndex = getIndexOfValue(snakes[j].body, steps[i]);
-
+                const possibleCollisionIndex = util_1.getIndexOfValue(snakes[j].body, steps[i]);
                 // For this point, consider each snake. Is this a snake body? How long
                 // Will it take to get to this point? Can we say the tail will be out of the way by then?
-                if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
+                if (possibleCollisionIndex > -1 && !this.isKnownTailDodge(steps[i])) {
                     const stepsToOccupy = i;
                     let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
-
                     // It's gonna take an extra step to vacate this spot if the snake who it belongs to
                     // is about to eat food. This is a quick preventative measure.
-                    if (StateAnalyzer.nextToFood(snakes[j].body[0])) {
-                        logger.verbose("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
+                    if (StateAnalyzer_1.StateAnalyzer.nextToFood(snakes[j].body[0])) {
+                        winston_1.logger.verbose("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
                         stepsToVacate++;
                     }
-
                     // Is it a tail dodge?
                     const tailDodge = stepsToOccupy >= stepsToVacate;
                     if (!tailDodge) {
@@ -115,9 +109,9 @@ export const TailDodger = class {
                         for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
                             this.addCollisionPoint(headToCollisionSection[k]);
                         }
-
                         return this.getShortestPath(endXY);
-                    } else {
+                    }
+                    else {
                         // Mark the entire tail-side section of this point as safe in this else clase where taildodge is true
                         for (let k = possibleCollisionIndex; k < snakes[j].body.length; k++) {
                             this.addKnownTailDodge(snakes[j].body[k]);
@@ -130,35 +124,29 @@ export const TailDodger = class {
             // If there is no path, this will be the case here.
             return undefined;
         }
-
         // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
-        if (StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
-            logger.verbose("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
+        if (StateAnalyzer_1.StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
+            winston_1.logger.verbose("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
             this.addCollisionPoint(steps[1]);
             return this.getShortestPath(endXY);
         }
-
         // Finally return and update steps found
         this.steps = steps;
         return steps;
     }
-
-    addCollisionPoint(xy: IPoint) {
+    addCollisionPoint(xy) {
         this.knownCollisions.set((xy.x), (xy.y), 1);
     }
-
-    addKnownTailDodge(xy: IPoint) {
+    addKnownTailDodge(xy) {
         this.knownTailDodges.push(xy);
     }
-
-    isKnownTailDodge(xy: IPoint) {
-        return getIndexOfValue(this.knownTailDodges, xy) > -1;
+    isKnownTailDodge(xy) {
+        return util_1.getIndexOfValue(this.knownTailDodges, xy) > -1;
     }
-
     // The purpose of this function is to convert the data returned by our
     // super efficient maze solver module into the [{xy point}] array shape used by this entire project.
     // It works fine the way it is and probably shouldn't be touched at this point.
-    stepsInPath (plannerPath: number[]): IPoint[] {
+    stepsInPath(plannerPath) {
         // The data starts as a 1-D array of corners and end x's and y's. Some conditional for blocks
         // figure out which way the steps are going for one pair of entries to the next, and then new {XY} IPoints
         // get pushed into an array and returned.
@@ -166,39 +154,41 @@ export const TailDodger = class {
         const steps = [];
         // first an array of points of just the corners and ends are put in an array
         for (let i = 0; i < plannerPath.length - 1; i += 2) {
-            cornersAndEnds.push({x: plannerPath[i], y: plannerPath[i + 1]});
+            cornersAndEnds.push({ x: plannerPath[i], y: plannerPath[i + 1] });
         }
-
         // Then each entry is filled in
         for (let k = 0; k < cornersAndEnds.length; k++) {
             let deltaX;
             let deltaY;
-            if (k < cornersAndEnds.length - 1 ) {
+            if (k < cornersAndEnds.length - 1) {
                 deltaX = cornersAndEnds[k + 1].x - cornersAndEnds[k].x;
                 deltaY = cornersAndEnds[k + 1].y - cornersAndEnds[k].y;
-            } else {
+            }
+            else {
                 deltaX = 0;
                 deltaY = 0;
             }
-
             // deltaX means change in X for this corner to the X
             // These if/elses figure out which way the progression is going on this run of the path
             // and adds IPoints into our return value accordingly.
-            if (deltaX > 0 ) {
+            if (deltaX > 0) {
                 for (let j = 0; j < deltaX; j++) {
-                    steps.push({x: cornersAndEnds[k].x + j, y: cornersAndEnds[k].y});
+                    steps.push({ x: cornersAndEnds[k].x + j, y: cornersAndEnds[k].y });
                 }
-            } else if (deltaX < 0) {
+            }
+            else if (deltaX < 0) {
                 for (let j = 0; j > deltaX; j--) {
-                    steps.push({x: cornersAndEnds[k].x + j, y: cornersAndEnds[k].y});
+                    steps.push({ x: cornersAndEnds[k].x + j, y: cornersAndEnds[k].y });
                 }
-            } else if (deltaY > 0) {
+            }
+            else if (deltaY > 0) {
                 for (let j = 0; j < deltaY; j++) {
-                    steps.push({x: cornersAndEnds[k].x, y: cornersAndEnds[k].y + j});
+                    steps.push({ x: cornersAndEnds[k].x, y: cornersAndEnds[k].y + j });
                 }
-            } else if (deltaY < 0) {
+            }
+            else if (deltaY < 0) {
                 for (let j = 0; j > deltaY; j--) {
-                    steps.push({x: cornersAndEnds[k].x, y: cornersAndEnds[k].y + j});
+                    steps.push({ x: cornersAndEnds[k].x, y: cornersAndEnds[k].y + j });
                 }
             }
         }
@@ -206,4 +196,5 @@ export const TailDodger = class {
         steps.push(cornersAndEnds[cornersAndEnds.length - 1]);
         return steps;
     }
-  };
+};
+//# sourceMappingURL=TailDodger.js.map
