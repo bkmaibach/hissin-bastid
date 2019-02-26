@@ -1,5 +1,6 @@
 import bodyParser from "body-parser";
 import express from "express";
+import * as path from "path";
 
 import { fallbackHandler,
   notFoundHandler,
@@ -11,10 +12,13 @@ import * as _ from "lodash";
 import { TailDodger } from "./snake/TailDodger" ;
 import { TargetGenerator } from "./snake/TargetGenerator";
 import { IPoint, EMoveDirections } from "./snake/types";
-import { logger } from "../winston";
+// import { logger } from "../winston";
+import { logger } from "./util/logger";
+// import * as rootPath from "app-root-path";
+import * as dataLogger from "./data/data";
 
 const app = express();
-
+let filename: string;
 // For deployment to Heroku, the port needs to be set using ENV, so
 // we check for the port number in process.env
 app.set("port", (process.env.PORT || 9001));
@@ -22,13 +26,16 @@ app.enable("verbose errors");
 app.use(bodyParser.json());
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
-
 // Handle POST request to "/start"
-app.post("/start", (request, response) => {
+app.post("/start", async (request, response) => {
   logger.info("Enter /start");
   // forward the initial request to the state analyzer upon start
   // All this part serves to do is choose our colour. If the program sees its on heroku (production)
   // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
+  const snakeName = request.body.you.name;
+  const gameID = request.body.game.id;
+  filename = gameID + "_" + snakeName;
+
   StateAnalyzer.update(request.body);
   let hexString;
   if (process.env.NODE_ENV == "production") {
@@ -71,9 +78,9 @@ app.post("/move", (request, response) => {
     const turn = StateAnalyzer.getTurnNumber();
     const myPosition = StateAnalyzer.getMyPosition();
 
-    // Where do we go? Ideally, our target gen has sorted all of the points in perfect order of how much we should go twards there
-    // This could be served up by a neural net processing the game state. But at the time of writing it's just the list of food points.
-    // (which got us to a score of 31)
+    // Where do we go? Ideally, ourappRoot target gen has sorted all of the points in perfect order of how much we should go twards there
+    // This could be served up by aappRoot neural net processing the game state. But at the time of writing it's just the list of food points.
+    // (which got us to a score of appRoot31)
     const targets = targetGen.getSortedTargets();
     const dodger = new TailDodger(myPosition);
 
@@ -93,13 +100,20 @@ app.post("/move", (request, response) => {
       move = StateAnalyzer.safeMove();
     }
 
+    logger.log("info", "Test message");
+
     // Console logging break
+    // dataLogger.updateFile("snake-decisions", filename, "turn: " + JSON.stringify(turn));
+    // dataLogger.updateFile("snake-decisions", filename, "current xy: " + JSON.stringify(myPosition));
+    // dataLogger.updateFile("snake-decisions", filename, "target xy: " + JSON.stringify(targetXY));
+    // dataLogger.updateFile("snake-decisions", filename, "path projection: " + JSON.stringify(path));
+    // dataLogger.updateFile("snake-decisions", filename, "move: " + JSON.stringify(move));
+
     console.log("turn: " + JSON.stringify(turn));
     console.log("current xy: " + JSON.stringify(myPosition));
     console.log("target xy: " + JSON.stringify(targetXY));
     console.log("path projection: " + JSON.stringify(path));
-    console.log("move: " + JSON.stringify(move));
-    console.log("\n");
+    console.log("snake-decisions", filename, "move: " + JSON.stringify(move));
 
     // Response data
     return response.json({move});
@@ -113,7 +127,6 @@ app.post("/move", (request, response) => {
 app.post("/end", (request, response) => {
   // NOTE: Any cleanup when a game is complete.
   // So we can run multiple games without re-starting app.
-
   return response.json({});
 });
 
@@ -131,4 +144,6 @@ app.use(genericErrorHandler);
 
 app.listen(app.get("port"), () => {
   console.log("Snake listening on port %s", app.get("port"));
+  const logDir = path.join(__dirname, "../logs" );
+  console.log("Logs can be found at " + logDir);
 });

@@ -1,7 +1,8 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
 import { getIndexOfValue } from "../util/helpers";
+import * as data from "../data/data";
 import * as _ from "lodash";
-import { logger } from "../../winston";
+// import { logger } from "../../winston";
 
 /*
 Every time our app is asked for a move, we receive a "request body" that contains all the information about the board
@@ -38,11 +39,24 @@ export class StateAnalyzer {
         // const current = this.getState(0);
         // const previous = this.getState(1);
         const snakeHeadBefore = this.snakeHead(snakeName, 1);
+        const snakeHeadAfter = this.snakeHead(snakeName, 0);
         const wasNextToFood = this.nextToFood(snakeHeadBefore, 1);
         if (!wasNextToFood) {
             return false;
-        } // TODO
+        } else {
+            const foodPoints = this.getNeighborsWithFood(snakeHeadBefore, 1);
+            const negativeOneIfAbsent = getIndexOfValue(foodPoints, snakeHeadAfter);
+            return (negativeOneIfAbsent != -1);
+        }
 
+    }
+    static getNeighborsWithFood(point: IPoint, turnsAgo: number): IPoint[] {
+        const neighbors = this.getRectilinearNeighbors(point);
+        const foodPoints = this.getFoodPoints(turnsAgo);
+        const result = neighbors.filter((neighborPoint) => {
+            return getIndexOfValue(foodPoints, neighborPoint) > -1;
+        });
+        return result;
     }
 
     static snakeHead(snakeName: string, turnsAgo: number): IPoint {

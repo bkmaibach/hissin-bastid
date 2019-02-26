@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("./util");
+const helpers_1 = require("../util/helpers");
 const StateAnalyzer_1 = require("./StateAnalyzer");
 const _ = __importStar(require("lodash"));
 const ndarray_1 = __importDefault(require("ndarray"));
@@ -18,7 +18,7 @@ const l1_path_finder_1 = __importDefault(require("l1-path-finder"));
 /*
     Okay. This is where the magic happens. The tail dodger is a sophisticated path drawing tool that provides one main public
     function. This function draws paths. The paths ignore snake tails when they are far enough away to be vacated by the time we get there.
-    The funciton does not take into account where the snake heads will go in the future, and will make assume no premption on this.
+    The function does not take into account where the snake heads will go in the future, and will make assume no premption on this.
 
     This can be used every turn to obtain a new move along the start of a new path. The snake does not have to follow the entire path.
 
@@ -30,8 +30,10 @@ const l1_path_finder_1 = __importDefault(require("l1-path-finder"));
     before it returns with its final answer.
 
     Finding a snake body in a hypothetical path does not always mean that there will be a wall drawn there. If the hypothetical
-    collision point is far enough away (farther than it is from its owners tail) then it won't be a collision, now will it?
-    Take note of this point and all the points from there along to its owner's tail as safe places that shouldn't be considered as a wall
+    collision point is far enough away
+h away (farther than it is from its owners tail) then it won't be a collision, now will it?
+    Take note of this point and
+all the points from there along to its owner's tail as safe places that shouldn't be considered as a wall
     on subsequent attempts.
 
     Once a path with no walls or collisions not marked as a tail dodge, return the path as a series of point objects in an array.
@@ -78,7 +80,7 @@ exports.TailDodger = class {
             // Each step in our supposed path will be considered. If its not a good step
             // Then the function restarts with this knowledge in mind.
             for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
-                const possibleCollisionIndex = util_1.getIndexOfValue(snakes[j].body, steps[i]);
+                const possibleCollisionIndex = helpers_1.getIndexOfValue(snakes[j].body, steps[i]);
                 // For this point, consider each snake. Is this a snake body? How long
                 // Will it take to get to this point? Can we say the tail will be out of the way by then?
                 if (possibleCollisionIndex > -1 && !this.isKnownTailDodge(steps[i])) {
@@ -86,7 +88,7 @@ exports.TailDodger = class {
                     let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
                     // It's gonna take an extra step to vacate this spot if the snake who it belongs to
                     // is about to eat food. This is a quick preventative measure.
-                    if (StateAnalyzer_1.StateAnalyzer.nextToFood(snakes[j].body[0])) {
+                    if (StateAnalyzer_1.StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
                         console.log("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
                         stepsToVacate++;
                     }
@@ -137,7 +139,7 @@ exports.TailDodger = class {
         this.knownTailDodges.push(xy);
     }
     isKnownTailDodge(xy) {
-        return util_1.getIndexOfValue(this.knownTailDodges, xy) > -1;
+        return helpers_1.getIndexOfValue(this.knownTailDodges, xy) > -1;
     }
     // The purpose of this function is to convert the data returned by our
     // super efficient maze solver module into the [{xy point}] array shape used by this entire project.

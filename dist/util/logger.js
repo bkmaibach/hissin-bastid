@@ -1,18 +1,38 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const winston_1 = __importDefault(require("winston"));
-const winston_2 = require("winston");
-const logger = new (winston_2.Logger)({
+const winston = __importStar(require("winston"));
+const options = {
+    file: {
+        level: "info",
+        filename: `${__dirname}/logs/app.log`,
+        handleExceptions: true,
+        json: true,
+        maxsize: 5242880,
+        maxFiles: 5,
+        colorize: false,
+    },
+    console: {
+        level: "debug",
+        handleExceptions: true,
+        json: false,
+        colorize: true,
+    }
+};
+exports.logger = new winston.Logger({
     transports: [
-        new (winston_1.default.transports.Console)({ level: process.env.NODE_ENV === "production" ? "error" : "debug" }),
-        new (winston_1.default.transports.File)({ filename: "debug.log", level: "debug" })
-    ]
+        new winston.transports.File(options.file),
+        new winston.transports.Console(options.console)
+    ],
+    exitOnError: false,
+    stream: {
+        write: function (message, encoding) { exports.logger.info(message); }
+    }
 });
-if (process.env.NODE_ENV !== "production") {
-    logger.debug("Logging initialized at debug level");
-}
-exports.default = logger;
 //# sourceMappingURL=logger.js.map

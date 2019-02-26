@@ -4,12 +4,13 @@ import { StateAnalyzer } from "./StateAnalyzer";
 import * as _ from "lodash";
 import ndarray from "ndarray";
 import createPlanner from "l1-path-finder";
-import { logger } from "../../winston";
+// import { logger } from "../../winston";
+import * as data from "../data/data";
 
 /*
     Okay. This is where the magic happens. The tail dodger is a sophisticated path drawing tool that provides one main public
     function. This function draws paths. The paths ignore snake tails when they are far enough away to be vacated by the time we get there.
-    The funciton does not take into account where the snake heads will go in the future, and will make assume no premption on this.
+    The function does not take into account where the snake heads will go in the future, and will make assume no premption on this.
 
     This can be used every turn to obtain a new move along the start of a new path. The snake does not have to follow the entire path.
 
@@ -94,7 +95,7 @@ export const TailDodger = class {
 
                     // It's gonna take an extra step to vacate this spot if the snake who it belongs to
                     // is about to eat food. This is a quick preventative measure.
-                    if (StateAnalyzer.nextToFood(snakes[j].body[0])) {
+                    if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
                         console.log("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
                         stepsToVacate++;
                     }
