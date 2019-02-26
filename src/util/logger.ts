@@ -1,35 +1,16 @@
-import * as appRoot from "app-root-path";
-import * as winston from "winston";
+import winston from "winston";
+import { Logger } from "winston";
+import { ENVIRONMENT } from "./secrets";
 
-const options = {
-
-    file: {
-        level: "info",
-        filename: `${__dirname}/logs/app.log`,
-        handleExceptions: true,
-        json: true,
-        maxsize: 5242880, // 5MB
-        maxFiles: 5,
-        colorize: false,
-    },
-
-    console: {
-        level: "debug",
-        handleExceptions: true,
-        json: false,
-        colorize: true,
-    }
-
-};
-
-export const logger = new winston.Logger({
-
+const logger = new (Logger)({
     transports: [
-        new winston.transports.File(options.file),
-        new winston.transports.Console(options.console)
-    ],
-    exitOnError: false, // do not exit on handled exceptions
-    stream: {
-        write: function(message: string, encoding: string) { logger.info(message); }
-    }
+        new (winston.transports.Console)({ level: process.env.NODE_ENV === "production" ? "error" : "debug" }),
+        new (winston.transports.File)({ filename: "debug.log", level: "debug"})
+    ]
 });
+
+if (process.env.NODE_ENV !== "production") {
+    logger.debug("Logging initialized at debug level");
+}
+
+export default logger;
