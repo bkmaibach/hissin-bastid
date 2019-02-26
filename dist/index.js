@@ -25,8 +25,7 @@ const handlers_1 = require("./handlers");
 const StateAnalyzer_1 = require("./snake/StateAnalyzer");
 const TailDodger_1 = require("./snake/TailDodger");
 const TargetGenerator_1 = require("./snake/TargetGenerator");
-// import { logger } from "../winston";
-const logger_1 = require("./util/logger");
+const SnakeLogger_1 = require("./util/SnakeLogger");
 const app = express_1.default();
 let filename;
 // For deployment to Heroku, the port needs to be set using ENV, so
@@ -37,12 +36,13 @@ app.use(body_parser_1.default.json());
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
 // Handle POST request to "/start"
 app.post("/start", (request, response) => __awaiter(this, void 0, void 0, function* () {
-    logger_1.logger.info("Enter /start");
+    const snakeName = request.body.you.name;
+    const gameID = request.body.game.id;
+    SnakeLogger_1.SnakeLogger.init(snakeName, gameID);
+    SnakeLogger_1.SnakeLogger.info("Enter /start");
     // forward the initial request to the state analyzer upon start
     // All this part serves to do is choose our colour. If the program sees its on heroku (production)
     // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
-    const snakeName = request.body.you.name;
-    const gameID = request.body.game.id;
     filename = gameID + "_" + snakeName;
     StateAnalyzer_1.StateAnalyzer.update(request.body);
     let hexString;
@@ -69,7 +69,7 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
 let targetXY;
 const targetGen = new TargetGenerator_1.TargetGenerator();
 app.post("/move", (request, response) => {
-    logger_1.logger.info("Enter /move");
+    SnakeLogger_1.SnakeLogger.info("Enter /move");
     // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
     try {
         // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
@@ -100,18 +100,11 @@ app.post("/move", (request, response) => {
         if (typeof path == "undefined") {
             move = StateAnalyzer_1.StateAnalyzer.safeMove();
         }
-        logger_1.logger.log("info", "Test message");
-        // Console logging break
-        // dataLogger.updateFile("snake-decisions", filename, "turn: " + JSON.stringify(turn));
-        // dataLogger.updateFile("snake-decisions", filename, "current xy: " + JSON.stringify(myPosition));
-        // dataLogger.updateFile("snake-decisions", filename, "target xy: " + JSON.stringify(targetXY));
-        // dataLogger.updateFile("snake-decisions", filename, "path projection: " + JSON.stringify(path));
-        // dataLogger.updateFile("snake-decisions", filename, "move: " + JSON.stringify(move));
-        console.log("turn: " + JSON.stringify(turn));
-        console.log("current xy: " + JSON.stringify(myPosition));
-        console.log("target xy: " + JSON.stringify(targetXY));
-        console.log("path projection: " + JSON.stringify(path));
-        console.log("snake-decisions", filename, "move: " + JSON.stringify(move));
+        SnakeLogger_1.SnakeLogger.notice("turn: " + JSON.stringify(turn));
+        SnakeLogger_1.SnakeLogger.notice("current xy: " + JSON.stringify(myPosition));
+        SnakeLogger_1.SnakeLogger.notice("target xy: " + JSON.stringify(targetXY));
+        SnakeLogger_1.SnakeLogger.notice("path projection: " + JSON.stringify(path));
+        SnakeLogger_1.SnakeLogger.notice("move: " + JSON.stringify(move));
         // Response data
         return response.json({ move });
     }
@@ -120,11 +113,13 @@ app.post("/move", (request, response) => {
     }
 });
 app.post("/end", (request, response) => {
+    SnakeLogger_1.SnakeLogger.info("Enter /end");
     // NOTE: Any cleanup when a game is complete.
     // So we can run multiple games without re-starting app.
     return response.json({});
 });
 app.post("/ping", (request, response) => {
+    SnakeLogger_1.SnakeLogger.info("Enter /ping");
     // Used for checking if this snake is still alive.
     return response.json({});
 });

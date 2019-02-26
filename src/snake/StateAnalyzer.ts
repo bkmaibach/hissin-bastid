@@ -2,6 +2,7 @@ import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake,
 import { getIndexOfValue } from "../util/helpers";
 import * as data from "../data/data";
 import * as _ from "lodash";
+import { SnakeLogger } from "../util/SnakeLogger";
 // import { logger } from "../../winston";
 
 /*
@@ -99,10 +100,10 @@ export class StateAnalyzer {
     // return false if no food on board
     static isThereFood() {
         if (StateAnalyzer.getState(0).board.food[0] == undefined) {
-            console.log("There is no food");
+            SnakeLogger.notice("There is no food");
             return false;
         } else {
-            console.log("Food is here: " + StateAnalyzer.getState(0).board.food[0]);
+            SnakeLogger.notice("Food is here: " + StateAnalyzer.getState(0).board.food[0]);
             return true;
         }
     }
@@ -171,9 +172,9 @@ export class StateAnalyzer {
         // The XY that we are looking at has been determined using "left" or whatever
         // Logging checkpoint
 
-        console.log(this.getTurnNumber().toString());
-        console.log("My position: " + JSON.stringify(this.getMyPosition()));
-        console.log("considering spot: " + JSON.stringify(newXY));
+        SnakeLogger.notice(this.getTurnNumber().toString());
+        SnakeLogger.notice("My position: " + JSON.stringify(this.getMyPosition()));
+        SnakeLogger.notice("considering spot: " + JSON.stringify(newXY));
 
         // Check if its a wall
         if (newX >= StateAnalyzer.getState(0).board.width
@@ -181,7 +182,7 @@ export class StateAnalyzer {
         || newY >= StateAnalyzer.getState(0).board.height
         || newY < 0) {
             if (returnVal.contents == ECellContents.unknown) returnVal.contents = ECellContents.wall;
-            console.log("Move found to collide with wall");
+            SnakeLogger.notice("Move found to collide with wall");
         }
 
         // Check if it's a part of any snake body
@@ -189,20 +190,20 @@ export class StateAnalyzer {
         for (let i = 0; i < boardSnake.body.length; i++) {
         if (_.isEqual(boardSnake.body[i], newXY)) {
             if (returnVal.contents == ECellContents.unknown) {
-                console.log("Move found to contain the body of snake: " + boardSnake.name);
+                SnakeLogger.notice("Move found to contain the body of snake: " + boardSnake.name);
                 returnVal.contents = ECellContents.body;
             }
             if (i == 0) {
                 // special note that body point is a head
                 returnVal.head = true;
-                console.log("It contains this snakes head");
+                SnakeLogger.notice("It contains this snakes head");
             }
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
-                console.log("It contains a snake tip");
+                SnakeLogger.notice("It contains a snake tip");
                 if (!StateAnalyzer.nextToFood(boardSnake.body[0], 0)
                 || boardSnake.name == StateAnalyzer.getMyName()) {
-                    console.log("But it is a safeTip");
+                    SnakeLogger.notice("But it is a safeTip");
                     returnVal.safeTip = true;
                 }
             }
@@ -215,19 +216,19 @@ export class StateAnalyzer {
 
         StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
         if (boardSnake.name != snakeName) {
-            // console.log("Checking snake " + boardSnake.name);
-            // console.log("Considering point " + JSON.stringify(newXY));
-            // console.log("neighbors of this point: " + JSON.stringify(neighbors));
-            // console.log("Snake head is at" + JSON.stringify(boardSnake.body[0]));
-            // console.log("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
+            // SnakeLogger.notice("Checking snake " + boardSnake.name);
+            // SnakeLogger.notice("Considering point " + JSON.stringify(newXY));
+            // SnakeLogger.notice("neighbors of this point: " + JSON.stringify(neighbors));
+            // SnakeLogger.notice("Snake head is at" + JSON.stringify(boardSnake.body[0]));
+            // SnakeLogger.notice("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
             if (getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
-                console.log("Move found to be contested by: " + boardSnake.name);
+                SnakeLogger.notice("Move found to be contested by: " + boardSnake.name);
                 returnVal.contested = true;
                 if (!returnVal.snakeLengths) {
                     returnVal.snakeLengths = [];
                 }
                 returnVal.snakeLengths.push(boardSnake.body.length);
-                console.log("returnVal.snakeLengths == " + returnVal.snakeLengths);
+                SnakeLogger.notice("returnVal.snakeLengths == " + returnVal.snakeLengths);
             } else {
                 returnVal.contested = false;
             }
@@ -237,7 +238,7 @@ export class StateAnalyzer {
         // If we still haven't changed it from unknown, the status
         if (returnVal.contents == ECellContents.unknown) {
         returnVal.contents = ECellContents.empty;
-        console.log("Move destination is free");
+        SnakeLogger.notice("Move destination is free");
         }
 
         // Also put in if the point is in the food list.
@@ -271,7 +272,7 @@ export class StateAnalyzer {
     // 5. An enemy snakes head, if he he's trapped he might do the same and we can take a bastard down with us.
     // 6. ...up?  good luck
     static safeMove(): EMoveDirections {
-        console.log("SAFEMOVE DEFAULT ENGAGED");
+        SnakeLogger.notice("SAFEMOVE DEFAULT ENGAGED");
         const myName = StateAnalyzer.getMyName();
         const moves = [EMoveDirections.left, EMoveDirections.right, EMoveDirections.up, EMoveDirections.down];
         const moveInfos: IMoveInfo[] = [];
@@ -286,7 +287,7 @@ export class StateAnalyzer {
             if (moveInfos[i].contents == ECellContents.empty
                 || (moveInfos[i].safeTip)) {
                 if (moveInfos[i].contested && StateAnalyzer.getMyLength() > Math.max(...moveInfos[i].snakeLengths)) {
-                    console.log("Taking point contested by smaller snake by moving: " + moves[i]);
+                    SnakeLogger.notice("Taking point contested by smaller snake by moving: " + moves[i]);
                     // Best pickins
                     return moves[i];
                 }
@@ -297,7 +298,7 @@ export class StateAnalyzer {
         for (let i = 0; i < 4; i++) {
             if (!moveInfos[i].contested && (moveInfos[i].contents == ECellContents.empty
                 || moveInfos[i].safeTip)) {
-                console.log("Taking empty or safe tip point by moving: " + moves[i]);
+                SnakeLogger.notice("Taking empty or safe tip point by moving: " + moves[i]);
                 // Will do fine
                 return moves[i];
             }
@@ -306,7 +307,7 @@ export class StateAnalyzer {
         // Taking empty or safetip spot, possibly contested
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip) {
-                console.log("Taking empty point that might not end so well: " + moves[i]);
+                SnakeLogger.notice("Taking empty point that might not end so well: " + moves[i]);
                 // Scraping the bottom of the barrell...
                 return moves[i];
             }
@@ -315,7 +316,7 @@ export class StateAnalyzer {
         // Taking tip spot
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].tip) {
-                console.log("Taking a not-so-safe tip: " + moves[i]);
+                SnakeLogger.notice("Taking a not-so-safe tip: " + moves[i]);
                 // Scraping the bottom of the barrel...
                 return moves[i];
             }
@@ -325,13 +326,13 @@ export class StateAnalyzer {
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].head) {
                 // AAAAAAAAAAAAAAAAAAAHHH!!!
-                console.log("Last resort kamikaze move into another snake head: " + moves[i]);
+                SnakeLogger.notice("Last resort kamikaze move into another snake head: " + moves[i]);
                 return moves[i];
             }
         }
 
         // Welp!
-        console.log("No safe move could be found, defaulting to up. Sorry snakey :[");
+        SnakeLogger.notice("No safe move could be found, defaulting to up. Sorry snakey :[");
         return EMoveDirections.up;
     }
 
@@ -357,13 +358,13 @@ export class StateAnalyzer {
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
         if (snake.name != myName) {
-            // console.log("checking snake " + snake.name);
-            // console.log("point neighbors are" + JSON.stringify(neighbors));
-            // console.log("snake head is at " + JSON.stringify(snake.body[0]));
+            // SnakeLogger.notice("checking snake " + snake.name);
+            // SnakeLogger.notice("point neighbors are" + JSON.stringify(neighbors));
+            // SnakeLogger.notice("snake head is at " + JSON.stringify(snake.body[0]));
             if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                console.log("snake head was found in neighbor list");
+                SnakeLogger.notice("snake head was found in neighbor list");
                 if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                    console.log("snake is too large to ignore");
+                    SnakeLogger.notice("snake is too large to ignore");
                     returnVal = true;
                     return;
                 }

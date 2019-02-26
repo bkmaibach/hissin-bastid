@@ -1,6 +1,7 @@
 import { StateAnalyzer } from "./StateAnalyzer";
 import { request } from "http";
 import * as data from "../data/data";
+import { SnakeLogger } from "../util/SnakeLogger";
 
 export const TargetGenerator = class {
 
