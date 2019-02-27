@@ -8,10 +8,10 @@ import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake,
 import * as _ from "lodash";
 
 export const MoveGenerator = class {
-    selfProximityWeight = 10;
+    selfProximityWeight = 1;
     foodProximityWeight = 25;
-    centreProximityWeight = 10;
-    agressionWeight = 15;
+    centreProximityWeight = 30;
+    agressionWeight = 10;
     avoidanceWeight = 10;
 
     paths: IPoint[][] = [];
@@ -117,7 +117,7 @@ export const MoveGenerator = class {
             }
         }
         const foodProximityFactor = (foodPathCommonality / this.stepReferenceScalar);
-        const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer.getMyHunger()) / 50);
+        const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer.getMyHunger()) / 33);
 
 
         let divideMeByLength: number = 0;

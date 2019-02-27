@@ -14,10 +14,10 @@ const helpers_1 = require("../util/helpers");
 const _ = __importStar(require("lodash"));
 exports.MoveGenerator = class {
     constructor() {
-        this.selfProximityWeight = 10;
-        this.foodProximityWeight = 25;
-        this.centreProximityWeight = 10;
-        this.agressionWeight = 15;
+        this.selfProximityWeight = 5;
+        this.foodProximityWeight = 20;
+        this.centreProximityWeight = 30;
+        this.agressionWeight = 10;
         this.avoidanceWeight = 10;
         this.paths = [];
         this.foodPaths = [];
@@ -113,7 +113,7 @@ exports.MoveGenerator = class {
             }
         }
         const foodProximityFactor = (foodPathCommonality / this.stepReferenceScalar);
-        const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer_1.StateAnalyzer.getMyHunger()) / 50);
+        const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer_1.StateAnalyzer.getMyHunger()) / 33);
         let divideMeByLength = 0;
         for (let i = 0; i < path.length; i++) {
             divideMeByLength += StateAnalyzer_1.StateAnalyzer.getDistanceFromCenter(path[i]);
