@@ -96,7 +96,7 @@ export const TailDodger = class {
                     // It's gonna take an extra step to vacate this spot if the snake who it belongs to
                     // is about to eat food. This is a quick preventative measure.
                     if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
-                        SnakeLogger.notice("Food next to " + snakes[j].name + " means an extra step is needed to vacate possible collision point");
+                        SnakeLogger.notice("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
                         stepsToVacate++;
                     }
 

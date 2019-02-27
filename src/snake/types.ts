@@ -32,6 +32,11 @@ export interface IPoint {
     y: number;
 }
 
+export interface IScoredPoint {
+    point: IPoint;
+    score: number;
+}
+
 export interface IGame {
     id: string;
 }

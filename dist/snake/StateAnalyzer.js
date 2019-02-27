@@ -165,7 +165,7 @@ class StateAnalyzer {
                     if (i == boardSnake.body.length - 1) {
                         returnVal.tip = true;
                         SnakeLogger_1.SnakeLogger.notice("It contains a snake tip");
-                        if (!StateAnalyzer.nextToFood(boardSnake.body[0], 0)
+                        if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)
                             || boardSnake.name == StateAnalyzer.getMyName()) {
                             SnakeLogger_1.SnakeLogger.notice("But it is a safeTip");
                             returnVal.safeTip = true;
@@ -178,11 +178,11 @@ class StateAnalyzer {
         const neighbors = StateAnalyzer.getRectilinearNeighbors(newXY);
         StateAnalyzer.getState(0).board.snakes.forEach((boardSnake) => {
             if (boardSnake.name != snakeName) {
-                // SnakeLogger.notice("Checking snake " + boardSnake.name);
-                // SnakeLogger.notice("Considering point " + JSON.stringify(newXY));
-                // SnakeLogger.notice("neighbors of this point: " + JSON.stringify(neighbors));
-                // SnakeLogger.notice("Snake head is at" + JSON.stringify(boardSnake.body[0]));
-                // SnakeLogger.notice("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
+                SnakeLogger_1.SnakeLogger.notice("Checking snake " + boardSnake.name);
+                SnakeLogger_1.SnakeLogger.notice("Considering point " + JSON.stringify(newXY));
+                SnakeLogger_1.SnakeLogger.notice("neighbors of this point: " + JSON.stringify(neighbors));
+                SnakeLogger_1.SnakeLogger.notice("Snake head is at" + JSON.stringify(boardSnake.body[0]));
+                SnakeLogger_1.SnakeLogger.notice("getIndexOfValue(neighbors, boardSnake.body[0]) == " + helpers_1.getIndexOfValue(neighbors, boardSnake.body[0]));
                 if (helpers_1.getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
                     SnakeLogger_1.SnakeLogger.notice("Move found to be contested by: " + boardSnake.name);
                     returnVal.contested = true;
@@ -310,9 +310,9 @@ class StateAnalyzer {
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
             if (snake.name != myName) {
-                // SnakeLogger.notice("checking snake " + snake.name);
-                // SnakeLogger.notice("point neighbors are" + JSON.stringify(neighbors));
-                // SnakeLogger.notice("snake head is at " + JSON.stringify(snake.body[0]));
+                SnakeLogger_1.SnakeLogger.notice("checking snake " + snake.name);
+                SnakeLogger_1.SnakeLogger.notice("point neighbors are" + JSON.stringify(neighbors));
+                SnakeLogger_1.SnakeLogger.notice("snake head is at " + JSON.stringify(snake.body[0]));
                 if (helpers_1.getIndexOfValue(neighbors, snake.body[0]) > -1) {
                     SnakeLogger_1.SnakeLogger.notice("snake head was found in neighbor list");
                     if (snake.body.length >= StateAnalyzer.getMyLength()) {
