@@ -32,8 +32,8 @@ export interface IPoint {
     y: number;
 }
 
-export interface IScoredPoint {
-    point: IPoint;
+export interface IScoredPath {
+    points: IPoint[];
     score: number;
 }
 

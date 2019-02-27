@@ -84,6 +84,9 @@ class StateAnalyzer {
     static getMyLength() {
         return StateAnalyzer.getState(0).you.body.length;
     }
+    static getMyHunger() {
+        return 100 - StateAnalyzer.getState(0).you.health;
+    }
     // Give me an array of all the points containing food
     static getFoodPoints(turnsAgo) {
         return StateAnalyzer.getState(turnsAgo).board.food;
@@ -306,6 +309,9 @@ class StateAnalyzer {
     // Is this point next to a snake that's bigger than us?
     static pointIsContestedByLargerSnake(point) {
         const myName = StateAnalyzer.getMyName();
+        if (point == undefined) {
+            console.log("break here");
+        }
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
@@ -347,6 +353,36 @@ class StateAnalyzer {
         const returnVal = _.clone(StateAnalyzer.gameStates);
         StateAnalyzer.gameStates = [];
         return returnVal;
+    }
+    static getDistanceFromCenter(point) {
+        const centerPoint = { x: this.getBoardWidth() / 2, y: this.getBoardHeight() / 2 };
+        const deltaX = Math.abs(point.x - centerPoint.x);
+        const deltaY = Math.abs(point.y - centerPoint.y);
+        return Math.pow(Math.pow(deltaX, 2) + Math.pow(deltaY, 2), 0.5);
+    }
+    static getSmallerHeadPoints() {
+        const myLength = this.getMyLength();
+        const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        snakes.filter((snake) => {
+            return (snake.body.length < myLength && snake.name != myName);
+        });
+        const heads = snakes.map((snake) => {
+            return snake.body[0];
+        });
+        return heads;
+    }
+    static getLargerHeadPoints() {
+        const myLength = this.getMyLength();
+        const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        snakes.filter((snake) => {
+            return (snake.body.length >= myLength && snake.name != myName);
+        });
+        const heads = snakes.map((snake) => {
+            return snake.body[0];
+        });
+        return heads;
     }
 }
 // The current game state (same shape as request body, ie IGameState)

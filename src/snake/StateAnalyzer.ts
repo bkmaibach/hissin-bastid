@@ -92,6 +92,10 @@ export class StateAnalyzer {
         return StateAnalyzer.getState(0).you.body.length;
     }
 
+    static getMyHunger() {
+        return 100 - StateAnalyzer.getState(0).you.health;
+    }
+
     // Give me an array of all the points containing food
     static getFoodPoints(turnsAgo: number) {
         return StateAnalyzer.getState(turnsAgo).board.food;
@@ -128,7 +132,6 @@ export class StateAnalyzer {
     static getRectilinearNeighbors(XY: IPoint): IPoint[] {
         const x = XY.x;
         const y = XY.y;
-        (let; i = 0; i < height; i++; )
         return [
             {x: x - 1, y}, // left cell
             {x: x + 1, y}, // right cell
@@ -354,6 +357,9 @@ export class StateAnalyzer {
     // Is this point next to a snake that's bigger than us?
     static pointIsContestedByLargerSnake (point: IPoint): boolean {
         const myName = StateAnalyzer.getMyName();
+        if (point == undefined) {
+            console.log("break here");
+        }
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
@@ -399,6 +405,39 @@ export class StateAnalyzer {
         const returnVal = _.clone(StateAnalyzer.gameStates);
         StateAnalyzer.gameStates = [];
         return returnVal;
+    }
+
+    static getDistanceFromCenter(point: IPoint): number {
+        const centerPoint: IPoint = {x: this.getBoardWidth() / 2, y: this.getBoardHeight() / 2 };
+        const deltaX = Math.abs(point.x - centerPoint.x);
+        const deltaY = Math.abs(point.y - centerPoint.y);
+        return Math.pow( Math.pow(deltaX, 2) + Math.pow(deltaY, 2), 0.5 );
+    }
+
+    static getSmallerHeadPoints(): IPoint[] {
+        const myLength = this.getMyLength();
+        const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        snakes.filter((snake) => {
+            return (snake.body.length < myLength && snake.name != myName);
+        });
+        const heads = snakes.map((snake) => {
+            return snake.body[0];
+        });
+        return heads;
+    }
+
+    static getLargerHeadPoints(): IPoint[] {
+        const myLength = this.getMyLength();
+        const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        snakes.filter((snake) => {
+            return (snake.body.length >= myLength && snake.name != myName);
+        });
+        const heads = snakes.map((snake) => {
+            return snake.body[0];
+        });
+        return heads;
     }
 
 }

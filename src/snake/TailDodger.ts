@@ -69,13 +69,13 @@ export const TailDodger = class {
     }
 
     getShortestPath ( endXY: IPoint ): IPoint[] {
-        // Create path planner (which is a maze that pumps out paths in an inconventient format)
+        // Create path planner (which is a maze that pumps out paths in an inconvenient format)
         // Define the walls, with the thing that was at first made with those height x width 0's arrays
         const planner = createPlanner(this.knownCollisions);
 
         // Init path as empty array.
         const path: number[] = [];
-        // distance of the path is the reutn value, but the path variable is no longer empty after this
+        // distance of the path is the return value, but the path variable is no longer empty after this
         // function runs
         const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
         const steps = this.stepsInPath(path);
@@ -129,6 +129,10 @@ export const TailDodger = class {
         if (typeof path[0] == "undefined") {
             // If there is no path, this will be the case here.
             return undefined;
+        }
+
+        if (typeof steps[1] == "undefined") {
+            console.log("break here");
         }
 
         // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart

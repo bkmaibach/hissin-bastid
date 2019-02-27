@@ -10,7 +10,7 @@ import { fallbackHandler,
 import { StateAnalyzer } from "./snake/StateAnalyzer";
 import * as _ from "lodash";
 import { TailDodger } from "./snake/TailDodger" ;
-import { TargetGenerator } from "./snake/TargetGenerator";
+import { MoveGenerator } from "./snake/MoveGenerator";
 import { IPoint, EMoveDirections } from "./snake/types";
 import { SnakeLogger } from "./util/SnakeLogger";
 // import * as dataLogger from "./data/data";
@@ -61,9 +61,6 @@ app.post("/start", async (request, response) => {
 // the same at that point.
 // A few things need to be stored outside this function so that they stay the same from one request to the next
 
-let targetXY: IPoint;
-const targetGen = new TargetGenerator();
-
 app.post("/move", (request, response) => {
   SnakeLogger.info("Enter /move");
   // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
@@ -71,47 +68,24 @@ app.post("/move", (request, response) => {
     // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
     StateAnalyzer.update(request.body);
 
-    // Our move generation is currently made of 2 questions:
-    // Where do we go? and
-    // How do we get there?
-    let path: IPoint[];
-    let move: EMoveDirections;
-    const turn = StateAnalyzer.getTurnNumber();
-    const myPosition = StateAnalyzer.getMyPosition();
-
-    // Where do we go? Ideally, ourappRoot target gen has sorted all of the points in perfect order of how much we should go twards there
-    // This could be served up by aappRoot neural net processing the game state. But at the time of writing it's just the list of food points.
-    // (which got us to a score of appRoot31)
-    const targets = targetGen.getSortedTargets();
-    const dodger = new TailDodger(myPosition);
-
-    // Notice that this for-loop tries to get paths to each of the points in the sorted array. It will consider a path to any of these
-    // Points and get the move for the first step on this path if available.
-    for (let i = 0; i < targets.length; i++) {
-      targetXY = targets[i];
-      path = dodger.getShortestPath(targetXY);
-      if (typeof path != "undefined") {
-        move = StateAnalyzer.getMove(path[0], path[1]);
-        break;
-      }
-    }
+    const moveGen = new MoveGenerator();
+    const move = moveGen.generateMove();
 
     // If there are literally no paths available to any of the points in our list, then we can default to a safemove
-    if (typeof path == "undefined") {
-      move = StateAnalyzer.safeMove();
-    }
 
-    SnakeLogger.notice("turn: " + JSON.stringify(turn));
-    SnakeLogger.notice("current xy: " + JSON.stringify(myPosition));
-    SnakeLogger.notice("target xy: " + JSON.stringify(targetXY));
-    SnakeLogger.notice("path projection: " + JSON.stringify(path));
-    SnakeLogger.notice("move: " + JSON.stringify(move));
+    // SnakeLogger.notice("turn: " + JSON.stringify(turn));
+    // SnakeLogger.notice("current xy: " + JSON.stringify(myPosition));
+    // SnakeLogger.notice("target xy: " + JSON.stringify(targetXY));
+    // SnakeLogger.notice("path projection: " + JSON.stringify(path));
+    // SnakeLogger.notice("move: " + JSON.stringify(move));
 
     // Response data
     return response.json({move});
 
   } catch (e) {
+    const stack = new Error().stack;
     console.log(e);
+    console.log(stack);
   }
 
 });
