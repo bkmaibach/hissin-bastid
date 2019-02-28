@@ -49,7 +49,7 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     };
     return response.json(data);
 }));
-app.post("/move", (request, response) => {
+app.post("/move", (request, response) => __awaiter(this, void 0, void 0, function* () {
     SnakeLogger_1.SnakeLogger.debug("Enter /move");
     // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
     try {
@@ -62,6 +62,12 @@ app.post("/move", (request, response) => {
         // SnakeLogger.info("path projection: " + JSON.stringify(path));
         // SnakeLogger.info("move: " + JSON.stringify(move));
         const moveGen = new MoveGenerator_1.MoveGenerator();
+        try {
+            yield moveGen.generatePaths();
+        }
+        catch (e) {
+            SnakeLogger_1.SnakeLogger.info(e.message);
+        }
         const move = moveGen.generateMove();
         return response.json({ move });
         // return response.json({move: "right"});
@@ -71,26 +77,7 @@ app.post("/move", (request, response) => {
         SnakeLogger_1.SnakeLogger.debug(e);
         SnakeLogger_1.SnakeLogger.debug(stack);
     }
-});
-// app.post("/start", (request, response) => {
-//   const snakeName = request.body.you.name;
-//   const gameID = request.body.game.id;
-//   SnakeLogger.init(snakeName, gameID);
-//   SnakeLogger.debug("Enter /start");
-//   // Response data
-//   const data = {
-//     color: "#DFFF00",
-//   };
-//   return response.json(data);
-// });
-// app.post("/move", (request, response) => {
-//   // NOTE: Do something here to generate your move
-//   // Response data
-//   const data = {
-//     move: "right", // one of: ["up","down","left","right"]
-//   };
-//   return response.json(data);
-// });
+}));
 app.post("/end", (request, response) => {
     // SnakeLogger.debug("Enter /end");
     // NOTE: Any cleanup when a game is complete.

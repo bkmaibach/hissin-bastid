@@ -49,7 +49,6 @@ export const TailDodger = class {
         // in a second array. this ndarray is then used to create our actual maze dealy that pumps
         // out hypothetical path's to check
         this.snakeHead = xy;
-        this.steps = [];
         const height = StateAnalyzer.getBoardHeight();
         const width = StateAnalyzer.getBoardWidth();
         const numCells = height * width;
@@ -68,83 +67,85 @@ export const TailDodger = class {
         this.knownTailDodges = [];
     }
 
-    getShortestPath ( endXY: IPoint ): IPoint[] {
-        // Create path planner (which is a maze that pumps out paths in an inconvenient format)
-        // Define the walls, with the thing that was at first made with those height x width 0's arrays
-        const planner = createPlanner(this.knownCollisions);
+    async getShortestPath ( endXY: IPoint ): Promise<IPoint[]> {
+        return new Promise<IPoint[]>(async (resolve, reject) => {
+            // Create path planner (which is a maze that pumps out paths in an inconvenient format)
+            // Define the walls, with the thing that was at first made with those height x width 0's arrays
+            const planner = createPlanner(this.knownCollisions);
 
-        // Init path as empty array.
-        const path: number[] = [];
-        // distance of the path is the return value, but the path variable is no longer empty after this
-        // function runs
-        const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
-        const steps = this.stepsInPath(path);
+            // Init path as empty array.
+            const path: number[] = [];
+            // distance of the path is the return value, but the path variable is no longer empty after this
+            // function runs
+            const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
+            const steps = this.stepsInPath(path);
 
-        const snakes = StateAnalyzer.getSnakes();
-        for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
-            // Each step in our supposed path will be considered. If its not a good step
-            // Then the function restarts with this knowledge in mind.
-            for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
-                const possibleCollisionIndex = getIndexOfValue(snakes[j].body, steps[i]);
+            const snakes = StateAnalyzer.getSnakes();
+            for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
+                // Each step in our supposed path will be considered. If its not a good step
+                // Then the function restarts with this knowledge in mind.
+                for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
+                    const possibleCollisionIndex = getIndexOfValue(snakes[j].body, steps[i]);
 
-                // For this point, consider each snake. Is this a snake body? How long
-                // Will it take to get to this point? Can we say the tail will be out of the way by then?
-                if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
-                    const stepsToOccupy = i;
-                    let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
+                    // For this point, consider each snake. Is this a snake body? How long
+                    // Will it take to get to this point? Can we say the tail will be out of the way by then?
+                    if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
+                        const stepsToOccupy = i;
+                        let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
 
-                    // It's gonna take an extra step to vacate this spot if the snake who it belongs to
-                    // is about to eat food. This is a quick preventative measure.
-                    if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
-                        SnakeLogger.info("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
-                        stepsToVacate++;
-                    }
-
-                    // Is it a tail dodge?
-                    const tailDodge = stepsToOccupy >= stepsToVacate;
-                    if (!tailDodge) {
-                        // If this is not a safe step, mark the entire section along to the snake's head as unsafe
-                        const headToCollisionSection = snakes[j].body.slice(0, possibleCollisionIndex + 1);
-                        // The following if statement prevents the algorithm from failing if the detected collision is a part our own snake
-                        // The head must be removed from the dangerous section because it will always be a part of any path
-                        // SHift just removes the first thing from the array. The snake shoud not be afraid of its own head!!!
-                        if (_.isEqual(headToCollisionSection[0], this.snakeHead)) {
-                            headToCollisionSection.shift();
-                        }
-                        // Now add the collision point for subsequent path seaches.
-                        for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
-                            this.addCollisionPoint(headToCollisionSection[k]);
+                        // It's gonna take an extra step to vacate this spot if the snake who it belongs to
+                        // is about to eat food. This is a quick preventative measure.
+                        if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
+                            SnakeLogger.info("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
+                            stepsToVacate++;
                         }
 
-                        return this.getShortestPath(endXY);
-                    } else {
-                        // Mark the entire tail-side section of this point as safe in this else clase where taildodge is true
-                        for (let k = possibleCollisionIndex; k < snakes[j].body.length; k++) {
-                            this.addKnownTailDodge(snakes[j].body[k]);
+                        // Is it a tail dodge?
+                        const tailDodge = stepsToOccupy >= stepsToVacate;
+                        if (!tailDodge) {
+                            // If this is not a safe step, mark the entire section along to the snake's head as unsafe
+                            const headToCollisionSection = snakes[j].body.slice(0, possibleCollisionIndex + 1);
+                            // The following if statement prevents the algorithm from failing if the detected collision is a part our own snake
+                            // The head must be removed from the dangerous section because it will always be a part of any path
+                            // SHift just removes the first thing from the array. The snake shoud not be afraid of its own head!!!
+                            if (_.isEqual(headToCollisionSection[0], this.snakeHead)) {
+                                headToCollisionSection.shift();
+                            }
+                            // Now add the collision point for subsequent path seaches.
+                            for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
+                                this.addCollisionPoint(headToCollisionSection[k]);
+                            }
+
+                            resolve(<IPoint[]>await this.getShortestPath(endXY));
+                        } else {
+                            // Mark the entire tail-side section of this point as safe in this else clase where taildodge is true
+                            for (let k = possibleCollisionIndex; k < snakes[j].body.length; k++) {
+                                this.addKnownTailDodge(snakes[j].body[k]);
+                            }
                         }
                     }
                 }
             }
-        }
-        if (typeof path[0] == "undefined") {
-            // If there is no path, this will be the case here.
-            return undefined;
-        }
+            if (typeof path[0] == "undefined") {
+                // If there is no path, this will be the case here.
+                reject({message: "No path could be found to endpoint " + endXY.toString()});
+            }
 
-        if (typeof steps[1] == "undefined") {
-            SnakeLogger.debug("The first step of path to point " + endXY + " is undefined");
-        }
+            if (typeof steps[1] == "undefined") {
+                SnakeLogger.debug("The first step of path to point " + endXY.toString() + " is undefined");
+            }
 
-        // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
-        if (StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
-            SnakeLogger.info("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
-            this.addCollisionPoint(steps[1]);
-            return this.getShortestPath(endXY);
-        }
+            // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
+            if (StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
+                SnakeLogger.info("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
+                this.addCollisionPoint(steps[1]);
+                resolve(<IPoint[]>await this.getShortestPath(endXY));
+            }
 
-        // Finally return and update steps found
-        this.steps = steps;
-        return steps;
+            // Finally return and update steps found
+            resolve(steps);
+        });
+
     }
 
     addCollisionPoint(xy: IPoint) {

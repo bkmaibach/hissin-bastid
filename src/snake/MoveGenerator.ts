@@ -27,10 +27,7 @@ export const MoveGenerator = class {
 
     constructor() {
         SnakeLogger.info("Constructing MoveGenerator");
-        this.paths = this.generatePaths();
-        this.foodPath = this.generateFoodPath();
-        this.agressionPath = this.generateAgressionPath();
-        this.nonAvoidancePath = this.generateNonAvoidancePath();
+
     }
 
     generateMove(): EMoveDirections {
@@ -42,24 +39,32 @@ export const MoveGenerator = class {
             return StateAnalyzer.safeMove();
         }
     }
-    generatePaths(): IPoint[][] {
+    async generatePaths(): Promise<void> {
         SnakeLogger.info("Generating all paths");
         const start = StateAnalyzer.getMyPosition();
         const dodger = new TailDodger(start);
-        const paths: IPoint[][] = [];
+        const pathPromises: Promise<IPoint[]>[] = [];
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 const end: IPoint = {x, y};
                 if (!_.isEqual(end, StateAnalyzer.getMyPosition())) {
-                    const path = dodger.getShortestPath(end);
-                    if (typeof path != "undefined")  paths.push(path);
+                    const pathPromise = dodger.getShortestPath(end);
+                    pathPromises.push(pathPromise);
                 }
             }
         }
-        return paths;
+        try {
+            this.paths = await Promise.all(pathPromises);
+        } catch (e) {
+            SnakeLogger.info(e.message);
+        }
+
+        this.foodPath = this.filterForFoodPath();
+        this.agressionPath = this.filterForAgressionPath();
+        this.nonAvoidancePath = this.filterForNonAvoidancePath();
     }
 
-    generateFoodPath(): IPoint[] {
+    filterForFoodPath(): IPoint[] {
         SnakeLogger.info("Filtering food paths");
         const foodPoints = StateAnalyzer.getFoodPoints(0);
         const foodPaths = this.paths.filter((path) => {
@@ -78,7 +83,7 @@ export const MoveGenerator = class {
         return foodPaths[0];
     }
 
-    generateAgressionPath(): IPoint[] {
+    filterForAgressionPath(): IPoint[] {
         SnakeLogger.info("Filtering Agression paths");
         const smallerHeadPoints = StateAnalyzer.getSmallerHeadPoints();
         const smallerHeadPaths = this.paths.filter((path) => {
@@ -97,7 +102,7 @@ export const MoveGenerator = class {
         return smallerHeadPaths[0];
     }
 
-    generateNonAvoidancePath(): IPoint[] {
+    filterForNonAvoidancePath(): IPoint[] {
         SnakeLogger.info("Filtering Agression paths");
         const largerHeadPoints = StateAnalyzer.getLargerHeadPoints();
         const largerHeadPaths = this.paths.filter((path) => {
@@ -120,7 +125,6 @@ export const MoveGenerator = class {
         let bestIndex;
         let bestScore = 0;
         for (let i = 0; i < this.paths.length; i++) {
-            SnakeLogger.info("Scoring path " + i + " of " + this.paths.length);
             const score = this.scorePath(this.paths[i]);
             if ( score > bestScore ) {
                 bestScore = score;
@@ -131,6 +135,7 @@ export const MoveGenerator = class {
     }
 
     scorePath(path: IPoint[]): number {
+        const endPoint = path[path.length - 1];
         const selfProximityFactor = 1 - (path.length / this.stepReferenceScalar);
         const selfProximityTerm = selfProximityFactor * this.selfProximityWeight;
 
@@ -143,7 +148,7 @@ export const MoveGenerator = class {
 
         const foodProximityFactor = (foodPathCommonality / this.stepReferenceScalar);
         const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer.getMyHunger()) / 33);
-
+        SnakeLogger.info("foodProximityTerm is " +  foodProximityTerm);
 
         let divideMeByLength: number = 0;
         for (let i = 0; i < path.length; i++) {
@@ -152,6 +157,7 @@ export const MoveGenerator = class {
         const averageDistanceFromCenter = divideMeByLength / path.length;
         const centerProximityFactor = 1 - (averageDistanceFromCenter / this.stepReferenceScalar);
         const centerProximityTerm = centerProximityFactor * this.centreProximityWeight;
+        SnakeLogger.info("centerProximityTerm is " +  centerProximityTerm);
 
         let agressionPathCommonality = 0;
         for (let j = 0; j < Math.min(this.agressionPath.length, path.length); j++) {
@@ -160,6 +166,7 @@ export const MoveGenerator = class {
 
         const agressionFactor = (agressionPathCommonality / this.stepReferenceScalar);
         const agressionTerm = agressionFactor * this.agressionWeight;
+        SnakeLogger.info("agressionTerm is " +  agressionTerm);
 
         let nonAvoidancePathCommonality = 0;
         for (let j = 0; j < Math.min(this.nonAvoidancePath.length, path.length); j++) {
@@ -167,11 +174,13 @@ export const MoveGenerator = class {
         }
         const avoidanceFactor = 1 - (nonAvoidancePathCommonality / this.stepReferenceScalar);
         const avoidanceTerm = avoidanceFactor * this.avoidanceWeight;
+        SnakeLogger.info("avoidanceTerm is " +  avoidanceTerm);
 
         // Add a bias?
         const bias = 0;
-
-        return selfProximityTerm + foodProximityTerm + centerProximityTerm + agressionTerm + avoidanceTerm + bias;
+        const summedScore = selfProximityTerm + foodProximityTerm + centerProximityTerm + agressionTerm + avoidanceTerm;
+        SnakeLogger.info("summedScore for path to endPoint " + endPoint + " is " + summedScore);
+        return summedScore + bias;
 
     }
 };

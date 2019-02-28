@@ -50,7 +50,7 @@ app.post("/start", async (request, response) => {
 });
 
 
-app.post("/move", (request, response) => {
+app.post("/move", async (request, response) => {
   SnakeLogger.debug("Enter /move");
   // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
   try {
@@ -68,6 +68,12 @@ app.post("/move", (request, response) => {
 
 
     const moveGen = new MoveGenerator();
+    try {
+      await moveGen.generatePaths();
+    } catch (e) {
+      SnakeLogger.info(e.message);
+    }
+
     const move = moveGen.generateMove();
     return response.json({move});
     // return response.json({move: "right"});
@@ -79,33 +85,6 @@ app.post("/move", (request, response) => {
   }
 
 });
-
-
-// app.post("/start", (request, response) => {
-//   const snakeName = request.body.you.name;
-//   const gameID = request.body.game.id;
-//   SnakeLogger.init(snakeName, gameID);
-//   SnakeLogger.debug("Enter /start");
-
-//   // Response data
-//   const data = {
-//     color: "#DFFF00",
-//   };
-
-//   return response.json(data);
-// });
-
-// app.post("/move", (request, response) => {
-//   // NOTE: Do something here to generate your move
-
-//   // Response data
-//   const data = {
-//     move: "right", // one of: ["up","down","left","right"]
-//   };
-
-//   return response.json(data);
-// });
-
 
 app.post("/end", (request, response) => {
   // SnakeLogger.debug("Enter /end");

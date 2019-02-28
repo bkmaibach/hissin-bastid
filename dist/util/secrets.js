@@ -17,7 +17,7 @@ exports.ENVIRONMENT = process.env.NODE_ENV;
 const prod = exports.ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 exports.MONGODB_URI = prod ? process.env["MONGODB_URI"] : process.env["MONGODB_URI_LOCAL"];
 if (!exports.MONGODB_URI) {
-    SnakeLogger_1.SnakeLogger.alert("No mongo connection string. Set MONGODB_URI environment variable.");
+    SnakeLogger_1.SnakeLogger.info("No mongo connection string. Set MONGODB_URI environment variable.");
     process.exit(1);
 }
 //# sourceMappingURL=secrets.js.map

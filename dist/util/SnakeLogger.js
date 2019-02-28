@@ -31,12 +31,12 @@ class SnakeLogger {
     }
     static alert(message) {
         if (process.env.NODE_ENV !== "production") {
-            this.logger.alert("TURN: " + StateAnalyzer_1.StateAnalyzer.getTurnNumber() + message);
+            this.logger.alert(message);
         }
     }
     static info(message) {
         if (process.env.NODE_ENV !== "production") {
-            this.logger.info("TURN: " + StateAnalyzer_1.StateAnalyzer.getTurnNumber() + message);
+            this.logger.info("TURN: " + StateAnalyzer_1.StateAnalyzer.getTurnNumber() + " - " + message);
         }
     }
     static debug(message) {
