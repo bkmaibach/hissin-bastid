@@ -53,41 +53,24 @@ app.post("/start", async (request, response) => {
 app.post("/move", async (request, response) => {
   SnakeLogger.debug("Enter /move");
   // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
+  // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
+  StateAnalyzer.update(request.body);
+
+  const moveGen = new MoveGenerator();
   try {
-    // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
-    StateAnalyzer.update(request.body);
-
-
-    // If there are literally no paths available to any of the points in our list, then we can default to a safemove
-
-    // SnakeLogger.info("turn: " + JSON.stringify(turn));
-    // SnakeLogger.info("current xy: " + JSON.stringify(myPosition));
-    // SnakeLogger.info("target xy: " + JSON.stringify(targetXY));
-    // SnakeLogger.info("path projection: " + JSON.stringify(path));
-    // SnakeLogger.info("move: " + JSON.stringify(move));
-
-
-    const moveGen = new MoveGenerator();
-    try {
-      await moveGen.generatePaths();
-    } catch (e) {
-      SnakeLogger.info(e.message);
-    }
-
-    const move = moveGen.generateMove();
+    const move = await moveGen.generateMove();
+    SnakeLogger.info("turn: " + JSON.stringify(StateAnalyzer.getTurnNumber()));
+    SnakeLogger.info("current xy: " + JSON.stringify(StateAnalyzer.getMyPosition()));
+    SnakeLogger.info("move: " + JSON.stringify(move));
     return response.json({move});
-    // return response.json({move: "right"});
-
   } catch (e) {
     const stack = new Error().stack;
-    SnakeLogger.debug(e);
-    SnakeLogger.debug(stack);
+    SnakeLogger.error(e + " : " + stack);
   }
-
 });
 
 app.post("/end", (request, response) => {
-  // SnakeLogger.debug("Enter /end");
+  SnakeLogger.debug("Enter /end");
   // NOTE: Any cleanup when a game is complete.
   // So we can run multiple games without re-starting app.
   return response.json({});

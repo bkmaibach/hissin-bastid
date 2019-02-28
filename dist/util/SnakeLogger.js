@@ -44,6 +44,11 @@ class SnakeLogger {
             this.logger.debug(message);
         }
     }
+    static error(message) {
+        if (process.env.NODE_ENV !== "production") {
+            this.logger.error(message);
+        }
+    }
 }
 exports.SnakeLogger = SnakeLogger;
 //# sourceMappingURL=SnakeLogger.js.map

@@ -51,6 +51,13 @@ export class SnakeLogger {
             this.logger.debug( message );
         }
     }
+
+    static error(message: string) {
+        if (process.env.NODE_ENV !== "production") {
+
+            this.logger.error( message );
+        }
+    }
 }
 
 
