@@ -385,6 +385,15 @@ class StateAnalyzer {
         });
         return heads;
     }
+    static getAllPoints() {
+        const returnVal = [];
+        for (let x = 0; x < this.getBoardWidth(); x++) {
+            for (let y = 0; y < this.getBoardHeight(); y++) {
+                returnVal.push({ x, y });
+            }
+        }
+        return returnVal;
+    }
 }
 // The current game state (same shape as request body, ie IGameState)
 StateAnalyzer.gameStates = [];

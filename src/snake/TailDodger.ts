@@ -116,7 +116,7 @@ export const TailDodger = class {
                                 this.addCollisionPoint(headToCollisionSection[k]);
                             }
                             try {
-                                resolve(<IPoint[]>await this.getShortestPath(endXY));
+                                resolve(await this.getShortestPath(endXY));
                             } catch (e) {
                                 const stack = new Error().stack;
                                 SnakeLogger.error(JSON.stringify(e) + " : " + stack);

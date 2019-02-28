@@ -27,28 +27,19 @@ exports.MoveGenerator = class {
         this.centreProximityWeight = 30;
         this.agressionWeight = 10;
         this.avoidanceWeight = 10;
-        this.pathPromises = [];
+        // pathPromises: Promise<IPoint[]>[] = [];
         this.paths = [];
         this.foodPath = [];
         this.agressionPath = [];
         this.nonAvoidancePath = [];
+        this.dodger = new TailDodger_1.TailDodger(StateAnalyzer_1.StateAnalyzer.getMyPosition());
         this.height = StateAnalyzer_1.StateAnalyzer.getBoardHeight();
         this.width = StateAnalyzer_1.StateAnalyzer.getBoardWidth();
         this.stepReferenceScalar = this.height + this.width;
         SnakeLogger_1.SnakeLogger.info("Constructing MoveGenerator - Generating all paths");
-        const start = StateAnalyzer_1.StateAnalyzer.getMyPosition();
-        const dodger = new TailDodger_1.TailDodger(start);
         this.startMs = new Date().getTime();
         // const endPointList = StateAnalyzer.get50NearestPoints();
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                const end = { x, y };
-                if (!_.isEqual(end, StateAnalyzer_1.StateAnalyzer.getMyPosition())) {
-                    const pathPromise = dodger.getShortestPath(end);
-                    this.pathPromises.push(pathPromise);
-                }
-            }
-        }
+        this.endPoints = StateAnalyzer_1.StateAnalyzer.getAllPoints();
     }
     generateMove() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -70,19 +61,25 @@ exports.MoveGenerator = class {
         return __awaiter(this, void 0, void 0, function* () {
             let bestIndex;
             let bestScore = 0;
-            for (let i = 0; i < this.pathPromises.length; i++) {
-                try {
-                    const path = yield this.pathPromises[i];
-                    SnakeLogger_1.SnakeLogger.info("Path " + JSON.stringify(path) + " has been acquired");
-                    this.paths.push(path);
-                }
-                catch (e) {
-                    const stack = new Error().stack;
-                    SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
-                }
+            try {
+                yield Promise.all(this.endPoints.map((endPoint) => __awaiter(this, void 0, void 0, function* () { yield this.pushPath(endPoint); })));
             }
-            const endMs = new Date().getTime();
-            SnakeLogger_1.SnakeLogger.info(this.paths.length + " paths have been generated in " + (endMs - this.startMs) + " milliseconds");
+            catch (e) {
+                const stack = new Error().stack;
+                SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
+            }
+            // for (let i = 0; i < this.pathPromises.length; i++) {
+            //     try {
+            //         const path = await this.pathPromises[i];
+            //         SnakeLogger.info("Path " + JSON.stringify(path) + " has been acquired");
+            //         this.paths.push(path);
+            //     } catch (e) {
+            //         const stack = new Error().stack;
+            //         SnakeLogger.error(JSON.stringify(e) + " : " + stack);
+            //     }
+            // }
+            const secondMs = new Date().getTime();
+            SnakeLogger_1.SnakeLogger.info(this.paths.length + " paths have been generated in " + (secondMs - this.startMs) + " milliseconds");
             this.foodPath = this.filterForFoodPath();
             this.agressionPath = this.filterForAgressionPath();
             this.nonAvoidancePath = this.filterForNonAvoidancePath();
@@ -96,6 +93,11 @@ exports.MoveGenerator = class {
             const bestPath = this.paths[bestIndex];
             SnakeLogger_1.SnakeLogger.info("Best path found to be " + JSON.stringify(bestPath));
             return bestPath;
+        });
+    }
+    pushPath(endPoint) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.paths.push(yield this.dodger.getShortestPath(endPoint));
         });
     }
     scorePath(path) {

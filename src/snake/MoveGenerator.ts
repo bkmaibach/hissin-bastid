@@ -13,11 +13,12 @@ export const MoveGenerator = class {
     centreProximityWeight = 30;
     agressionWeight = 10;
     avoidanceWeight = 10;
-    pathPromises: Promise<IPoint[]>[] = [];
+    // pathPromises: Promise<IPoint[]>[] = [];
     paths: IPoint[][] = [];
     foodPath: IPoint[] = [];
     agressionPath: IPoint[] = [];
     nonAvoidancePath: IPoint[] = [];
+    dodger = new TailDodger(StateAnalyzer.getMyPosition());
 
     height = StateAnalyzer.getBoardHeight();
     width = StateAnalyzer.getBoardWidth();
@@ -25,23 +26,13 @@ export const MoveGenerator = class {
     stepReferenceScalar = this.height + this.width;
 
     startMs: number;
+    endPoints: IPoint[];
 
     constructor() {
         SnakeLogger.info("Constructing MoveGenerator - Generating all paths");
-        const start = StateAnalyzer.getMyPosition();
-        const dodger = new TailDodger(start);
         this.startMs = new Date().getTime();
         // const endPointList = StateAnalyzer.get50NearestPoints();
-
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                const end: IPoint = {x, y};
-                if (!_.isEqual(end, StateAnalyzer.getMyPosition())) {
-                    const pathPromise = dodger.getShortestPath(end);
-                    this.pathPromises.push(pathPromise);
-                }
-            }
-        }
+        this.endPoints = StateAnalyzer.getAllPoints();
     }
 
     async generateMove(): Promise<EMoveDirections> {
@@ -62,18 +53,27 @@ export const MoveGenerator = class {
     async bestPath(): Promise<IPoint[]> {
         let bestIndex;
         let bestScore = 0;
-        for (let i = 0; i < this.pathPromises.length; i++) {
-            try {
-                const path = await this.pathPromises[i];
-                SnakeLogger.info("Path " + JSON.stringify(path) + " has been acquired");
-                this.paths.push(path);
-            } catch (e) {
-                const stack = new Error().stack;
-                SnakeLogger.error(JSON.stringify(e) + " : " + stack);
-            }
+        try {
+            await Promise.all (this.endPoints.map( async (endPoint) => { await this.pushPath(endPoint); }));
+        } catch (e) {
+            const stack = new Error().stack;
+            SnakeLogger.error(JSON.stringify(e) + " : " + stack);
         }
-        const endMs = new Date().getTime();
-        SnakeLogger.info(this.paths.length + " paths have been generated in " + (endMs - this.startMs) + " milliseconds");
+
+        // for (let i = 0; i < this.pathPromises.length; i++) {
+        //     try {
+        //         const path = await this.pathPromises[i];
+        //         SnakeLogger.info("Path " + JSON.stringify(path) + " has been acquired");
+        //         this.paths.push(path);
+        //     } catch (e) {
+        //         const stack = new Error().stack;
+        //         SnakeLogger.error(JSON.stringify(e) + " : " + stack);
+        //     }
+        // }
+
+        const secondMs = new Date().getTime();
+        SnakeLogger.info(this.paths.length + " paths have been generated in " + (secondMs - this.startMs) + " milliseconds");
+
         this.foodPath = this.filterForFoodPath();
         this.agressionPath = this.filterForAgressionPath();
         this.nonAvoidancePath = this.filterForNonAvoidancePath();
@@ -88,6 +88,10 @@ export const MoveGenerator = class {
         const bestPath = this.paths[bestIndex];
         SnakeLogger.info("Best path found to be " + JSON.stringify(bestPath));
         return bestPath;
+    }
+
+    async pushPath (endPoint: IPoint) {
+        this.paths.push(await this.dodger.getShortestPath(endPoint));
     }
 
     scorePath(path: IPoint[]): number {
