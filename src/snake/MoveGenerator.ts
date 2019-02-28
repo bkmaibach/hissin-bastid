@@ -16,9 +16,9 @@ export const MoveGenerator = class {
 
     paths: IPoint[][] = [];
 
-    foodPaths: IPoint[][] = [];
-    agressionPaths: IPoint[][] = [];
-    nonAvoidancePaths: IPoint[][] = [];
+    foodPath: IPoint[] = [];
+    agressionPath: IPoint[] = [];
+    nonAvoidancePath: IPoint[] = [];
 
     height = StateAnalyzer.getBoardHeight();
     width = StateAnalyzer.getBoardWidth();
@@ -28,9 +28,9 @@ export const MoveGenerator = class {
     constructor() {
         SnakeLogger.info("Constructing MoveGenerator");
         this.paths = this.generatePaths();
-        this.foodPaths = this.generateFoodPaths();
-        this.agressionPaths = this.generateAgressionPaths();
-        this.nonAvoidancePaths = this.generateNonAvoidancePaths();
+        this.foodPath = this.generateFoodPath();
+        this.agressionPath = this.generateAgressionPath();
+        this.nonAvoidancePath = this.generateNonAvoidancePath();
     }
 
     generateMove(): EMoveDirections {
@@ -59,34 +59,61 @@ export const MoveGenerator = class {
         return paths;
     }
 
-    generateFoodPaths(): IPoint[][] {
+    generateFoodPath(): IPoint[] {
         SnakeLogger.info("Filtering food paths");
         const foodPoints = StateAnalyzer.getFoodPoints(0);
         const foodPaths = this.paths.filter((path) => {
             const endPoint = path[path.length - 1];
             return getIndexOfValue(foodPoints, endPoint) > -1;
         });
-        return foodPaths;
+        foodPaths.sort((a, b) => {
+            if (a.length < b.length) {
+                return -1;
+            } else if (a.length > b.length) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return foodPaths[0];
     }
 
-    generateAgressionPaths(): IPoint[][] {
+    generateAgressionPath(): IPoint[] {
         SnakeLogger.info("Filtering Agression paths");
         const smallerHeadPoints = StateAnalyzer.getSmallerHeadPoints();
         const smallerHeadPaths = this.paths.filter((path) => {
             const endPoint = path[path.length - 1];
             return getIndexOfValue(smallerHeadPoints, endPoint) > -1;
         });
-        return smallerHeadPaths;
+        smallerHeadPaths.sort((a, b) => {
+            if (a.length < b.length) {
+                return -1;
+            } else if (a.length > b.length) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return smallerHeadPaths[0];
     }
 
-    generateNonAvoidancePaths(): IPoint[][] {
+    generateNonAvoidancePath(): IPoint[] {
         SnakeLogger.info("Filtering Agression paths");
         const largerHeadPoints = StateAnalyzer.getLargerHeadPoints();
         const largerHeadPaths = this.paths.filter((path) => {
             const endPoint = path[path.length - 1];
             return getIndexOfValue(largerHeadPoints, endPoint) > -1;
         });
-        return largerHeadPaths;
+        largerHeadPaths.sort((a, b) => {
+            if (a.length < b.length) {
+                return -1;
+            } else if (a.length > b.length) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return largerHeadPaths[0];
     }
 
     bestPath(): IPoint[] {
@@ -110,12 +137,10 @@ export const MoveGenerator = class {
         // The following compares the path to all of the food paths, and generates a factor
         // that is larger the more the path overlaps with any of the food paths
         let foodPathCommonality = 0;
-        for (let i = 0; i < this.foodPaths.length; i++) {
-            const smallerLength = Math.min(this.foodPaths.length, path.length);
-            for (let j = 0; j < smallerLength; j++) {
-                if (_.isEqual(path[j], this.foodPaths[i][j])) foodPathCommonality++;
-            }
+        for (let j = 0; j < Math.min(this.foodPath.length, path.length); j++) {
+            if (_.isEqual(path[j], this.foodPath[j])) foodPathCommonality++;
         }
+
         const foodProximityFactor = (foodPathCommonality / this.stepReferenceScalar);
         const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer.getMyHunger()) / 33);
 
@@ -129,21 +154,16 @@ export const MoveGenerator = class {
         const centerProximityTerm = centerProximityFactor * this.centreProximityWeight;
 
         let agressionPathCommonality = 0;
-        for (let i = 0; i < this.agressionPaths.length; i++) {
-            const smallerLength = Math.min(this.agressionPaths.length, path.length);
-            for (let j = 0; j < smallerLength; j++) {
-                if (_.isEqual(path[j], this.agressionPaths[i][j])) agressionPathCommonality++;
-            }
+        for (let j = 0; j < Math.min(this.agressionPath.length, path.length); j++) {
+            if (_.isEqual(path[j], this.agressionPath[j])) agressionPathCommonality++;
         }
+
         const agressionFactor = (agressionPathCommonality / this.stepReferenceScalar);
         const agressionTerm = agressionFactor * this.agressionWeight;
 
         let nonAvoidancePathCommonality = 0;
-        for (let i = 0; i < this.nonAvoidancePaths.length; i++) {
-            const smallerLength = Math.min(this.nonAvoidancePaths.length, path.length);
-            for (let j = 0; j < smallerLength; j++) {
-                if (_.isEqual(path[j], this.nonAvoidancePaths[i][j])) nonAvoidancePathCommonality++;
-            }
+        for (let j = 0; j < Math.min(this.nonAvoidancePath.length, path.length); j++) {
+            if (_.isEqual(path[j], this.nonAvoidancePath[j])) nonAvoidancePathCommonality++;
         }
         const avoidanceFactor = 1 - (nonAvoidancePathCommonality / this.stepReferenceScalar);
         const avoidanceTerm = avoidanceFactor * this.avoidanceWeight;

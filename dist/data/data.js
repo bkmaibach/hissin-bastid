@@ -24,11 +24,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
 const promisified_1 = require("../util/promisified");
 const helpers_1 = require("../util/helpers");
-const util_1 = require("util");
+const SnakeLogger_1 = require("../util/SnakeLogger");
 // Base directory of the data folder
 exports.baseDir = path.join(__dirname, "../../logs");
 exports.createFile = (dir, file, data) => __awaiter(this, void 0, void 0, function* () {
-    util_1.debug("Creating file " + `${exports.baseDir}/${dir}/${file}.json`);
+    SnakeLogger_1.SnakeLogger.debug("Creating file " + `${exports.baseDir}/${dir}/${file}.json`);
     const strData = JSON.stringify(data);
     const fd = yield promisified_1.open(`${exports.baseDir}/${dir}/${file}.json`, "wx");
     yield promisified_1.writeFile(fd, strData);
@@ -36,14 +36,14 @@ exports.createFile = (dir, file, data) => __awaiter(this, void 0, void 0, functi
 });
 exports.readFile = function (dir, file) {
     return __awaiter(this, void 0, void 0, function* () {
-        util_1.debug("Reading file " + `${exports.baseDir}/${dir}/${file}.json`);
+        SnakeLogger_1.SnakeLogger.debug("Reading file " + `${exports.baseDir}/${dir}/${file}.json`);
         const userStr = yield exports.readFile(`${exports.baseDir}/${dir}/${file}.json`, "utf-8");
         return yield helpers_1.parseStringToObject(userStr);
     });
 };
 exports.updateFile = function (dir, file, data) {
     return __awaiter(this, void 0, void 0, function* () {
-        util_1.debug("Updating file " + `${exports.baseDir}/${dir}/${file}.json`);
+        SnakeLogger_1.SnakeLogger.debug("Updating file " + `${exports.baseDir}/${dir}/${file}.json`);
         const strData = JSON.stringify(data);
         const fd = yield promisified_1.open(`${exports.baseDir}/${dir}/${file}.json`, "r+");
         yield promisified_1.ftruncate(fd);
@@ -53,13 +53,13 @@ exports.updateFile = function (dir, file, data) {
 };
 exports.deleteFile = function (dir, file) {
     return __awaiter(this, void 0, void 0, function* () {
-        util_1.debug("Deleting file " + `${exports.baseDir}/${dir}/${file}.json`);
+        SnakeLogger_1.SnakeLogger.debug("Deleting file " + `${exports.baseDir}/${dir}/${file}.json`);
         return yield promisified_1.unlink(`${exports.baseDir}/${dir}/${file}.json`);
     });
 };
 // List all the items in a directory
 exports.list = (dir) => __awaiter(this, void 0, void 0, function* () {
-    util_1.debug("Listing directory " + dir);
+    SnakeLogger_1.SnakeLogger.debug("Listing directory " + dir);
     const data = yield promisified_1.readdir(exports.baseDir + " /" + dir);
     if (data.length > 0) {
         const trimmedFileNames = [];

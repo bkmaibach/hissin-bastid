@@ -13,13 +13,13 @@ import { open, append, close, read, ftruncate, writeFile, unlink, readdir } from
 import * as util from "util";
 import { parseStringToObject } from "../util/helpers";
 
-import { debug } from "util";
+import { SnakeLogger } from "../util/SnakeLogger";
 
 // Base directory of the data folder
 export const baseDir = path.join(__dirname, "../../logs" );
 
 export const createFile = async (dir: string, file: string, data: string) => {
-    debug("Creating file " + `${baseDir}/${dir}/${file}.json`);
+    SnakeLogger.debug("Creating file " + `${baseDir}/${dir}/${file}.json`);
     const strData = JSON.stringify(data);
     const fd = await open(`${baseDir}/${dir}/${file}.json`, "wx" );
     await writeFile(fd, strData);
@@ -27,13 +27,13 @@ export const createFile = async (dir: string, file: string, data: string) => {
 };
 
 export const readFile = async function(dir: string, file: string) {
-    debug("Reading file " + `${baseDir}/${dir}/${file}.json`);
+    SnakeLogger.debug("Reading file " + `${baseDir}/${dir}/${file}.json`);
     const userStr: string = await readFile(`${baseDir}/${dir}/${file}.json`, "utf-8" );
     return await parseStringToObject(userStr);
 };
 
 export const updateFile = async function(dir: string, file: string, data: string) {
-    debug("Updating file " + `${baseDir}/${dir}/${file}.json`);
+    SnakeLogger.debug("Updating file " + `${baseDir}/${dir}/${file}.json`);
     const strData = JSON.stringify(data);
     const fd = await open(`${baseDir}/${dir}/${file}.json`, "r+" );
     await ftruncate(fd);
@@ -42,13 +42,13 @@ export const updateFile = async function(dir: string, file: string, data: string
 };
 
 export const deleteFile = async function(dir: string, file: string) {
-    debug("Deleting file " + `${baseDir}/${dir}/${file}.json`);
+    SnakeLogger.debug("Deleting file " + `${baseDir}/${dir}/${file}.json`);
     return await unlink(`${baseDir}/${dir}/${file}.json`);
 };
 
 // List all the items in a directory
 export const list = async (dir: string) => {
-    debug("Listing directory " + dir );
+    SnakeLogger.debug("Listing directory " + dir );
     const data = await readdir(baseDir + " /" + dir);
     if (data.length > 0) {
         const trimmedFileNames: string[] = [];

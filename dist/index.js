@@ -10,23 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_1 = __importDefault(require("express"));
-const path = __importStar(require("path"));
 const handlers_1 = require("./handlers");
 const StateAnalyzer_1 = require("./snake/StateAnalyzer");
 const MoveGenerator_1 = require("./snake/MoveGenerator");
 const SnakeLogger_1 = require("./util/SnakeLogger");
 const app = express_1.default();
-let filename;
 // For deployment to Heroku, the port needs to be set using ENV, so
 // we check for the port number in process.env
 app.set("port", (process.env.PORT || 9001));
@@ -38,11 +29,7 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     const snakeName = request.body.you.name;
     const gameID = request.body.game.id;
     SnakeLogger_1.SnakeLogger.init(snakeName, gameID);
-    SnakeLogger_1.SnakeLogger.info("Enter /start");
-    // forward the initial request to the state analyzer upon start
-    // All this part serves to do is choose our colour. If the program sees its on heroku (production)
-    // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
-    filename = gameID + "_" + snakeName;
+    SnakeLogger_1.SnakeLogger.debug("Enter /start");
     StateAnalyzer_1.StateAnalyzer.update(request.body);
     let hexString;
     if (process.env.NODE_ENV == "production") {
@@ -62,40 +49,56 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     };
     return response.json(data);
 }));
-// This is the function that gets run once per frame. It sends us a request whose body tells us everything about
-// the same at that point.
-// A few things need to be stored outside this function so that they stay the same from one request to the next
 app.post("/move", (request, response) => {
-    SnakeLogger_1.SnakeLogger.info("Enter /move");
+    SnakeLogger_1.SnakeLogger.debug("Enter /move");
     // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
     try {
         // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
         StateAnalyzer_1.StateAnalyzer.update(request.body);
+        // If there are literally no paths available to any of the points in our list, then we can default to a safemove
+        // SnakeLogger.info("turn: " + JSON.stringify(turn));
+        // SnakeLogger.info("current xy: " + JSON.stringify(myPosition));
+        // SnakeLogger.info("target xy: " + JSON.stringify(targetXY));
+        // SnakeLogger.info("path projection: " + JSON.stringify(path));
+        // SnakeLogger.info("move: " + JSON.stringify(move));
         const moveGen = new MoveGenerator_1.MoveGenerator();
         const move = moveGen.generateMove();
-        // If there are literally no paths available to any of the points in our list, then we can default to a safemove
-        // SnakeLogger.notice("turn: " + JSON.stringify(turn));
-        // SnakeLogger.notice("current xy: " + JSON.stringify(myPosition));
-        // SnakeLogger.notice("target xy: " + JSON.stringify(targetXY));
-        // SnakeLogger.notice("path projection: " + JSON.stringify(path));
-        // SnakeLogger.notice("move: " + JSON.stringify(move));
-        // Response data
         return response.json({ move });
+        // return response.json({move: "right"});
     }
     catch (e) {
         const stack = new Error().stack;
-        console.log(e);
-        console.log(stack);
+        SnakeLogger_1.SnakeLogger.debug(e);
+        SnakeLogger_1.SnakeLogger.debug(stack);
     }
 });
+// app.post("/start", (request, response) => {
+//   const snakeName = request.body.you.name;
+//   const gameID = request.body.game.id;
+//   SnakeLogger.init(snakeName, gameID);
+//   SnakeLogger.debug("Enter /start");
+//   // Response data
+//   const data = {
+//     color: "#DFFF00",
+//   };
+//   return response.json(data);
+// });
+// app.post("/move", (request, response) => {
+//   // NOTE: Do something here to generate your move
+//   // Response data
+//   const data = {
+//     move: "right", // one of: ["up","down","left","right"]
+//   };
+//   return response.json(data);
+// });
 app.post("/end", (request, response) => {
-    SnakeLogger_1.SnakeLogger.info("Enter /end");
+    // SnakeLogger.debug("Enter /end");
     // NOTE: Any cleanup when a game is complete.
     // So we can run multiple games without re-starting app.
     return response.json({});
 });
 app.post("/ping", (request, response) => {
-    SnakeLogger_1.SnakeLogger.info("Enter /ping");
+    // SnakeLogger.debug("Enter /ping");
     // Used for checking if this snake is still alive.
     return response.json({});
 });
@@ -105,8 +108,6 @@ app.use("*", handlers_1.fallbackHandler);
 app.use(handlers_1.notFoundHandler);
 app.use(handlers_1.genericErrorHandler);
 app.listen(app.get("port"), () => {
-    console.log("Snake listening on port %s", app.get("port"));
-    const logDir = path.join(__dirname, "../logs");
-    console.log("Logs can be found at " + logDir);
+    console.log("Snake listening on port " + app.get("port"));
 });
 //# sourceMappingURL=index.js.map

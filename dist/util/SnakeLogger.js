@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const winston_1 = __importDefault(require("winston"));
 const winston_2 = require("winston");
+const StateAnalyzer_1 = require("../snake/StateAnalyzer");
 // import { createFile } from "../data/data";
 let filename;
 class SnakeLogger {
@@ -28,29 +29,20 @@ class SnakeLogger {
             console.log("Could not create log file");
         }
     }
-    static emerg(message) {
-        this.logger.emerg(message);
-    }
     static alert(message) {
-        this.logger.alert(message);
-    }
-    static crit(message) {
-        this.logger.crit(message);
-    }
-    static error(message) {
-        this.logger.error(message);
-    }
-    static warning(message) {
-        this.logger.warning(message);
-    }
-    static notice(message) {
-        this.logger.info(message);
+        if (process.env.NODE_ENV !== "production") {
+            this.logger.alert("TURN: " + StateAnalyzer_1.StateAnalyzer.getTurnNumber() + message);
+        }
     }
     static info(message) {
-        this.logger.info(message);
+        if (process.env.NODE_ENV !== "production") {
+            this.logger.info("TURN: " + StateAnalyzer_1.StateAnalyzer.getTurnNumber() + message);
+        }
     }
     static debug(message) {
-        this.logger.debug(message);
+        if (process.env.NODE_ENV !== "production") {
+            this.logger.debug(message);
+        }
     }
 }
 exports.SnakeLogger = SnakeLogger;

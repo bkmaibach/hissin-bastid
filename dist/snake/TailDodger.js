@@ -91,7 +91,7 @@ exports.TailDodger = class {
                     // It's gonna take an extra step to vacate this spot if the snake who it belongs to
                     // is about to eat food. This is a quick preventative measure.
                     if (StateAnalyzer_1.StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
-                        SnakeLogger_1.SnakeLogger.notice("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
+                        SnakeLogger_1.SnakeLogger.info("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
                         stepsToVacate++;
                     }
                     // Is it a tail dodge?
@@ -125,11 +125,11 @@ exports.TailDodger = class {
             return undefined;
         }
         if (typeof steps[1] == "undefined") {
-            console.log("break here");
+            SnakeLogger_1.SnakeLogger.debug("The first step of path to point " + endXY + " is undefined");
         }
         // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
         if (StateAnalyzer_1.StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
-            SnakeLogger_1.SnakeLogger.notice("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
+            SnakeLogger_1.SnakeLogger.info("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
             this.addCollisionPoint(steps[1]);
             return this.getShortestPath(endXY);
         }
