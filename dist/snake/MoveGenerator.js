@@ -61,12 +61,14 @@ exports.MoveGenerator = class {
                     }
                 }
             }
-            try {
-                this.paths = yield Promise.all(pathPromises);
-            }
-            catch (e) {
-                SnakeLogger_1.SnakeLogger.info(e.message);
-            }
+            pathPromises.forEach((promise) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    this.paths.push(yield promise);
+                }
+                catch (e) {
+                    SnakeLogger_1.SnakeLogger.info(e.message);
+                }
+            }));
             this.foodPath = this.filterForFoodPath();
             this.agressionPath = this.filterForAgressionPath();
             this.nonAvoidancePath = this.filterForNonAvoidancePath();
@@ -185,7 +187,7 @@ exports.MoveGenerator = class {
         // Add a bias?
         const bias = 0;
         const summedScore = selfProximityTerm + foodProximityTerm + centerProximityTerm + agressionTerm + avoidanceTerm;
-        SnakeLogger_1.SnakeLogger.info("summedScore for path to endPoint " + endPoint + " is " + summedScore);
+        SnakeLogger_1.SnakeLogger.info("summedScore for path to endPoint " + JSON.stringify(endPoint) + " is " + summedScore);
         return summedScore + bias;
     }
 };

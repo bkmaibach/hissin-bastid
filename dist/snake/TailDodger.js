@@ -131,10 +131,10 @@ exports.TailDodger = class {
                 }
                 if (typeof path[0] == "undefined") {
                     // If there is no path, this will be the case here.
-                    reject({ message: "No path could be found to endpoint " + endXY.toString() });
+                    reject({ message: "No path could be found to endpoint " + JSON.stringify(endXY) + " from " + JSON.stringify(StateAnalyzer_1.StateAnalyzer.getMyPosition()) });
                 }
                 if (typeof steps[1] == "undefined") {
-                    SnakeLogger_1.SnakeLogger.debug("The first step of path to point " + endXY.toString() + " is undefined");
+                    SnakeLogger_1.SnakeLogger.info("The first step of path from point " + JSON.stringify(StateAnalyzer_1.StateAnalyzer.getMyPosition()) + " to point " + JSON.stringify(endXY) + " is undefined");
                 }
                 // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
                 if (StateAnalyzer_1.StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {

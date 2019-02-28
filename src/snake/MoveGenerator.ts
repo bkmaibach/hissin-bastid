@@ -53,11 +53,14 @@ export const MoveGenerator = class {
                 }
             }
         }
-        try {
-            this.paths = await Promise.all(pathPromises);
-        } catch (e) {
-            SnakeLogger.info(e.message);
-        }
+        pathPromises.forEach(async (promise) => {
+            try {
+                this.paths.push(await promise);
+            } catch (e) {
+                SnakeLogger.info(e.message);
+            }
+        });
+
 
         this.foodPath = this.filterForFoodPath();
         this.agressionPath = this.filterForAgressionPath();
@@ -179,7 +182,7 @@ export const MoveGenerator = class {
         // Add a bias?
         const bias = 0;
         const summedScore = selfProximityTerm + foodProximityTerm + centerProximityTerm + agressionTerm + avoidanceTerm;
-        SnakeLogger.info("summedScore for path to endPoint " + endPoint + " is " + summedScore);
+        SnakeLogger.info("summedScore for path to endPoint " + JSON.stringify(endPoint) + " is " + summedScore);
         return summedScore + bias;
 
     }
