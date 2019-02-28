@@ -24,10 +24,13 @@ export const MoveGenerator = class {
 
     stepReferenceScalar = this.height + this.width;
 
+    startMs: number;
+
     constructor() {
         SnakeLogger.info("Constructing MoveGenerator - Generating all paths");
         const start = StateAnalyzer.getMyPosition();
         const dodger = new TailDodger(start);
+        this.startMs = new Date().getTime();
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 const end: IPoint = {x, y};
@@ -67,7 +70,8 @@ export const MoveGenerator = class {
                 SnakeLogger.error(e + " : " + stack);
             }
         }
-        SnakeLogger.info(this.paths.length + " paths have been generated");
+        const endMs = new Date().getTime();
+        SnakeLogger.info(this.paths.length + " paths have been generated in " + (endMs - this.startMs) + " milliseconds");
         this.foodPath = this.filterForFoodPath();
         this.agressionPath = this.filterForAgressionPath();
         this.nonAvoidancePath = this.filterForNonAvoidancePath();
