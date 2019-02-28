@@ -11,6 +11,10 @@ export enum EMoveDirections {
     left = "left",
     right = "right"
 }
+export interface IScoredPath {
+    path: IPoint[];
+    score: number;
+}
 
 export interface IMoveInfo {
     contents: ECellContents;

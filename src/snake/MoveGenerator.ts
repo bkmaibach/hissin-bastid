@@ -4,7 +4,7 @@ import * as data from "../data/data";
 import { SnakeLogger } from "../util/SnakeLogger";
 import { TailDodger } from "./TailDodger" ;
 import { getIndexOfValue } from "../util/helpers";
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
+import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard, IScoredPath } from "./types";
 import * as _ from "lodash";
 
 export const MoveGenerator = class {
@@ -31,6 +31,8 @@ export const MoveGenerator = class {
         const start = StateAnalyzer.getMyPosition();
         const dodger = new TailDodger(start);
         this.startMs = new Date().getTime();
+        // const endPointList = StateAnalyzer.get50NearestPoints();
+
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 const end: IPoint = {x, y};
@@ -44,14 +46,14 @@ export const MoveGenerator = class {
 
     async generateMove(): Promise<EMoveDirections> {
         SnakeLogger.info("Starting generateMove");
-        const bestPath = await this.bestPath();
-
-        SnakeLogger.info("target xy: " + JSON.stringify(bestPath[bestPath.length - 1]));
-        SnakeLogger.info("path projection: " + JSON.stringify(bestPath));
-
-        if (typeof bestPath != "undefined") {
+        try {
+            const bestPath = await this.bestPath();
+            SnakeLogger.info("target xy: " + JSON.stringify(bestPath[bestPath.length - 1]));
+            SnakeLogger.info("path projection: " + JSON.stringify(bestPath));
             return StateAnalyzer.getMove(bestPath[0], bestPath[1]);
-        } else {
+        } catch (e) {
+            const stack = new Error().stack;
+            SnakeLogger.error(JSON.stringify(e) + " : " + stack);
             return StateAnalyzer.safeMove();
         }
     }
@@ -67,7 +69,7 @@ export const MoveGenerator = class {
                 this.paths.push(path);
             } catch (e) {
                 const stack = new Error().stack;
-                SnakeLogger.error(e + " : " + stack);
+                SnakeLogger.error(JSON.stringify(e) + " : " + stack);
             }
         }
         const endMs = new Date().getTime();

@@ -115,8 +115,13 @@ export const TailDodger = class {
                             for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
                                 this.addCollisionPoint(headToCollisionSection[k]);
                             }
+                            try {
+                                resolve(<IPoint[]>await this.getShortestPath(endXY));
+                            } catch (e) {
+                                const stack = new Error().stack;
+                                SnakeLogger.error(JSON.stringify(e) + " : " + stack);
+                            }
 
-                            resolve(<IPoint[]>await this.getShortestPath(endXY));
                         } else {
                             // Mark the entire tail-side section of this point as safe in this else clase where taildodge is true
                             for (let k = possibleCollisionIndex; k < snakes[j].body.length; k++) {
@@ -132,7 +137,7 @@ export const TailDodger = class {
             }
 
             if (typeof steps[1] == "undefined") {
-                SnakeLogger.info("The first step of path from point " + JSON.stringify(StateAnalyzer.getMyPosition()) + " to point " + JSON.stringify(endXY) + " is undefined");
+                reject({message: "The first step of path from point " + JSON.stringify(StateAnalyzer.getMyPosition()) + " to point " + JSON.stringify(endXY) + " is undefined"});
             }
 
             // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart

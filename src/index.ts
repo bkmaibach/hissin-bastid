@@ -65,7 +65,7 @@ app.post("/move", async (request, response) => {
     return response.json({move});
   } catch (e) {
     const stack = new Error().stack;
-    SnakeLogger.error(e + " : " + stack);
+    SnakeLogger.error(JSON.stringify(e) + " : " + stack);
   }
 });
 

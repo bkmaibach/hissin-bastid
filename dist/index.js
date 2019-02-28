@@ -64,7 +64,7 @@ app.post("/move", (request, response) => __awaiter(this, void 0, void 0, functio
     }
     catch (e) {
         const stack = new Error().stack;
-        SnakeLogger_1.SnakeLogger.error(e + " : " + stack);
+        SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
     }
 }));
 app.post("/end", (request, response) => {

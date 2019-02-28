@@ -39,6 +39,7 @@ exports.MoveGenerator = class {
         const start = StateAnalyzer_1.StateAnalyzer.getMyPosition();
         const dodger = new TailDodger_1.TailDodger(start);
         this.startMs = new Date().getTime();
+        // const endPointList = StateAnalyzer.get50NearestPoints();
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 const end = { x, y };
@@ -52,13 +53,15 @@ exports.MoveGenerator = class {
     generateMove() {
         return __awaiter(this, void 0, void 0, function* () {
             SnakeLogger_1.SnakeLogger.info("Starting generateMove");
-            const bestPath = yield this.bestPath();
-            SnakeLogger_1.SnakeLogger.info("target xy: " + JSON.stringify(bestPath[bestPath.length - 1]));
-            SnakeLogger_1.SnakeLogger.info("path projection: " + JSON.stringify(bestPath));
-            if (typeof bestPath != "undefined") {
+            try {
+                const bestPath = yield this.bestPath();
+                SnakeLogger_1.SnakeLogger.info("target xy: " + JSON.stringify(bestPath[bestPath.length - 1]));
+                SnakeLogger_1.SnakeLogger.info("path projection: " + JSON.stringify(bestPath));
                 return StateAnalyzer_1.StateAnalyzer.getMove(bestPath[0], bestPath[1]);
             }
-            else {
+            catch (e) {
+                const stack = new Error().stack;
+                SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
                 return StateAnalyzer_1.StateAnalyzer.safeMove();
             }
         });
@@ -75,7 +78,7 @@ exports.MoveGenerator = class {
                 }
                 catch (e) {
                     const stack = new Error().stack;
-                    SnakeLogger_1.SnakeLogger.error(e + " : " + stack);
+                    SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
                 }
             }
             const endMs = new Date().getTime();
