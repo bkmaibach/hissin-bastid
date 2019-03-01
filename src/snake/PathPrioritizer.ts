@@ -20,15 +20,19 @@ export const PathPrioritizer = class {
         const foodPoints = StateAnalyzer.getFoodPoints(0);
         const smallerSnakeHeads = StateAnalyzer.getSmallerHeadPoints();
         const tailTip = StateAnalyzer.getMyTailTip();
+
         const startTime = new Date().getTime();
+
         const dodger = new TailDodger(myPosition);
         const foodPaths = dodger.getShortestPaths(foodPoints);
         const agressionPaths = dodger.getShortestPaths(smallerSnakeHeads);
 
+        const turn = StateAnalyzer.getTurnNumber();
+
         const endTime = new Date().getTime();
 
         let tailPaths: IPoint[][] = [];
-        if (!_.isEqual(tailTip, myPosition)) {
+        if (!_.isEqual(tailTip, myPosition) && turn >= 2) {
             tailPaths = [dodger.getShortestPath(tailTip)];
         }
 
@@ -50,7 +54,8 @@ export const PathPrioritizer = class {
             SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
 
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
-                return StateAnalyzer.isEdgePoint(path[path.length - 1]);
+                return StateAnalyzer.isEdgePoint(path[path.length - 1])
+                    && !_.isEqual(path[path.length - 1], tailTip);
             });
 
 
@@ -67,7 +72,8 @@ export const PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 return StateAnalyzer.isEdgePoint(path[path.length - 1])
-                    && !StateAnalyzer.isFoodPoint(path[path.length - 1]);
+                    && !StateAnalyzer.isFoodPoint(path[path.length - 1])
+                    && !_.isEqual(path[path.length - 1], tailTip);
             });
         }
         return prioritizedPaths;

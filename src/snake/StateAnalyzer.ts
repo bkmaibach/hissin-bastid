@@ -356,19 +356,20 @@ export class StateAnalyzer {
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
-        if (snake.name != myName) {
-            // SnakeLogger.info("checking snake " + snake.name);
-            // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
-            // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
-            if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                // SnakeLogger.info("snake head was found in neighbor list");
-                if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                    SnakeLogger.info("Contesting snake is too large to ignore");
-                    returnVal = true;
-                    return;
+            if (snake.name != myName) {
+                // SnakeLogger.info("Checking point: " + JSON.stringify(point));
+                // SnakeLogger.info("checking snake " + snake.name);
+                // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
+                // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
+                if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
+                    // SnakeLogger.info("snake head was found in neighbor list");
+                    if (snake.body.length >= StateAnalyzer.getMyLength()) {
+                        SnakeLogger.info("Snake" + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
+                        returnVal = true;
+                        return;
+                    }
                 }
             }
-        }
         });
         return returnVal;
     }
@@ -436,5 +437,11 @@ export class StateAnalyzer {
     static isFoodPoint(point: IPoint): boolean {
         const foodPoints = this.getFoodPoints(0);
         return getIndexOfValue(foodPoints, point) > -1;
+    }
+
+    static getCorners(): IPoint[] {
+        const maxY = this.getBoardHeight() - 1;
+        const maxX = this.getBoardWidth() - 1;
+        return [{x: 0, y: 0}, {x: 0, y: maxY }, {x: maxX , y: 0}, {x: maxX, y: maxY}];
     }
 }
