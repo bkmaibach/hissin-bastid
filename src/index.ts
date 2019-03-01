@@ -44,6 +44,8 @@ app.post("/start", (request, response) => {
   // Response data
   const data = {
     color: "#" + hexString,
+    headType: "shades",
+    tailType: "hook",
   };
   return response.json(data);
 });
