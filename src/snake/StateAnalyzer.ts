@@ -61,8 +61,7 @@ export class StateAnalyzer {
     }
 
     static snakeHead(snakeName: string, turnsAgo: number): IPoint {
-        const state = this.getState(turnsAgo);
-        const snakeArray = state.board.snakes;
+        const snakeArray = this.getSnakes();
         const snake = snakeArray.filter((snake) => snake.name == snakeName )[0];
         return snake.body[0];
     }
@@ -200,8 +199,7 @@ export class StateAnalyzer {
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
                 SnakeLogger.info("It contains a snake tip");
-                if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)
-                || boardSnake.name == StateAnalyzer.getMyName()) {
+                if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)) {
                     SnakeLogger.info("But it is a safeTip");
                     returnVal.safeTip = true;
                 }
