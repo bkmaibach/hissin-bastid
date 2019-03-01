@@ -82,14 +82,13 @@ app.post("/move", (request, response) => {
     // Where do we go? Ideally, ourappRoot target gen has sorted all of the points in perfect order of how much we should go twards there
     // This could be served up by aappRoot neural net processing the game state. But at the time of writing it's just the list of food points.
     // (which got us to a score of appRoot31)
-    const targets = targetGen.getPrioritizedPaths();
+    const paths = targetGen.getPrioritizedPaths();
     const dodger = new TailDodger(myPosition);
 
     // Notice that this for-loop tries to get paths to each of the points in the sorted array. It will consider a path to any of these
     // Points and get the move for the first step on this path if available.
-    for (let i = 0; i < targets.length; i++) {
-      targetXY = targets[i];
-      path = dodger.getShortestPath(targetXY);
+    for (let i = 0; i < paths.length; i++) {
+      path = paths[i];
       if (typeof path != "undefined") {
         move = StateAnalyzer.getMove(path[0], path[1]);
         break;

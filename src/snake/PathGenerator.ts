@@ -11,7 +11,7 @@ export const TargetGenerator = class {
 
     }
 
-    getPrioritizedPaths () {
+    getPrioritizedPaths (): IPoint[][] {
         const myPosition = StateAnalyzer.getMyPosition();
         const myHunger = StateAnalyzer.getMyHunger();
 
@@ -45,7 +45,7 @@ export const TargetGenerator = class {
                     && !StateAnalyzer.isFoodPoint(path[path.length - 1]);
             });
         }
-
+        return prioritizedPaths;
     }
 
     sortByLength(paths: IPoint[][]) {
