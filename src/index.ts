@@ -78,8 +78,15 @@ app.post("/move", (request, response) => {
 
     const paths = pathPrioritizer.getPrioritizedPaths();
     if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
-      path = paths[0];
-      move = StateAnalyzer.getMove(path[0], path[1]);
+      // path = paths[0];
+      // move = StateAnalyzer.getMove(path[0], path[1]);
+      for (let i = 0; i < paths.length; i++) {
+        path = paths[i];
+        if (typeof path != "undefined") {
+          move = StateAnalyzer.getMove(path[0], path[1]);
+          break;
+        }
+      }
     } else {
       move = StateAnalyzer.safeMove();
     }
