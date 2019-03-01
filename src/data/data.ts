@@ -7,7 +7,7 @@
 // Dependencies
 import * as path from "path";
 import * as fs from "fs";
-import { open, append, close, read, truncate, writeFile, unlink, readdir } from "../util/promisified";
+import { open, append, close, read, ftruncate, writeFile, unlink, readdir } from "../util/promisified";
 
 
 import * as util from "util";
@@ -36,7 +36,7 @@ export const updateFile = async function(dir: string, file: string, data: string
     debug("Updating file " + `${baseDir}/${dir}/${file}.json`);
     const strData = JSON.stringify(data);
     const fd = await open(`${baseDir}/${dir}/${file}.json`, " r+" );
-    await truncate(fd);
+    await ftruncate(fd);
     await writeFile(fd, strData);
     return await close(fd);
 };

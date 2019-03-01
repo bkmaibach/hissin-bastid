@@ -8,7 +8,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
-const util_1 = require("./util");
+const helpers_1 = require("../util/helpers");
 const _ = __importStar(require("lodash"));
 /*
 Every time our app is asked for a move, we receive a "request body" that contains all the information about the board
@@ -152,7 +152,7 @@ class StateAnalyzer {
                 // console.log("neighbors of this point: " + JSON.stringify(neighbors));
                 // console.log("Snake head is at" + JSON.stringify(boardSnake.body[0]));
                 // console.log("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
-                if (util_1.getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
+                if (helpers_1.getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
                     console.log("Move found to be contested by: " + boardSnake.name);
                     returnVal.contested = true;
                     if (!returnVal.snakeLengths) {
@@ -173,7 +173,7 @@ class StateAnalyzer {
         }
         // Also put in if the point is in the food list.
         // Notice the getIndexOfValue function returns -1 when it can't find the index in the list
-        returnVal.food = util_1.getIndexOfValue(StateAnalyzer.getCurrentState().board.food, newXY) > -1;
+        returnVal.food = helpers_1.getIndexOfValue(StateAnalyzer.getCurrentState().board.food, newXY) > -1;
         return returnVal;
     }
     // what move do I need to get from the start point to the finish point?
@@ -265,7 +265,7 @@ class StateAnalyzer {
         let returnVal = false;
         // For each neighboring point is it in the food list blah blah
         neighbors.forEach((neighborPoint) => {
-            if (util_1.getIndexOfValue(foodPoints, neighborPoint) > -1) {
+            if (helpers_1.getIndexOfValue(foodPoints, neighborPoint) > -1) {
                 returnVal = true;
                 return;
             }
@@ -282,7 +282,7 @@ class StateAnalyzer {
                 // console.log("checking snake " + snake.name);
                 // console.log("point neighbors are" + JSON.stringify(neighbors));
                 // console.log("snake head is at " + JSON.stringify(snake.body[0]));
-                if (util_1.getIndexOfValue(neighbors, snake.body[0]) > -1) {
+                if (helpers_1.getIndexOfValue(neighbors, snake.body[0]) > -1) {
                     console.log("snake head was found in neighbor list");
                     if (snake.body.length >= StateAnalyzer.getMyLength()) {
                         console.log("snake is too large to ignore");
@@ -305,7 +305,7 @@ class StateAnalyzer {
     // Is this point a part of a snake body?
     static pointIsTaken(point) {
         const takenPoints = StateAnalyzer.getTakenPoints();
-        return (util_1.getIndexOfValue(takenPoints, point) > -1);
+        return (helpers_1.getIndexOfValue(takenPoints, point) > -1);
     }
     static getMyTailTip() {
         const last = StateAnalyzer.getCurrentState().you.body.length - 1;
