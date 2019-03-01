@@ -10,7 +10,7 @@ import { fallbackHandler,
 import { StateAnalyzer } from "./snake/StateAnalyzer";
 import * as _ from "lodash";
 import { TailDodger } from "./snake/TailDodger" ;
-import { TargetGenerator } from "./snake/PathGenerator";
+import { PathPrioritizer } from "./snake/PathPrioritizer";
 import { IPoint, EMoveDirections } from "./snake/types";
 import { SnakeLogger } from "./util/SnakeLogger";
 // import * as dataLogger from "./data/data";
@@ -30,7 +30,7 @@ app.post("/start", async (request, response) => {
   const snakeName = request.body.you.name;
   const gameID = request.body.game.id;
   SnakeLogger.init(snakeName, gameID);
-  SnakeLogger.info("Enter /start");
+  SnakeLogger.debug("Enter /start");
   // forward the initial request to the state analyzer upon start
   // All this part serves to do is choose our colour. If the program sees its on heroku (production)
   // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
@@ -56,20 +56,15 @@ app.post("/start", async (request, response) => {
   return response.json(data);
 });
 
-
-// This is the function that gets run once per frame. It sends us a request whose body tells us everything about
-// the same at that point.
-// A few things need to be stored outside this function so that they stay the same from one request to the next
-
-let targetXY: IPoint;
-const targetGen = new TargetGenerator();
-
 app.post("/move", (request, response) => {
-  SnakeLogger.info("Enter /move");
+  const moveStartTime = new Date().getTime();
+  SnakeLogger.debug("Enter /move");
   // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
   try {
     // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
     StateAnalyzer.update(request.body);
+
+    const pathPrioritizer = new PathPrioritizer();
 
     // Our move generation is currently made of 2 questions:
     // Where do we go? and
@@ -82,29 +77,19 @@ app.post("/move", (request, response) => {
     // Where do we go? Ideally, ourappRoot target gen has sorted all of the points in perfect order of how much we should go twards there
     // This could be served up by aappRoot neural net processing the game state. But at the time of writing it's just the list of food points.
     // (which got us to a score of appRoot31)
-    const paths = targetGen.getPrioritizedPaths();
-    const dodger = new TailDodger(myPosition);
-
-    // Notice that this for-loop tries to get paths to each of the points in the sorted array. It will consider a path to any of these
-    // Points and get the move for the first step on this path if available.
-    for (let i = 0; i < paths.length; i++) {
-      path = paths[i];
-      if (typeof path != "undefined") {
-        move = StateAnalyzer.getMove(path[0], path[1]);
-        break;
-      }
-    }
-
-    // If there are literally no paths available to any of the points in our list, then we can default to a safemove
-    if (typeof path == "undefined") {
+    const paths = pathPrioritizer.getPrioritizedPaths();
+    if (paths !== []) {
+      path = paths[0];
+      move = StateAnalyzer.getMove(path[0], path[1]);
+    } else {
       move = StateAnalyzer.safeMove();
     }
 
+    const moveEndTime = new Date().getTime();
     SnakeLogger.info("turn: " + JSON.stringify(turn));
     SnakeLogger.info("current xy: " + JSON.stringify(myPosition));
-    SnakeLogger.info("target xy: " + JSON.stringify(targetXY));
     SnakeLogger.info("path projection: " + JSON.stringify(path));
-    SnakeLogger.info("move: " + JSON.stringify(move));
+    SnakeLogger.info("move: " + JSON.stringify(move) + " chosen in " + (moveEndTime - moveStartTime) + " milliseconds");
 
     // Response data
     return response.json({move});
@@ -116,7 +101,7 @@ app.post("/move", (request, response) => {
 });
 
 app.post("/end", (request, response) => {
-  SnakeLogger.info("Enter /end");
+  SnakeLogger.debug("Enter /end");
   // NOTE: Any cleanup when a game is complete.
   // So we can run multiple games without re-starting app.
   return response.json({});

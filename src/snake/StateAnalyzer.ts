@@ -357,13 +357,13 @@ export class StateAnalyzer {
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
         if (snake.name != myName) {
-            SnakeLogger.info("checking snake " + snake.name);
-            SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
-            SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
+            // SnakeLogger.info("checking snake " + snake.name);
+            // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
+            // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
             if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                SnakeLogger.info("snake head was found in neighbor list");
+                // SnakeLogger.info("snake head was found in neighbor list");
                 if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                    SnakeLogger.info("snake is too large to ignore");
+                    SnakeLogger.info("Contesting snake is too large to ignore");
                     returnVal = true;
                     return;
                 }
@@ -401,13 +401,12 @@ export class StateAnalyzer {
     }
     static getSmallerHeadPoints(): IPoint[] {
         const myLength = this.getMyLength();
-        const myName = this.getMyName();
         const snakes = this.getSnakes();
-        snakes.filter((snake) => {
-            return (snake.body.length < myLength && snake.name != myName);
-        });
-        const heads = snakes.map((snake) => {
-            return snake.body[0];
+        const heads: IPoint[] = [];
+        snakes.forEach((snake) => {
+            if (snake.body.length < myLength) {
+                heads.push(snake.body[0]);
+            }
         });
         return heads;
     }
@@ -424,6 +423,9 @@ export class StateAnalyzer {
     }
 
     static isEdgePoint(point: IPoint): boolean {
+        if (typeof point == "undefined") {
+            console.log("break time");
+        }
         const x = point.x;
         const y = point.y;
         const maxX = this.getBoardWidth() - 1;

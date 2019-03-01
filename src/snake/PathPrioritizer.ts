@@ -4,8 +4,10 @@ import * as data from "../data/data";
 import { SnakeLogger } from "../util/SnakeLogger";
 import { TailDodger } from "./TailDodger" ;
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard, IScoredPoint } from "./types";
+import * as _ from "lodash";
+import { isArray } from "util";
 
-export const TargetGenerator = class {
+export const PathPrioritizer = class {
 
     constructor() {
 
@@ -18,28 +20,51 @@ export const TargetGenerator = class {
         const foodPoints = StateAnalyzer.getFoodPoints(0);
         const smallerSnakeHeads = StateAnalyzer.getSmallerHeadPoints();
         const tailTip = StateAnalyzer.getMyTailTip();
-
+        const startTime = new Date().getTime();
         const dodger = new TailDodger(myPosition);
         const foodPaths = dodger.getShortestPaths(foodPoints);
         const agressionPaths = dodger.getShortestPaths(smallerSnakeHeads);
-        const tailPath = dodger.getShortestPath(tailTip);
+
+        const endTime = new Date().getTime();
+
+        let tailPaths: IPoint[][] = [];
+        if (!_.isEqual(tailTip, myPosition)) {
+            tailPaths = [dodger.getShortestPath(tailTip)];
+        }
+
+        SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
 
         let prioritizedPaths: IPoint[][];
 
         if (myHunger < 50) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
-            const sortedPaths = primaryPaths.concat(tailPath);
+            const sortedPaths = primaryPaths.concat(tailPaths);
+            if (sortedPaths.length === 0) {
+                return sortedPaths;
+            }
+
+            SnakeLogger.info("foodPaths is " + JSON.stringify(foodPaths));
+            SnakeLogger.info("agressionPaths is " + JSON.stringify(agressionPaths));
+            SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
+            SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
+
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 return StateAnalyzer.isEdgePoint(path[path.length - 1]);
             });
+
+
+            SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
 
         } else {
             const primaryPaths = foodPaths;
             this.sortByLength(primaryPaths);
             const secondaryPaths = agressionPaths;
             this.sortByLength(secondaryPaths);
-            const sortedPaths = primaryPaths.concat(secondaryPaths).concat(tailPath);
+            const sortedPaths = primaryPaths.concat(secondaryPaths).concat(tailPaths);
+            if (sortedPaths.length === 0) {
+                return sortedPaths;
+            }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 return StateAnalyzer.isEdgePoint(path[path.length - 1])
                     && !StateAnalyzer.isFoodPoint(path[path.length - 1]);
