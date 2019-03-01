@@ -1,6 +1,7 @@
 import winston from "winston";
 import { Logger } from "winston";
 import { ENVIRONMENT } from "./secrets";
+import { StateAnalyzer } from "../snake/StateAnalyzer";
 // import { createFile } from "../data/data";
 
 let filename: string;
@@ -32,36 +33,30 @@ export class SnakeLogger {
         }
     }
 
-    static emerg(message: string) {
-        this.logger.emerg(message);
-    }
-
     static alert(message: string) {
-        this.logger.alert(message);
-    }
-
-    static crit(message: string) {
-        this.logger.crit(message);
-    }
-
-    static error(message: string) {
-        this.logger.error(message);
-    }
-
-    static warning(message: string) {
-        this.logger.warning(message);
-    }
-
-    static notice(message: string) {
-        this.logger.info(message);
+        if (process.env.NODE_ENV !== "production") {
+            this.logger.alert( message );
+        }
     }
 
     static info(message: string) {
-        this.logger.info(message);
+        if (process.env.NODE_ENV !== "production") {
+            this.logger.info("TURN: " + StateAnalyzer.getTurnNumber() + " - " + message );
+        }
     }
 
     static debug(message: string) {
-        this.logger.debug(message);
+        if (process.env.NODE_ENV !== "production") {
+
+            this.logger.debug( message );
+        }
+    }
+
+    static error(message: string) {
+        if (process.env.NODE_ENV !== "production") {
+
+            this.logger.error( message );
+        }
     }
 }
 

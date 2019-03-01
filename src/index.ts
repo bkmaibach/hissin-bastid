@@ -101,11 +101,11 @@ app.post("/move", (request, response) => {
       move = StateAnalyzer.safeMove();
     }
 
-    SnakeLogger.notice("turn: " + JSON.stringify(turn));
-    SnakeLogger.notice("current xy: " + JSON.stringify(myPosition));
-    SnakeLogger.notice("target xy: " + JSON.stringify(targetXY));
-    SnakeLogger.notice("path projection: " + JSON.stringify(path));
-    SnakeLogger.notice("move: " + JSON.stringify(move));
+    SnakeLogger.info("turn: " + JSON.stringify(turn));
+    SnakeLogger.info("current xy: " + JSON.stringify(myPosition));
+    SnakeLogger.info("target xy: " + JSON.stringify(targetXY));
+    SnakeLogger.info("path projection: " + JSON.stringify(path));
+    SnakeLogger.info("move: " + JSON.stringify(move));
 
     // Response data
     return response.json({move});
