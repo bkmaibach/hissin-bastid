@@ -50,6 +50,7 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     return response.json(data);
 }));
 app.post("/move", (request, response) => __awaiter(this, void 0, void 0, function* () {
+    const moveStartTime = new Date().getTime();
     SnakeLogger_1.SnakeLogger.debug("Enter /move");
     // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
     // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
@@ -59,7 +60,8 @@ app.post("/move", (request, response) => __awaiter(this, void 0, void 0, functio
         const move = yield moveGen.generateMove();
         SnakeLogger_1.SnakeLogger.info("turn: " + JSON.stringify(StateAnalyzer_1.StateAnalyzer.getTurnNumber()));
         SnakeLogger_1.SnakeLogger.info("current xy: " + JSON.stringify(StateAnalyzer_1.StateAnalyzer.getMyPosition()));
-        SnakeLogger_1.SnakeLogger.info("move: " + JSON.stringify(move));
+        const moveEndTime = new Date().getTime();
+        SnakeLogger_1.SnakeLogger.info("move: " + JSON.stringify(move) + " chosen in " + (moveEndTime - moveStartTime) + " milliseconds");
         return response.json({ move });
     }
     catch (e) {

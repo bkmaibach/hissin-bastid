@@ -87,6 +87,15 @@ exports.TailDodger = class {
                 const dist = planner.search((this.snakeHead.x), (this.snakeHead.y), (endXY.x), (endXY.y), path);
                 const steps = this.stepsInPath(path);
                 const snakes = StateAnalyzer_1.StateAnalyzer.getSnakes();
+                // First thing: mark all neighboring contested spots as collisions:
+                const neighbors = StateAnalyzer_1.StateAnalyzer.getRectilinearNeighbors(this.snakeHead);
+                neighbors.forEach((point) => {
+                    if (StateAnalyzer_1.StateAnalyzer.pointIsContestedByLargerSnake(point)) {
+                        SnakeLogger_1.SnakeLogger.info("The first step of this path is contested by a snake of larger or equal size. Marking point before calculating...");
+                        this.addCollisionPoint(point);
+                    }
+                });
+                this.contestedPointsBlocked = true;
                 for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
                     // Each step in our supposed path will be considered. If its not a good step
                     // Then the function restarts with this knowledge in mind.
@@ -110,11 +119,11 @@ exports.TailDodger = class {
                                 const headToCollisionSection = snakes[j].body.slice(0, possibleCollisionIndex + 1);
                                 // The following if statement prevents the algorithm from failing if the detected collision is a part our own snake
                                 // The head must be removed from the dangerous section because it will always be a part of any path
-                                // SHift just removes the first thing from the array. The snake shoud not be afraid of its own head!!!
+                                // Shift just removes the first thing from the array. The snake should not be afraid of its own head!!!
                                 if (_.isEqual(headToCollisionSection[0], this.snakeHead)) {
                                     headToCollisionSection.shift();
                                 }
-                                // Now add the collision point for subsequent path seaches.
+                                // Now add the collision point for subsequent path searches.
                                 for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
                                     this.addCollisionPoint(headToCollisionSection[k]);
                                 }
@@ -122,8 +131,7 @@ exports.TailDodger = class {
                                     resolve(yield this.getShortestPath(endXY));
                                 }
                                 catch (e) {
-                                    const stack = new Error().stack;
-                                    SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
+                                    SnakeLogger_1.SnakeLogger.info(JSON.stringify(e));
                                 }
                             }
                             else {
@@ -137,16 +145,22 @@ exports.TailDodger = class {
                 }
                 if (typeof path[0] == "undefined") {
                     // If there is no path, this will be the case here.
+                    // if (this.contestedPointsBlocked) {
+                    //     const neighbors = StateAnalyzer.getRectilinearNeighbors(this.snakeHead);
+                    //     neighbors.forEach( (point) => {
+                    //         if (StateAnalyzer.pointIsContestedByLargerSnake(point)) {
+                    //             SnakeLogger.info("No path could be found, allowing contested points and trying again");
+                    //             this.removeCollisionPoint(point);
+                    //         }
+                    //     });
+                    //     this.contestedPointsBlocked = false;
+                    //     try {
+                    //         resolve(await this.getShortestPath(endXY));
+                    //     } catch (e) {
+                    //         SnakeLogger.info(JSON.stringify(e));
+                    //     }
+                    // }
                     reject({ message: "No path could be found to endpoint " + JSON.stringify(endXY) + " from " + JSON.stringify(StateAnalyzer_1.StateAnalyzer.getMyPosition()) });
-                }
-                if (typeof steps[1] == "undefined") {
-                    reject({ message: "The first step of path from point " + JSON.stringify(StateAnalyzer_1.StateAnalyzer.getMyPosition()) + " to point " + JSON.stringify(endXY) + " is undefined" });
-                }
-                // Last second check on if the first point is a contested point. If it is, it will be marked as a wall for safety and then restart
-                if (StateAnalyzer_1.StateAnalyzer.pointIsContestedByLargerSnake(steps[1])) {
-                    SnakeLogger_1.SnakeLogger.info("The first step of this path is contested by a snake of larger or equal size. Marking point and recalculating...");
-                    this.addCollisionPoint(steps[1]);
-                    resolve(yield this.getShortestPath(endXY));
                 }
                 // Finally return and update steps found
                 resolve(steps);
@@ -155,6 +169,9 @@ exports.TailDodger = class {
     }
     addCollisionPoint(xy) {
         this.knownCollisions.set((xy.x), (xy.y), 1);
+    }
+    removeCollisionPoint(xy) {
+        this.knownCollisions.set((xy.x), (xy.y), 0);
     }
     addKnownTailDodge(xy) {
         this.knownTailDodges.push(xy);

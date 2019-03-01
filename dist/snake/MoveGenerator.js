@@ -22,11 +22,11 @@ const helpers_1 = require("../util/helpers");
 const _ = __importStar(require("lodash"));
 exports.MoveGenerator = class {
     constructor() {
-        this.selfProximityWeight = 1;
-        this.foodProximityWeight = 25;
-        this.centreProximityWeight = 30;
-        this.agressionWeight = 10;
-        this.avoidanceWeight = 10;
+        this.selfProximityWeight = 5;
+        this.foodProximityWeight = 35;
+        this.centreProximityWeight = 35;
+        this.agressionWeight = 25;
+        this.avoidanceWeight = 20;
         // pathPromises: Promise<IPoint[]>[] = [];
         this.paths = [];
         this.foodPath = [];
@@ -83,6 +83,7 @@ exports.MoveGenerator = class {
             this.foodPath = this.filterForFoodPath();
             this.agressionPath = this.filterForAgressionPath();
             this.nonAvoidancePath = this.filterForNonAvoidancePath();
+            const thirdMs = new Date().getTime();
             for (let i = 0; i < this.paths.length; i++) {
                 const score = this.scorePath(this.paths[i]);
                 if (score > bestScore) {
@@ -90,6 +91,7 @@ exports.MoveGenerator = class {
                     bestIndex = i;
                 }
             }
+            SnakeLogger_1.SnakeLogger.info(this.paths.length + " paths have been scored in " + (thirdMs - secondMs) + " milliseconds");
             const bestPath = this.paths[bestIndex];
             SnakeLogger_1.SnakeLogger.info("Best path found to be " + JSON.stringify(bestPath));
             return bestPath;
@@ -97,7 +99,13 @@ exports.MoveGenerator = class {
     }
     pushPath(endPoint) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.paths.push(yield this.dodger.getShortestPath(endPoint));
+            try {
+                this.paths.push(yield this.dodger.getShortestPath(endPoint));
+            }
+            catch (e) {
+                const stack = new Error().stack;
+                SnakeLogger_1.SnakeLogger.error(JSON.stringify(e) + " : " + stack);
+            }
         });
     }
     scorePath(path) {
@@ -113,15 +121,17 @@ exports.MoveGenerator = class {
         }
         const foodProximityFactor = (foodPathCommonality / this.stepReferenceScalar);
         const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer_1.StateAnalyzer.getMyHunger()) / 33);
-        SnakeLogger_1.SnakeLogger.info("foodProximityTerm is " + foodProximityTerm);
+        SnakeLogger_1.SnakeLogger.info("foodProximityTerm is " + foodProximityTerm + " for path to " + JSON.stringify(path[path.length - 1]));
         let divideMeByLength = 0;
         for (let i = 0; i < path.length; i++) {
             divideMeByLength += StateAnalyzer_1.StateAnalyzer.getDistanceFromCenter(path[i]);
         }
         const averageDistanceFromCenter = divideMeByLength / path.length;
         const centerProximityFactor = 1 - (averageDistanceFromCenter / this.stepReferenceScalar);
+        // const distanceFromCenter = StateAnalyzer.getDistanceFromCenter(path[path.length - 1]);
+        // const centerProximityFactor = 1 - (distanceFromCenter / this.stepReferenceScalar);
         const centerProximityTerm = centerProximityFactor * this.centreProximityWeight;
-        SnakeLogger_1.SnakeLogger.info("centerProximityTerm is " + centerProximityTerm);
+        SnakeLogger_1.SnakeLogger.info("centerProximityTerm is " + centerProximityTerm + " for path to " + JSON.stringify(path[path.length - 1]));
         let agressionPathCommonality = 0;
         for (let j = 0; j < Math.min(this.agressionPath.length, path.length); j++) {
             if (_.isEqual(path[j], this.agressionPath[j]))
@@ -129,7 +139,7 @@ exports.MoveGenerator = class {
         }
         const agressionFactor = (agressionPathCommonality / this.stepReferenceScalar);
         const agressionTerm = agressionFactor * this.agressionWeight;
-        SnakeLogger_1.SnakeLogger.info("agressionTerm is " + agressionTerm);
+        SnakeLogger_1.SnakeLogger.info("agressionTerm is " + agressionTerm + " for path to " + JSON.stringify(path[path.length - 1]));
         let nonAvoidancePathCommonality = 0;
         for (let j = 0; j < Math.min(this.nonAvoidancePath.length, path.length); j++) {
             if (_.isEqual(path[j], this.nonAvoidancePath[j]))
@@ -137,7 +147,7 @@ exports.MoveGenerator = class {
         }
         const avoidanceFactor = 1 - (nonAvoidancePathCommonality / this.stepReferenceScalar);
         const avoidanceTerm = avoidanceFactor * this.avoidanceWeight;
-        SnakeLogger_1.SnakeLogger.info("avoidanceTerm is " + avoidanceTerm);
+        SnakeLogger_1.SnakeLogger.info("avoidanceTerm is " + avoidanceTerm + " for path to " + JSON.stringify(path[path.length - 1]));
         // Add a bias?
         const bias = 0;
         const summedScore = selfProximityTerm + foodProximityTerm + centerProximityTerm + agressionTerm + avoidanceTerm;

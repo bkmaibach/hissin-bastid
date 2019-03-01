@@ -51,6 +51,7 @@ app.post("/start", async (request, response) => {
 
 
 app.post("/move", async (request, response) => {
+  const moveStartTime = new Date().getTime();
   SnakeLogger.debug("Enter /move");
   // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
   // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
@@ -61,7 +62,8 @@ app.post("/move", async (request, response) => {
     const move = await moveGen.generateMove();
     SnakeLogger.info("turn: " + JSON.stringify(StateAnalyzer.getTurnNumber()));
     SnakeLogger.info("current xy: " + JSON.stringify(StateAnalyzer.getMyPosition()));
-    SnakeLogger.info("move: " + JSON.stringify(move));
+    const moveEndTime = new Date().getTime();
+    SnakeLogger.info("move: " + JSON.stringify(move) + " chosen in " + (moveEndTime - moveStartTime) + " milliseconds");
     return response.json({move});
   } catch (e) {
     const stack = new Error().stack;
