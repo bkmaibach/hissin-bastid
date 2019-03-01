@@ -10,7 +10,7 @@ import { fallbackHandler,
 import { StateAnalyzer } from "./snake/StateAnalyzer";
 import * as _ from "lodash";
 import { TailDodger } from "./snake/TailDodger" ;
-import { TargetGenerator } from "./snake/TargetGenerator";
+import { TargetGenerator } from "./snake/PathGenerator";
 import { IPoint, EMoveDirections } from "./snake/types";
 import { SnakeLogger } from "./util/SnakeLogger";
 // import * as dataLogger from "./data/data";
@@ -82,7 +82,7 @@ app.post("/move", (request, response) => {
     // Where do we go? Ideally, ourappRoot target gen has sorted all of the points in perfect order of how much we should go twards there
     // This could be served up by aappRoot neural net processing the game state. But at the time of writing it's just the list of food points.
     // (which got us to a score of appRoot31)
-    const targets = targetGen.getSortedTargets();
+    const targets = targetGen.getPrioritizedPaths();
     const dodger = new TailDodger(myPosition);
 
     // Notice that this for-loop tries to get paths to each of the points in the sorted array. It will consider a path to any of these

@@ -128,7 +128,6 @@ export class StateAnalyzer {
     static getRectilinearNeighbors(XY: IPoint): IPoint[] {
         const x = XY.x;
         const y = XY.y;
-        (let; i = 0; i < height; i++; )
         return [
             {x: x - 1, y}, // left cell
             {x: x + 1, y}, // right cell
@@ -400,5 +399,40 @@ export class StateAnalyzer {
         StateAnalyzer.gameStates = [];
         return returnVal;
     }
+    static getSmallerHeadPoints(): IPoint[] {
+        const myLength = this.getMyLength();
+        const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        snakes.filter((snake) => {
+            return (snake.body.length < myLength && snake.name != myName);
+        });
+        const heads = snakes.map((snake) => {
+            return snake.body[0];
+        });
+        return heads;
+    }
 
+    static getDistanceFromCenter(point: IPoint): number {
+        const centerPoint: IPoint = {x: this.getBoardWidth() / 2, y: this.getBoardHeight() / 2 };
+        const deltaX = Math.abs(point.x - centerPoint.x);
+        const deltaY = Math.abs(point.y - centerPoint.y);
+        return Math.pow( Math.pow(deltaX, 2) + Math.pow(deltaY, 2), 0.5 );
+    }
+
+    static getMyHunger() {
+        return 100 - StateAnalyzer.getState(0).you.health;
+    }
+
+    static isEdgePoint(point: IPoint): boolean {
+        const x = point.x;
+        const y = point.y;
+        const maxX = this.getBoardWidth() - 1;
+        const maxY = this.getBoardHeight() - 1;
+        return (x == 0 || y == 0 || x == maxX || y == maxY);
+    }
+
+    static isFoodPoint(point: IPoint): boolean {
+        const foodPoints = this.getFoodPoints(0);
+        return getIndexOfValue(foodPoints, point) > -1;
+    }
 }

@@ -206,4 +206,15 @@ export const TailDodger = class {
         steps.push(cornersAndEnds[cornersAndEnds.length - 1]);
         return steps;
     }
+
+    getShortestPaths(endPointArray: IPoint[]): IPoint[][] {
+        const returnArr: IPoint[][] = [];
+        endPointArray.forEach( (endpoint) => {
+            const path = this.getShortestPath(endpoint);
+            if (typeof path != "undefined") {
+                returnArr.push(path);
+            }
+        });
+        return returnArr;
+    }
   };
