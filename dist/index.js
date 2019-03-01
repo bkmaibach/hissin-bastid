@@ -77,11 +77,8 @@ app.post("/move", (request, response) => {
         let move;
         const turn = StateAnalyzer_1.StateAnalyzer.getTurnNumber();
         const myPosition = StateAnalyzer_1.StateAnalyzer.getMyPosition();
-        // Where do we go? Ideally, ourappRoot target gen has sorted all of the points in perfect order of how much we should go twards there
-        // This could be served up by aappRoot neural net processing the game state. But at the time of writing it's just the list of food points.
-        // (which got us to a score of appRoot31)
         const paths = pathPrioritizer.getPrioritizedPaths();
-        if (paths !== []) {
+        if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
             path = paths[0];
             move = StateAnalyzer_1.StateAnalyzer.getMove(path[0], path[1]);
         }

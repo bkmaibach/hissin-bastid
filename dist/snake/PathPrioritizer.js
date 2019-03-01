@@ -78,11 +78,14 @@ exports.PathPrioritizer = class {
     }
     deprioritizePaths(paths, condition) {
         const deprioritizedPaths = [];
-        for (let i = 0; i < paths.length; i++) {
+        let i = 0;
+        while (typeof paths[i] != "undefined") {
             if (condition(paths[i])) {
                 const deprioritizedPath = paths.splice(i, 1)[0]; // 0 is the item index, 1 is the count of items you want to remove.
                 deprioritizedPaths.push(deprioritizedPath);
-                // i--;
+            }
+            else {
+                i++;
             }
         }
         return paths.concat(deprioritizedPaths);
