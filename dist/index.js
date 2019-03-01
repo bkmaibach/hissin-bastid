@@ -59,6 +59,8 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     // Response data
     const data = {
         color: "#" + hexString,
+        headType: "fang",
+        tailType: "hook"
     };
     return response.json(data);
 }));
