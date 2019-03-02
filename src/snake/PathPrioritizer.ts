@@ -40,7 +40,7 @@ export const PathPrioritizer = class {
 
         let prioritizedPaths: IPoint[][];
 
-        if (myHunger < 50) {
+        if (myHunger < 40) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);
@@ -53,9 +53,12 @@ export const PathPrioritizer = class {
             SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
             SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
 
+
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
-                return StateAnalyzer.isEdgePoint(path[path.length - 1])
-                    && !_.isEqual(path[path.length - 1], tailTip);
+                const endPoint = path[path.length - 1];
+                return (StateAnalyzer.isEdgePoint(endPoint)
+                    && !_.isEqual(endPoint, tailTip))
+                    || (StateAnalyzer.howSurrounded(endPoint) > 3 && StateAnalyzer.isFoodPoint(endPoint));
             });
 
 
@@ -71,9 +74,11 @@ export const PathPrioritizer = class {
                 return sortedPaths;
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
-                return StateAnalyzer.isEdgePoint(path[path.length - 1])
-                    && !StateAnalyzer.isFoodPoint(path[path.length - 1])
-                    && !_.isEqual(path[path.length - 1], tailTip);
+                const endPoint = path[path.length - 1];
+                return (StateAnalyzer.isEdgePoint(endPoint)
+                    && !StateAnalyzer.isFoodPoint(endPoint)
+                    && !_.isEqual(endPoint, tailTip))
+                    || (StateAnalyzer.howSurrounded(endPoint) > 3 && StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;

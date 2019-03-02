@@ -109,6 +109,20 @@ class StateAnalyzer {
             { x, y: y - 1 } // up cell
         ];
     }
+    static get8Neighbors(XY) {
+        const x = XY.x;
+        const y = XY.y;
+        return [
+            { x: x - 1, y },
+            { x: x + 1, y },
+            { x, y: y + 1 },
+            { x, y: y - 1 },
+            { x: x - 1, y: y - 1 },
+            { x: x + 1, y: y + 1 },
+            { x: x - 1, y: y + 1 },
+            { x: x + 1, y: y - 1 }
+        ];
+    }
     // This one is fancy, and very helpful for determining the safety of a move.
     // Give me the name of a snake and a move it wants to make ("up" or "left" etc)
     // And I will give you some info about that move
@@ -385,6 +399,17 @@ class StateAnalyzer {
         const maxY = this.getBoardHeight() - 1;
         const maxX = this.getBoardWidth() - 1;
         return [{ x: 0, y: 0 }, { x: 0, y: maxY }, { x: maxX, y: 0 }, { x: maxX, y: maxY }];
+    }
+    static howSurrounded(point) {
+        const eightNeighbors = this.get8Neighbors(point);
+        const bodyPoints = this.getTakenPoints();
+        let howSurrounded = 0;
+        eightNeighbors.forEach((cell) => {
+            if (helpers_1.getIndexOfValue(bodyPoints, cell) > -1) {
+                howSurrounded++;
+            }
+        });
+        return howSurrounded;
     }
 }
 // The current game state (same shape as request body, ie IGameState)

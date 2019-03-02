@@ -135,6 +135,21 @@ export class StateAnalyzer {
         ];
     }
 
+    static get8Neighbors(XY: IPoint): IPoint[] {
+        const x = XY.x;
+        const y = XY.y;
+        return [
+            {x: x - 1, y}, // left cell
+            {x: x + 1, y}, // right cell
+            {x, y: y + 1}, // down cell
+            {x, y: y - 1}, // up cell
+            {x: x - 1, y: y - 1},
+            {x: x + 1, y: y + 1},
+            {x: x - 1, y: y + 1},
+            {x: x + 1, y: y - 1}
+        ];
+    }
+
     // This one is fancy, and very helpful for determining the safety of a move.
     // Give me the name of a snake and a move it wants to make ("up" or "left" etc)
     // And I will give you some info about that move
@@ -441,5 +456,17 @@ export class StateAnalyzer {
         const maxY = this.getBoardHeight() - 1;
         const maxX = this.getBoardWidth() - 1;
         return [{x: 0, y: 0}, {x: 0, y: maxY }, {x: maxX , y: 0}, {x: maxX, y: maxY}];
+    }
+
+    static howSurrounded(point: IPoint): number {
+        const eightNeighbors = this.get8Neighbors(point);
+        const bodyPoints = this.getTakenPoints();
+        let howSurrounded = 0;
+        eightNeighbors.forEach((cell) => {
+            if (getIndexOfValue(bodyPoints, cell) > -1) {
+                howSurrounded++;
+            }
+        });
+        return howSurrounded;
     }
 }

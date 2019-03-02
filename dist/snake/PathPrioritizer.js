@@ -32,7 +32,7 @@ exports.PathPrioritizer = class {
         }
         SnakeLogger_1.SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
         let prioritizedPaths;
-        if (myHunger < 50) {
+        if (myHunger < 40) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);
@@ -44,8 +44,10 @@ exports.PathPrioritizer = class {
             SnakeLogger_1.SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
             SnakeLogger_1.SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
-                return StateAnalyzer_1.StateAnalyzer.isEdgePoint(path[path.length - 1])
-                    && !_.isEqual(path[path.length - 1], tailTip);
+                const endPoint = path[path.length - 1];
+                return (StateAnalyzer_1.StateAnalyzer.isEdgePoint(endPoint)
+                    && !_.isEqual(endPoint, tailTip))
+                    || (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) > 3 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
             });
             SnakeLogger_1.SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
         }
@@ -59,9 +61,11 @@ exports.PathPrioritizer = class {
                 return sortedPaths;
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
-                return StateAnalyzer_1.StateAnalyzer.isEdgePoint(path[path.length - 1])
-                    && !StateAnalyzer_1.StateAnalyzer.isFoodPoint(path[path.length - 1])
-                    && !_.isEqual(path[path.length - 1], tailTip);
+                const endPoint = path[path.length - 1];
+                return (StateAnalyzer_1.StateAnalyzer.isEdgePoint(endPoint)
+                    && !StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint)
+                    && !_.isEqual(endPoint, tailTip))
+                    || (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) > 3 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;
