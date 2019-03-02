@@ -100,12 +100,12 @@ exports.TailDodger = class {
         if (typeof path[0] == "undefined") {
             // If there is no path, this will be the case here.
             SnakeLogger_1.SnakeLogger.info("Danger points are: " + JSON.stringify(this.dangerPoints));
-            if (this.dangerPointsBlocked && helpers_1.getIndexOfValue(this.dangerPoints, endXY) == -1) {
-                SnakeLogger_1.SnakeLogger.info("No path from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY) + "could be found with danger points blocked; allowing these points and retrying");
-                SnakeLogger_1.SnakeLogger.info("Danger points are: " + JSON.stringify(this.dangerPoints) + " BLOCKED? -> " + this.dangerPointsBlocked);
-                this.allowDangerPoints();
-                return this.getShortestPath(endXY);
-            }
+            // if (this.dangerPointsBlocked && getIndexOfValue(this.dangerPoints, endXY) == -1) {
+            //     SnakeLogger.info("No path from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY) + "could be found with danger points blocked; allowing these points and retrying");
+            //     SnakeLogger.info("Danger points are: " + JSON.stringify(this.dangerPoints) + " BLOCKED? -> " + this.dangerPointsBlocked);
+            //     this.allowDangerPoints();
+            //     return this.getShortestPath(endXY);
+            // }
             return undefined;
         }
         // Finally return and update steps found
