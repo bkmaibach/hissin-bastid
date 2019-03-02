@@ -73,7 +73,7 @@ export const PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer.howSurrounded(endPoint) >= 4 && StateAnalyzer.isFoodPoint(endPoint));
+                return (StateAnalyzer.howSurrounded(endPoint) >= 5 && StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;

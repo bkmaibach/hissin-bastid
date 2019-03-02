@@ -60,7 +60,7 @@ exports.PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 4 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
+                return (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 5 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;
