@@ -40,7 +40,7 @@ export const PathPrioritizer = class {
 
         let prioritizedPaths: IPoint[][];
 
-        if (myHunger < 40) {
+        if (myHunger < 30) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);
@@ -56,7 +56,7 @@ export const PathPrioritizer = class {
 
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return StateAnalyzer.howSurrounded(endPoint) > 3 && StateAnalyzer.isFoodPoint(endPoint);
+                return StateAnalyzer.howSurrounded(endPoint) >= 3 && StateAnalyzer.isFoodPoint(endPoint);
             });
 
 
@@ -73,7 +73,7 @@ export const PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer.howSurrounded(endPoint) > 4 && StateAnalyzer.isFoodPoint(endPoint));
+                return (StateAnalyzer.howSurrounded(endPoint) >= 4 && StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;

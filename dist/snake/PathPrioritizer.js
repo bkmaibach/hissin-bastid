@@ -32,7 +32,7 @@ exports.PathPrioritizer = class {
         }
         SnakeLogger_1.SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
         let prioritizedPaths;
-        if (myHunger < 70) {
+        if (myHunger < 30) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);
@@ -45,9 +45,7 @@ exports.PathPrioritizer = class {
             SnakeLogger_1.SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer_1.StateAnalyzer.isEdgePoint(endPoint)
-                    && !_.isEqual(endPoint, tailTip))
-                    || (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) > 3 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
+                return StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 3 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint);
             });
             SnakeLogger_1.SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
         }
@@ -62,10 +60,7 @@ exports.PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer_1.StateAnalyzer.isEdgePoint(endPoint)
-                    && !StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint)
-                    && !_.isEqual(endPoint, tailTip))
-                    || (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) > 5 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
+                return (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 4 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;
