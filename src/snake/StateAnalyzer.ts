@@ -462,8 +462,10 @@ export class StateAnalyzer {
         const eightNeighbors = this.get8Neighbors(point);
         const bodyPoints = this.getTakenPoints();
         let howSurrounded = 0;
+        const maxX = StateAnalyzer.getBoardWidth() - 1;
+        const maxY = StateAnalyzer.getBoardHeight() - 1;
         eightNeighbors.forEach((cell) => {
-            if (getIndexOfValue(bodyPoints, cell) > -1) {
+            if (getIndexOfValue(bodyPoints, cell) > -1 || cell.x > maxX || cell.y > maxY || cell.x < 0 || cell.y < 0) {
                 howSurrounded++;
             }
         });
