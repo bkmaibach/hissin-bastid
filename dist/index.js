@@ -80,20 +80,31 @@ app.post("/move", (request, response) => {
         const turn = StateAnalyzer_1.StateAnalyzer.getTurnNumber();
         const myPosition = StateAnalyzer_1.StateAnalyzer.getMyPosition();
         const paths = pathPrioritizer.getPrioritizedPaths();
-        if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
-            // path = paths[0];
-            // move = StateAnalyzer.getMove(path[0], path[1]);
-            for (let i = 0; i < paths.length; i++) {
+        for (let i = 0; i < paths.length; i++) {
+            if (typeof paths[i] != "undefined") {
                 path = paths[i];
-                if (typeof path != "undefined") {
-                    move = StateAnalyzer_1.StateAnalyzer.getMove(path[0], path[1]);
-                    break;
-                }
+                break;
             }
+        }
+        if (typeof path != "undefined") {
+            move = StateAnalyzer_1.StateAnalyzer.getMove(path[0], path[1]);
         }
         else {
             move = StateAnalyzer_1.StateAnalyzer.safeMove();
         }
+        // if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
+        //   // path = paths[0];
+        //   // move = StateAnalyzer.getMove(path[0], path[1]);
+        //   for (let i = 0; i < paths.length; i++) {
+        //     path = paths[i];
+        //     if (typeof path != "undefined") {
+        //       move = StateAnalyzer.getMove(path[0], path[1]);
+        //       break;
+        //     }
+        //   }
+        // } else {
+        //   move = StateAnalyzer.safeMove();
+        // }
         const moveEndTime = new Date().getTime();
         SnakeLogger_1.SnakeLogger.info("turn: " + JSON.stringify(turn));
         SnakeLogger_1.SnakeLogger.info("current xy: " + JSON.stringify(myPosition));

@@ -77,19 +77,34 @@ app.post("/move", (request, response) => {
     const myPosition = StateAnalyzer.getMyPosition();
 
     const paths = pathPrioritizer.getPrioritizedPaths();
-    if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
-      // path = paths[0];
-      // move = StateAnalyzer.getMove(path[0], path[1]);
-      for (let i = 0; i < paths.length; i++) {
+
+    for (let i = 0; i < paths.length; i++) {
+      if (typeof paths[i] != "undefined") {
         path = paths[i];
-        if (typeof path != "undefined") {
-          move = StateAnalyzer.getMove(path[0], path[1]);
-          break;
-        }
+        break;
       }
+    }
+
+    if (typeof path != "undefined") {
+      move = StateAnalyzer.getMove(path[0], path[1]);
     } else {
       move = StateAnalyzer.safeMove();
     }
+
+
+    // if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
+    //   // path = paths[0];
+    //   // move = StateAnalyzer.getMove(path[0], path[1]);
+    //   for (let i = 0; i < paths.length; i++) {
+    //     path = paths[i];
+    //     if (typeof path != "undefined") {
+    //       move = StateAnalyzer.getMove(path[0], path[1]);
+    //       break;
+    //     }
+    //   }
+    // } else {
+    //   move = StateAnalyzer.safeMove();
+    // }
 
     const moveEndTime = new Date().getTime();
     SnakeLogger.info("turn: " + JSON.stringify(turn));
