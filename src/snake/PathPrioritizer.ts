@@ -40,7 +40,7 @@ export const PathPrioritizer = class {
 
         let prioritizedPaths: IPoint[][];
 
-        if (myHunger < 30) {
+        if (myHunger < 70) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);

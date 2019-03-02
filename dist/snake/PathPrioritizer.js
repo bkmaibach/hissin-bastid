@@ -32,7 +32,7 @@ exports.PathPrioritizer = class {
         }
         SnakeLogger_1.SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
         let prioritizedPaths;
-        if (myHunger < 30) {
+        if (myHunger < 70) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);
