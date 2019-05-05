@@ -66,6 +66,14 @@ export const TailDodger = class {
         this.addCollisionPoints(this.contestedNeighbors);
     }
 
+    getShortestPaths ( endXYs: IPoint[] ): IPoint[][] {
+        const returnArr: IPoint[][] = [];
+        endXYs.forEach(point => {
+            returnArr.push(this.getShortestPath(point));
+        });
+        return returnArr;
+    }
+
     getShortestPath ( endXY: IPoint ): IPoint[] {
 
             const { SnakeLogger } = require("../util/SnakeLogger");

@@ -103,7 +103,7 @@ export const MoveGenerator = class {
                         SnakeLogger.debug("Score generation then block reached (" + (endMs - startMs) + " ms)");
 
                     } ).catch((e: Error) => {
-                        SnakeLogger.error(e);
+                        SnakeLogger.error(e.message);
                     });
 
 

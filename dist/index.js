@@ -114,7 +114,7 @@ app.post("/move", (request, response) => {
         return response.json({ move });
     }
     catch (e) {
-        console.log(e);
+        SnakeLogger_1.SnakeLogger.error(e.message);
     }
 });
 app.post("/end", (request, response) => {
