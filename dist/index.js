@@ -23,8 +23,8 @@ const express_1 = __importDefault(require("express"));
 const path = __importStar(require("path"));
 const handlers_1 = require("./handlers");
 const StateAnalyzer_1 = require("./snake/StateAnalyzer");
-const PathPrioritizer_1 = require("./snake/PathPrioritizer");
 const SnakeLogger_1 = require("./util/SnakeLogger");
+const MoveGenerator_1 = require("./snake/MoveGenerator");
 const app = express_1.default();
 let filename;
 // For deployment to Heroku, the port needs to be set using ENV, so
@@ -38,7 +38,7 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     const snakeName = request.body.you.name;
     const gameID = request.body.game.id;
     SnakeLogger_1.SnakeLogger.init(snakeName, gameID);
-    SnakeLogger_1.SnakeLogger.debug("Enter /start");
+    // SnakeLogger.debug("Enter /start");
     // forward the initial request to the state analyzer upon start
     // All this part serves to do is choose our colour. If the program sees its on heroku (production)
     // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
@@ -64,59 +64,35 @@ app.post("/start", (request, response) => __awaiter(this, void 0, void 0, functi
     };
     return response.json(data);
 }));
-app.post("/move", (request, response) => {
+app.post("/move", (request, response) => __awaiter(this, void 0, void 0, function* () {
     const moveStartTime = new Date().getTime();
-    SnakeLogger_1.SnakeLogger.debug("Enter /move");
-    // Everything is wrapped in a try/catch so our app doesnt crash if something goes wrong
+    // Everything is wrapped in a try/catch so our app doesn't crash if something goes wrong
     try {
         // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
         StateAnalyzer_1.StateAnalyzer.update(request.body);
-        const pathPrioritizer = new PathPrioritizer_1.PathPrioritizer();
-        // Our move generation is currently made of 2 questions:
-        // Where do we go? and
-        // How do we get there?
-        let path;
+        SnakeLogger_1.SnakeLogger.debug("Enter /move");
+        const moveGen = new MoveGenerator_1.MoveGenerator();
+        moveGen.commencePathScoring();
+        yield sleep(240);
         let move;
-        const turn = StateAnalyzer_1.StateAnalyzer.getTurnNumber();
-        const myPosition = StateAnalyzer_1.StateAnalyzer.getMyPosition();
-        const paths = pathPrioritizer.getPrioritizedPaths();
-        for (let i = 0; i < paths.length; i++) {
-            if (typeof paths[i] != "undefined") {
-                path = paths[i];
-                break;
-            }
-        }
-        if (typeof path != "undefined") {
-            move = StateAnalyzer_1.StateAnalyzer.getMove(path[0], path[1]);
-        }
-        else {
-            move = StateAnalyzer_1.StateAnalyzer.safeMove();
-        }
-        // if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
-        //   // path = paths[0];
-        //   // move = StateAnalyzer.getMove(path[0], path[1]);
-        //   for (let i = 0; i < paths.length; i++) {
-        //     path = paths[i];
-        //     if (typeof path != "undefined") {
-        //       move = StateAnalyzer.getMove(path[0], path[1]);
-        //       break;
-        //     }
-        //   }
-        // } else {
-        //   move = StateAnalyzer.safeMove();
-        // }
-        const moveEndTime = new Date().getTime();
-        SnakeLogger_1.SnakeLogger.info("turn: " + JSON.stringify(turn));
-        SnakeLogger_1.SnakeLogger.info("current xy: " + JSON.stringify(myPosition));
-        SnakeLogger_1.SnakeLogger.info("path projection: " + JSON.stringify(path));
-        SnakeLogger_1.SnakeLogger.info("move: " + JSON.stringify(move) + " chosen in " + (moveEndTime - moveStartTime) + " milliseconds");
-        // Response data
+        move = moveGen.getMove();
+        SnakeLogger_1.SnakeLogger.info("Timeout reached! Using move " + move);
         return response.json({ move });
+        // setTimeout(() => {
+        //   move = moveGen.getMove();
+        //   SnakeLogger.info("Timeout reached! Using move " + move);
+        //   return response.json({move});
+        // }, 245);
     }
     catch (e) {
-        SnakeLogger_1.SnakeLogger.error(e.message);
+        SnakeLogger_1.SnakeLogger.error(e);
     }
-});
+}));
+function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
 app.post("/end", (request, response) => {
     SnakeLogger_1.SnakeLogger.debug("Enter /end");
     // NOTE: Any cleanup when a game is complete.
