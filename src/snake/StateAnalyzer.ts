@@ -1,9 +1,7 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
 import { getIndexOfValue } from "../util/helpers";
-import * as data from "../data/data";
 import * as _ from "lodash";
 import { SnakeLogger } from "../util/SnakeLogger";
-// import { logger } from "../../winston";
 
 /*
 Every time our app is asked for a move, we receive a "request body" that contains all the information about the board
@@ -61,7 +59,8 @@ export class StateAnalyzer {
     }
 
     static snakeHead(snakeName: string, turnsAgo: number): IPoint {
-        const snakeArray = this.getSnakes();
+        const state = this.getState(turnsAgo);
+        const snakeArray = state.board.snakes;
         const snake = snakeArray.filter((snake) => snake.name == snakeName )[0];
         return snake.body[0];
     }
@@ -89,6 +88,10 @@ export class StateAnalyzer {
     // How long am I?
     static getMyLength() {
         return StateAnalyzer.getState(0).you.body.length;
+    }
+
+    static getMyHunger() {
+        return 100 - StateAnalyzer.getState(0).you.health;
     }
 
     // Give me an array of all the points containing food
@@ -132,21 +135,6 @@ export class StateAnalyzer {
             {x: x + 1, y}, // right cell
             {x, y: y + 1}, // down cell
             {x, y: y - 1} // up cell
-        ];
-    }
-
-    static get8Neighbors(XY: IPoint): IPoint[] {
-        const x = XY.x;
-        const y = XY.y;
-        return [
-            {x: x - 1, y}, // left cell
-            {x: x + 1, y}, // right cell
-            {x, y: y + 1}, // down cell
-            {x, y: y - 1}, // up cell
-            {x: x - 1, y: y - 1},
-            {x: x + 1, y: y + 1},
-            {x: x - 1, y: y + 1},
-            {x: x + 1, y: y - 1}
         ];
     }
 
@@ -214,7 +202,8 @@ export class StateAnalyzer {
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
                 SnakeLogger.info("It contains a snake tip");
-                if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)) {
+                if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)
+                || boardSnake.name == StateAnalyzer.getMyName()) {
                     SnakeLogger.info("But it is a safeTip");
                     returnVal.safeTip = true;
                 }
@@ -228,11 +217,11 @@ export class StateAnalyzer {
 
         StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
         if (boardSnake.name != snakeName) {
-            SnakeLogger.info("Checking snake " + boardSnake.name);
-            SnakeLogger.info("Considering point " + JSON.stringify(newXY));
-            SnakeLogger.info("neighbors of this point: " + JSON.stringify(neighbors));
-            SnakeLogger.info("Snake head is at" + JSON.stringify(boardSnake.body[0]));
-            SnakeLogger.info("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
+            // SnakeLogger.info("Checking snake " + boardSnake.name);
+            // SnakeLogger.info("Considering point " + JSON.stringify(newXY));
+            // SnakeLogger.info("neighbors of this point: " + JSON.stringify(neighbors));
+            // SnakeLogger.info("Snake head is at" + JSON.stringify(boardSnake.body[0]));
+            // SnakeLogger.info("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
             if (getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
                 SnakeLogger.info("Move found to be contested by: " + boardSnake.name);
                 returnVal.contested = true;
@@ -240,7 +229,7 @@ export class StateAnalyzer {
                     returnVal.snakeLengths = [];
                 }
                 returnVal.snakeLengths.push(boardSnake.body.length);
-                SnakeLogger.info("returnVal.snakeLengths == " + returnVal.snakeLengths);
+                // SnakeLogger.info("returnVal.snakeLengths == " + returnVal.snakeLengths);
             } else {
                 returnVal.contested = false;
             }
@@ -249,8 +238,8 @@ export class StateAnalyzer {
 
         // If we still haven't changed it from unknown, the status
         if (returnVal.contents == ECellContents.unknown) {
-        returnVal.contents = ECellContents.empty;
-        SnakeLogger.info("Move destination is free");
+            returnVal.contents = ECellContents.empty;
+            SnakeLogger.info("Move destination is free");
         }
 
         // Also put in if the point is in the food list.
@@ -366,23 +355,26 @@ export class StateAnalyzer {
     // Is this point next to a snake that's bigger than us?
     static pointIsContestedByLargerSnake (point: IPoint): boolean {
         const myName = StateAnalyzer.getMyName();
+        if (point == undefined) {
+            SnakeLogger.debug("The point being checked for larger snake contestation is undefined");
+            return false;
+        }
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
         StateAnalyzer.getSnakes().forEach((snake) => {
-            if (snake.name != myName) {
-                // SnakeLogger.info("Checking point: " + JSON.stringify(point));
-                // SnakeLogger.info("checking snake " + snake.name);
-                // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
-                // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
-                if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                    // SnakeLogger.info("snake head was found in neighbor list");
-                    if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                        SnakeLogger.info("Snake" + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
-                        returnVal = true;
-                        return;
-                    }
+        if (snake.name != myName) {
+            // SnakeLogger.info("checking snake " + snake.name);
+            // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
+            // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
+            if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
+                SnakeLogger.info("snake head was found in neighbor list");
+                if (snake.body.length >= StateAnalyzer.getMyLength()) {
+                    SnakeLogger.info("snake is too large to ignore");
+                    returnVal = true;
+                    return;
                 }
             }
+        }
         });
         return returnVal;
     }
@@ -413,17 +405,6 @@ export class StateAnalyzer {
         StateAnalyzer.gameStates = [];
         return returnVal;
     }
-    static getSmallerHeadPoints(): IPoint[] {
-        const myLength = this.getMyLength();
-        const snakes = this.getSnakes();
-        const heads: IPoint[] = [];
-        snakes.forEach((snake) => {
-            if (snake.body.length < myLength) {
-                heads.push(snake.body[0]);
-            }
-        });
-        return heads;
-    }
 
     static getDistanceFromCenter(point: IPoint): number {
         const centerPoint: IPoint = {x: this.getBoardWidth() / 2, y: this.getBoardHeight() / 2 };
@@ -432,19 +413,44 @@ export class StateAnalyzer {
         return Math.pow( Math.pow(deltaX, 2) + Math.pow(deltaY, 2), 0.5 );
     }
 
-    static getMyHunger() {
-        return 100 - StateAnalyzer.getState(0).you.health;
+    static getSmallerHeadPoints(): IPoint[] {
+        const myLength = this.getMyLength();
+        // const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        const smallerHeadPoints: IPoint[] = [];
+        snakes.forEach((snake) => {
+            if (snake.body.length < myLength) {
+                SnakeLogger.debug(snake.name + " length: " + snake.body.length + ", my length: " + myLength);
+                smallerHeadPoints.push(snake.body[0]);
+            }
+        });
+
+        return smallerHeadPoints;
     }
 
-    static isEdgePoint(point: IPoint): boolean {
-        if (typeof point == "undefined") {
-            console.log("break time");
+    static getLargerHeadPoints(): IPoint[] {
+        const myLength = this.getMyLength();
+        // const myName = this.getMyName();
+        const snakes = this.getSnakes();
+        const largerHeadPoints: IPoint[] = [];
+        snakes.forEach((snake) => {
+            if (snake.body.length > myLength) {
+                SnakeLogger.debug(snake.name + " length: " + snake.body.length + ", my length: " + myLength);
+                largerHeadPoints.push(snake.body[0]);
+            }
+        });
+
+        return largerHeadPoints;
+    }
+
+    static getAllPoints(): IPoint[] {
+        const returnVal: IPoint[] = [];
+        for (let x = 0; x < this.getBoardWidth(); x++) {
+            for (let y = 0; y < this.getBoardHeight(); y++) {
+                returnVal.push({x, y});
+            }
         }
-        const x = point.x;
-        const y = point.y;
-        const maxX = this.getBoardWidth() - 1;
-        const maxY = this.getBoardHeight() - 1;
-        return (x == 0 || y == 0 || x == maxX || y == maxY);
+        return returnVal;
     }
 
     static isFoodPoint(point: IPoint): boolean {
@@ -470,5 +476,37 @@ export class StateAnalyzer {
             }
         });
         return howSurrounded;
+    }
+
+    static get8Neighbors(XY: IPoint): IPoint[] {
+        const x = XY.x;
+        const y = XY.y;
+        return [
+            {x: x - 1, y}, // left cell
+            {x: x + 1, y}, // right cell
+            {x, y: y + 1}, // down cell
+            {x, y: y - 1}, // up cell
+            {x: x - 1, y: y - 1},
+            {x: x + 1, y: y + 1},
+            {x: x - 1, y: y + 1},
+            {x: x + 1, y: y - 1}
+        ];
+    }
+
+    static getContestedNeighbors(): IPoint[] {
+        const contestedNeighbors: IPoint[] = [];
+        const neighbors = StateAnalyzer.getRectilinearNeighbors(this.getMyPosition());
+        neighbors.forEach( (point) => {
+            if (StateAnalyzer.pointIsContestedByLargerSnake(point)) {
+                contestedNeighbors.push(point);
+            }
+        });
+        return contestedNeighbors;
+    }
+
+    static isOnBoard(point: IPoint) {
+        const height = this.getBoardHeight();
+        const width = this.getBoardWidth();
+        return (point.x >= 0 && point.x < width && point.y >= 0 && point.y < height);
     }
 }

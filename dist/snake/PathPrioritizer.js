@@ -45,7 +45,7 @@ exports.PathPrioritizer = class {
             SnakeLogger_1.SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 3 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint);
+                return StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 2 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint);
             });
             SnakeLogger_1.SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
         }
@@ -60,7 +60,7 @@ exports.PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 5 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
+                return (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 1 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;

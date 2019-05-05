@@ -3,7 +3,7 @@ import { request } from "http";
 import * as data from "../data/data";
 import { SnakeLogger } from "../util/SnakeLogger";
 import { TailDodger } from "./TailDodger" ;
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard, IScoredPoint } from "./types";
+import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
 import * as _ from "lodash";
 import { isArray } from "util";
 
@@ -56,7 +56,7 @@ export const PathPrioritizer = class {
 
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return StateAnalyzer.howSurrounded(endPoint) >= 3 && StateAnalyzer.isFoodPoint(endPoint);
+                return StateAnalyzer.howSurrounded(endPoint) >= 2 && StateAnalyzer.isFoodPoint(endPoint);
             });
 
 
@@ -73,7 +73,7 @@ export const PathPrioritizer = class {
             }
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
-                return (StateAnalyzer.howSurrounded(endPoint) >= 5 && StateAnalyzer.isFoodPoint(endPoint));
+                return (StateAnalyzer.howSurrounded(endPoint) >= 1 && StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;

@@ -1,12 +1,10 @@
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint } from "./types";
+import { IPoint } from "./types";
 import { getIndexOfValue } from "../util/helpers";
 import { StateAnalyzer } from "./StateAnalyzer";
 import * as _ from "lodash";
 import ndarray from "ndarray";
 import createPlanner from "l1-path-finder";
-// import { logger } from "../../winston";
 import { SnakeLogger } from "../util/SnakeLogger";
-import { ALPN_ENABLED } from "constants";
 
 /*
     Okay. This is where the magic happens. The tail dodger is a sophisticated path drawing tool that provides one main public
@@ -30,7 +28,7 @@ all the points from there along to its owner's tail as safe places that shouldn'
     on subsequent attempts.
 
     Once a path with no walls or collisions not marked as a tail dodge, return the path as a series of point objects in an array.
-    This array's 0th entry is the start point that was initially povided to the objects constructor.
+    This array's 0th entry is the start point that was initially provided to the objects constructor.
 
 */
 
@@ -38,122 +36,141 @@ export const TailDodger = class {
     snakeHead: IPoint;
     state: StateAnalyzer;
     steps: IPoint[];
-    knownCollisions: ndarray;
+    knownCollisionsNDA: ndarray;
     knownTailDodges: IPoint[];
     dangerPointsBlocked: boolean;
 
-    dangerPoints: IPoint[];
+    contestedNeighbors: IPoint[];
     turn = StateAnalyzer.getTurnNumber();
+    pathsSearched = 0;
+    pathsRejected = 0;
 
     constructor(xy: IPoint) {
-
+        SnakeLogger.debug("Instantiating new TailDodger");
         this.snakeHead = xy;
         this.steps = [];
         const height = StateAnalyzer.getBoardHeight();
         const width = StateAnalyzer.getBoardWidth();
         const numCells = height * width;
         const ndArrayParam = [];
-        this.markDangerPoints();
         // The ND array requires an array of width * height 0's to start
         for (let i = 0; i < numCells; i++) {
             ndArrayParam.push(0);
         }
 
-        this.knownCollisions = ndarray(ndArrayParam, [height, width]);
+        this.knownCollisionsNDA = ndarray(ndArrayParam, [height, width]);
 
         this.knownTailDodges = [];
 
-        this.blockDangerPoints();
+        this.contestedNeighbors = StateAnalyzer.getContestedNeighbors();
+        this.addCollisionPoints(this.contestedNeighbors);
+    }
+
+    getShortestPaths ( endXYs: IPoint[] ): IPoint[][] {
+        const returnArr: IPoint[][] = [];
+        endXYs.forEach(point => {
+            returnArr.push(this.getShortestPath(point));
+        });
+        return returnArr;
     }
 
     getShortestPath ( endXY: IPoint ): IPoint[] {
-        SnakeLogger.info("Starting getShortestPath to: " + JSON.stringify(endXY));
-        const planner = createPlanner(this.knownCollisions);
 
-        // Init path as empty array.
-        const path: number[] = [];
-        const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
-        const steps = this.stepsInPath(path);
+            const { SnakeLogger } = require("../util/SnakeLogger");
+            const { StateAnalyzer } = require("./StateAnalyzer");
 
-        const snakes = StateAnalyzer.getSnakes();
-        for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
+            SnakeLogger.info("Starting getShortestPath from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY));
+            let searchAgain: boolean;
+            const getShortestPathStart = new Date().getTime();
+            const snakes = StateAnalyzer.getSnakes();
+            let steps: IPoint[];
+            let iteration = 0;
+            let path: number[] = [];
 
-            for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
+            do {
+                path = [];
+                searchAgain = false;
+                iteration++;
+                SnakeLogger.debug("Beginning iteration " + iteration + " for path from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY));
+                SnakeLogger.debug("Creating planner using known collisions: " + JSON.stringify(this.getKnownCollisionPoints()));
 
-                const possibleCollisionIndex = getIndexOfValue(snakes[j].body, steps[i]);
-                if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
-                    const stepsToOccupy = i;
-                    let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
-                    if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
-                        SnakeLogger.info("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
-                        stepsToVacate++;
-                    }
-                    const tailDodge = stepsToOccupy >= stepsToVacate;
-                    if (!tailDodge) {
-                        const headToCollisionSection = snakes[j].body.slice(0, possibleCollisionIndex + 1);
-                        if (_.isEqual(headToCollisionSection[0], this.snakeHead)) {
-                            headToCollisionSection.shift();
-                        }
-                        for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
-                            this.addCollisionPoint(headToCollisionSection[k]);
-                        }
-                        return this.getShortestPath(endXY);
-                    } else {
-                        for (let k = possibleCollisionIndex; k < snakes[j].body.length; k++) {
-                            this.addKnownTailDodge(snakes[j].body[k]);
+                const planner = createPlanner(this.knownCollisionsNDA);
+                // Init path as empty array.
+                const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
+                steps = this.stepsInPath(path);
+                SnakeLogger.debug("Considering path " + JSON.stringify(steps));
+                for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
+                    for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
+                        const possibleCollisionIndex = getIndexOfValue(snakes[j].body, steps[i]);
+                        if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
+                            SnakeLogger.debug("Point " + JSON.stringify(steps[i]) + " may not be safe to include in path from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY));
+                            const stepsToOccupy = i;
+                            let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
+                            if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
+                                SnakeLogger.debug("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
+                                stepsToVacate++;
+                            }
+                            SnakeLogger.debug("stepsToOccupy: " + stepsToOccupy + ", stepsToVacate: " + stepsToVacate);
+                            const tailDodge = stepsToOccupy >= stepsToVacate;
+                            if (!tailDodge) {
+                                SnakeLogger.debug("Point " + JSON.stringify(steps[i]) + " was determined to NOT be a safe tail dodge");
+                                const headToCollisionSection = snakes[j].body.slice(0, possibleCollisionIndex + 1);
+                                if (_.isEqual(headToCollisionSection[0], this.snakeHead)) {
+                                    headToCollisionSection.shift();
+                                }
+                                for (let k = 0, headToCollisionLength = headToCollisionSection.length; k < headToCollisionLength; k++) {
+                                    this.addCollisionPoint(headToCollisionSection[k]);
+                                }
+                                SnakeLogger.debug("Search again will be set to true");
+                                this.pathsRejected++;
+                                searchAgain = true;
+                            } else {
+                                SnakeLogger.debug("Point " + JSON.stringify(steps[i]) + " was determined to be a safe tail dodge");
+                                for (let k = possibleCollisionIndex; k < snakes[j].body.length; k++) {
+                                    this.addKnownTailDodge(snakes[j].body[k]);
+                                }
+                            }
                         }
                     }
                 }
+                searchAgain = typeof path[0] == "undefined" ? false : searchAgain;
+            } while (searchAgain);
+
+            let returnVal;
+            if (typeof path[0] == "undefined") {
+                // If there is no path, this will be the case here.
+                throw (new Error("No path could be found to " + JSON.stringify(endXY)));
+            } else {
+                returnVal = steps;
             }
-        }
-        if (typeof path[0] == "undefined") {
-            // If there is no path, this will be the case here.
-            SnakeLogger.info("Danger points are: " + JSON.stringify(this.dangerPoints));
-            // if (this.dangerPointsBlocked && getIndexOfValue(this.dangerPoints, endXY) == -1) {
-            //     SnakeLogger.info("No path from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY) + "could be found with danger points blocked; allowing these points and retrying");
-            //     SnakeLogger.info("Danger points are: " + JSON.stringify(this.dangerPoints) + " BLOCKED? -> " + this.dangerPointsBlocked);
-            //     this.allowDangerPoints();
-            //     return this.getShortestPath(endXY);
-            // }
-            return undefined;
-        }
 
-        // Finally return and update steps found
-        this.steps = steps;
-        return steps;
+            // Finally return and update steps found
+            this.pathsSearched++;
+            const getShortestPathEnd = new Date().getTime();
+            SnakeLogger.debug("Path from " + JSON.stringify(this.snakeHead) + " to " + JSON.stringify(endXY) + " has been found to be " + JSON.stringify(returnVal));
+            SnakeLogger.debug("Path was generated in " + (getShortestPathEnd - getShortestPathStart) + " milliseconds");
+            SnakeLogger.debug("Paths searched: " + this.pathsSearched);
+            SnakeLogger.debug("Paths rejected: " + this.pathsRejected);
+            return returnVal;
+
     }
 
-    markDangerPoints() {
-        this.dangerPoints = [];
-        const neighbors = StateAnalyzer.getRectilinearNeighbors(this.snakeHead);
-        neighbors.forEach( (point) => {
-            if (StateAnalyzer.pointIsContestedByLargerSnake(point)) {
-                this.dangerPoints.push(point);
-            }
-        });
-        this.dangerPoints = this.dangerPoints.concat(this.dangerPoints, StateAnalyzer.getCorners());
-    }
-
-    blockDangerPoints() {
-        this.dangerPoints.forEach( (point) => {
-            this.addCollisionPoint(point);
-        });
-        this.dangerPointsBlocked = true;
-    }
-
-    allowDangerPoints() {
-        this.dangerPoints.forEach( (point) => {
-            this.removeCollisionPoint(point);
-        });
-        this.dangerPointsBlocked = false;
-    }
 
     addCollisionPoint(xy: IPoint) {
-        this.knownCollisions.set((xy.x), (xy.y), 1);
+        SnakeLogger.debug("Adding known collision point " + JSON.stringify(xy));
+        this.knownCollisionsNDA.set((xy.x), (xy.y), 1);
+    }
+
+    addCollisionPoints(xyArray: IPoint[]) {
+        xyArray.forEach( point => this.addCollisionPoint(point));
     }
 
     removeCollisionPoint(xy: IPoint) {
-        this.knownCollisions.set((xy.x), (xy.y), 0);
+        this.knownCollisionsNDA.set((xy.x), (xy.y), 0);
+    }
+
+    removeCollisionPoints(xyArray: IPoint[]) {
+        xyArray.forEach( point => this.removeCollisionPoint(point));
     }
 
     addKnownTailDodge(xy: IPoint) {
@@ -165,6 +182,7 @@ export const TailDodger = class {
     }
 
     stepsInPath (plannerPath: number[]): IPoint[] {
+        SnakeLogger.debug("Finding steps in plannerPath " + JSON.stringify(plannerPath));
         // The data starts as a 1-D array of corners and end x's and y's. Some conditional for blocks
         // figure out which way the steps are going for one pair of entries to the next, and then new {XY} IPoints
         // get pushed into an array and returned.
@@ -210,17 +228,32 @@ export const TailDodger = class {
         }
         // steps.shift();
         steps.push(cornersAndEnds[cornersAndEnds.length - 1]);
+        SnakeLogger.debug("Steps in plannerPath found: " + JSON.stringify(steps));
         return steps;
     }
 
-    getShortestPaths(endPointArray: IPoint[]): IPoint[][] {
-        const returnArr: IPoint[][] = [];
-        endPointArray.forEach( (endpoint) => {
-            const path = this.getShortestPath(endpoint);
-            if (typeof path != "undefined") {
-                returnArr.push(path);
+    // getShortestPaths(endPointArray: IPoint[]): IPoint[][] {
+    //     const returnArr: IPoint[][] = [];
+    //     endPointArray.forEach( (endpoint) => {
+    //         const path = this.getShortestPath(endpoint);
+    //         if (typeof path != "undefined") {
+    //             returnArr.push(path);
+    //         }
+    //     });
+    //     return returnArr;
+    // }
+
+    getKnownCollisionPoints() {
+        const width = StateAnalyzer.getBoardWidth();
+        const height = StateAnalyzer.getBoardHeight();
+        const returnArr: IPoint[] = [];
+        for (let i = 0; i < width; i++) {
+            for (let j = 0; j < height; j++) {
+                const cell = this.knownCollisionsNDA.get(i, j);
+                if (cell == 1) returnArr.push({x: i, y: j});
             }
-        });
+        }
         return returnArr;
     }
+
   };
