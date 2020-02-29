@@ -97,5 +97,8 @@
   "main": "jest.config.js",
   "directories": {
     "test": "test"
+  },
+  "engines": {
+    "node": "12.16.1"
   }
 }
