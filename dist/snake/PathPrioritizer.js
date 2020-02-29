@@ -32,7 +32,7 @@ exports.PathPrioritizer = class {
         }
         SnakeLogger_1.SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
         let prioritizedPaths;
-        if (myHunger < 70) {
+        if (myHunger < 40) {
             const primaryPaths = foodPaths.concat(agressionPaths);
             this.sortByLength(primaryPaths);
             const sortedPaths = primaryPaths.concat(tailPaths);
@@ -65,7 +65,7 @@ exports.PathPrioritizer = class {
                 return (StateAnalyzer_1.StateAnalyzer.isEdgePoint(endPoint)
                     && !StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint)
                     && !_.isEqual(endPoint, tailTip))
-                    || (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) > 5 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
+                    || (StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) > 4 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint));
             });
         }
         return prioritizedPaths;

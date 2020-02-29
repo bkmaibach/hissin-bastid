@@ -9,7 +9,7 @@
   "author": "Keith Maibach",
   "license": "MIT",
   "scripts": {
-    "start": "npm run serve",
+    "start": "ts-node src/index.ts",
     "start4": "PORT=9001 npm run serve & PORT=9002 npm run serve & PORT=9003 npm run serve & PORT=9004 npm run serve &",
     "stop4": "fuser -k 9001/tcp & fuser -k 9002/tcp & fuser -k 9003/tcp & fuser -k 9004/tcp",
     "build-engine-board": "cd $GOPATH/src/github.com/battlesnakeio/engine && make run & cd $CODEPATH/board && npm i",
