@@ -34,6 +34,9 @@ export class StateAnalyzer {
     // Call this method right away when you know about a new game state
     static update(newState: IGameState) {
         StateAnalyzer.gameStates.push(newState);
+        if (StateAnalyzer.gameStates.length > 2) {
+            StateAnalyzer.gameStates.shift();
+        } 
     }
 
     static isSnakeDigesting(snakeName: string) {
