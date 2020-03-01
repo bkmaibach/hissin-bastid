@@ -36,7 +36,7 @@ export class StateAnalyzer {
         StateAnalyzer.gameStates.push(newState);
         if (StateAnalyzer.gameStates.length > 2) {
             StateAnalyzer.gameStates.shift();
-        } 
+        }
     }
 
     static isSnakeDigesting(snakeName: string) {
