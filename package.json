@@ -47,7 +47,6 @@
     "ndarray": "^1.0.18",
     "typegoose": "^5.5.0",
     "winston": "^2.4.4",
-    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@types/async": "^2.0.50",
