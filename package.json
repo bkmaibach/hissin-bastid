@@ -47,7 +47,8 @@
     "ndarray": "^1.0.18",
     "typegoose": "^5.5.0",
     "winston": "^2.4.4",
-    "ts-node": "^5.0.1"
+    "ts-node": "^5.0.1",
+    "typescript": "^2.9.2"
   },
   "devDependencies": {
     "@types/async": "^2.0.50",
