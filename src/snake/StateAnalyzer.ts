@@ -188,7 +188,7 @@ export class StateAnalyzer {
 
         SnakeLogger.info(this.getTurnNumber().toString());
         SnakeLogger.info("My position: " + JSON.stringify(this.getMyPosition()));
-        SnakeLogger.info("considering spot: " + JSON.stringify(newXY));
+        SnakeLogger.info("looking '" + move + "', considering spot: " + JSON.stringify(newXY));
 
         // Check if its a wall
         if (newX >= StateAnalyzer.getState(0).board.width
@@ -196,7 +196,7 @@ export class StateAnalyzer {
         || newY >= StateAnalyzer.getState(0).board.height
         || newY < 0) {
             if (returnVal.contents == ECellContents.unknown) returnVal.contents = ECellContents.wall;
-            SnakeLogger.info("Move found to collide with wall");
+            SnakeLogger.info("  Move found to collide with wall");
         }
 
         // Check if it's a part of any snake body
@@ -204,19 +204,19 @@ export class StateAnalyzer {
         for (let i = 0; i < boardSnake.body.length; i++) {
         if (_.isEqual(boardSnake.body[i], newXY)) {
             if (returnVal.contents == ECellContents.unknown) {
-                SnakeLogger.info("Move found to contain the body of snake: " + boardSnake.name);
+                SnakeLogger.info("  Move found to contain the body of snake: " + boardSnake.name);
                 returnVal.contents = ECellContents.body;
             }
             if (i == 0) {
                 // special note that body point is a head
                 returnVal.head = true;
-                SnakeLogger.info("It contains this snakes head");
+                SnakeLogger.info("    It contains this snakes head");
             }
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
-                SnakeLogger.info("It contains a snake tip");
+                SnakeLogger.info("    It contains a snake tip");
                 if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)) {
-                    SnakeLogger.info("But it is a safeTip");
+                    SnakeLogger.info("      But it is a safeTip");
                     returnVal.safeTip = true;
                 }
             }
@@ -229,19 +229,19 @@ export class StateAnalyzer {
 
         StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
         if (boardSnake.name != snakeName) {
-            SnakeLogger.info("Checking snake " + boardSnake.name);
-            SnakeLogger.info("Considering point " + JSON.stringify(newXY));
-            SnakeLogger.info("neighbors of this point: " + JSON.stringify(neighbors));
-            SnakeLogger.info("Snake head is at" + JSON.stringify(boardSnake.body[0]));
-            SnakeLogger.info("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
+            SnakeLogger.info("  Checking snake " + boardSnake.name);
+            //SnakeLogger.info("    Considering point " + JSON.stringify(newXY));
+            SnakeLogger.info("    neighbors of this point: " + JSON.stringify(neighbors));
+            SnakeLogger.info("    Snake head is at" + JSON.stringify(boardSnake.body[0]));
+            SnakeLogger.info("    getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
             if (getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
-                SnakeLogger.info("Move found to be contested by: " + boardSnake.name);
+                SnakeLogger.info("      Move found to be contested by: " + boardSnake.name);
                 returnVal.contested = true;
                 if (!returnVal.snakeLengths) {
                     returnVal.snakeLengths = [];
                 }
                 returnVal.snakeLengths.push(boardSnake.body.length);
-                SnakeLogger.info("returnVal.snakeLengths == " + returnVal.snakeLengths);
+                SnakeLogger.info("      returnVal.snakeLengths == " + returnVal.snakeLengths);
             } else {
                 returnVal.contested = false;
             }
@@ -292,7 +292,7 @@ export class StateAnalyzer {
 
         // Basically we just get the move infos for each neighbor
         moves.forEach((move) => {
-        moveInfos.push(StateAnalyzer.moveInfo(myName, move));
+            moveInfos.push(StateAnalyzer.moveInfo(myName, move));
         });
 
         // Check the move infos multiple times over, return out and finish if we find something
@@ -378,7 +378,7 @@ export class StateAnalyzer {
                 if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
                     // SnakeLogger.info("snake head was found in neighbor list");
                     if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                        SnakeLogger.info("Snake" + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
+                        SnakeLogger.info("Snake " + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
                         returnVal = true;
                         return;
                     }
