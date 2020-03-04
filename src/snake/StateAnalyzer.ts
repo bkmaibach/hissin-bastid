@@ -33,15 +33,19 @@ export class StateAnalyzer {
     static update(newState: IGameState) {
         StateAnalyzer.gameStates.push(newState);
         if (StateAnalyzer.gameStates.length > 2) {
+            // NOTE: if there are only two states, why not just have current and previous?
             StateAnalyzer.gameStates.shift();
         }
     }
 
     static isSnakeDigesting(snakeName: string) {
+        // NOTE: why not see if current head is at past food?
+        
         // const current = this.getState(0);
         // const previous = this.getState(1);
         const snakeHeadBefore = this.snakeHead(snakeName, 1);
         const snakeHeadAfter = this.snakeHead(snakeName, 0);
+        // NOTE: snakeHeadBefore and After are both current turn
         const wasNextToFood = this.nextToFood(snakeHeadBefore, 1);
         if (!wasNextToFood) {
             return false;
@@ -62,6 +66,7 @@ export class StateAnalyzer {
     }
 
     static snakeHead(snakeName: string, turnsAgo: number): IPoint {
+        // NOTE: turnsAgo is not used
         const snakeArray = this.getSnakes();
         const snake = snakeArray.filter((snake) => snake.name == snakeName )[0];
         return snake.body[0];
@@ -230,7 +235,7 @@ export class StateAnalyzer {
         StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
         if (boardSnake.name != snakeName) {
             SnakeLogger.info("  Checking snake " + boardSnake.name);
-            //SnakeLogger.info("    Considering point " + JSON.stringify(newXY));
+            // SnakeLogger.info("    Considering point " + JSON.stringify(newXY));
             SnakeLogger.info("    neighbors of this point: " + JSON.stringify(neighbors));
             SnakeLogger.info("    Snake head is at" + JSON.stringify(boardSnake.body[0]));
             SnakeLogger.info("    getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
