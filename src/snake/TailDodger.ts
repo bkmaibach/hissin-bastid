@@ -1,12 +1,10 @@
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint } from "./types";
+import { IPoint } from "./types";
 import { getIndexOfValue } from "../util/helpers";
 import { StateAnalyzer } from "./StateAnalyzer";
 import * as _ from "lodash";
 import ndarray from "ndarray";
 import createPlanner from "l1-path-finder";
-// import { logger } from "../../winston";
 import { SnakeLogger } from "../util/SnakeLogger";
-import { ALPN_ENABLED } from "constants";
 
 /*
     Okay. This is where the magic happens. The tail dodger is a sophisticated path drawing tool that provides one main public

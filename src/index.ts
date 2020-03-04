@@ -8,13 +8,9 @@ import { fallbackHandler,
   poweredByHandler
 } from "./handlers";
 import { StateAnalyzer } from "./snake/StateAnalyzer";
-import * as _ from "lodash";
-import { TailDodger } from "./snake/TailDodger" ;
 import { PathPrioritizer } from "./snake/PathPrioritizer";
 import { IPoint, EMoveDirections } from "./snake/types";
 import { SnakeLogger } from "./util/SnakeLogger";
-// import * as dataLogger from "./data/data";
-import { Logger } from "mongodb";
 
 const app = express();
 let filename: string;
