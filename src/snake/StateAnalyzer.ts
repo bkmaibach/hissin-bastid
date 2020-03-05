@@ -67,7 +67,7 @@ export class StateAnalyzer {
 
     static snakeHead(snakeName: string, turnsAgo: number): IPoint {
         // NOTE: turnsAgo is not used
-        const snakeArray = this.getSnakes();
+        const snakeArray = this.getAllSnakes();
         const snake = snakeArray.filter((snake) => snake.name == snakeName )[0];
         return snake.body[0];
     }
@@ -82,14 +82,24 @@ export class StateAnalyzer {
         return StateAnalyzer.getState(0).you.body[0];
     }
 
+    static getMyId() {
+        return StateAnalyzer.getState(0).you.id;
+    }
+
     // What is the name of my snake?
     static getMyName() {
         return StateAnalyzer.getState(0).you.name;
     }
 
     // Give me an array of objects, each object contains all info on a snake ie health
-    static getSnakes() {
+    static getAllSnakes() {
         return StateAnalyzer.getState(0).board.snakes;
+    }
+
+    static getEnemySnakes() {
+        const allSnakes = StateAnalyzer.getAllSnakes()
+        const myId = StateAnalyzer.getMyId()
+        return allSnakes.filter(snake => snake.id !== myId)
     }
 
     // How long am I?
@@ -232,8 +242,7 @@ export class StateAnalyzer {
         // Check if it's contested
         const neighbors = StateAnalyzer.getRectilinearNeighbors(newXY);
 
-        StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
-        if (boardSnake.name != snakeName) {
+        StateAnalyzer.getEnemySnakes().forEach((boardSnake: ISnake) => {
             SnakeLogger.info("  Checking snake " + boardSnake.name);
             // SnakeLogger.info("    Considering point " + JSON.stringify(newXY));
             SnakeLogger.info("    neighbors of this point: " + JSON.stringify(neighbors));
@@ -250,7 +259,6 @@ export class StateAnalyzer {
             } else {
                 returnVal.contested = false;
             }
-        }
         });
 
         // If we still haven't changed it from unknown, the status
@@ -374,19 +382,17 @@ export class StateAnalyzer {
         const myName = StateAnalyzer.getMyName();
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
-        StateAnalyzer.getSnakes().forEach((snake) => {
-            if (snake.name != myName) {
-                // SnakeLogger.info("Checking point: " + JSON.stringify(point));
-                // SnakeLogger.info("checking snake " + snake.name);
-                // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
-                // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
-                if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                    // SnakeLogger.info("snake head was found in neighbor list");
-                    if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                        SnakeLogger.info("Snake " + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
-                        returnVal = true;
-                        return;
-                    }
+        StateAnalyzer.getEnemySnakes().forEach((snake) => {
+            // SnakeLogger.info("Checking point: " + JSON.stringify(point));
+            // SnakeLogger.info("checking snake " + snake.name);
+            // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
+            // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
+            if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
+                // SnakeLogger.info("snake head was found in neighbor list");
+                if (snake.body.length >= StateAnalyzer.getMyLength()) {
+                    SnakeLogger.info("Snake " + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
+                    returnVal = true;
+                    return;
                 }
             }
         });
@@ -396,7 +402,7 @@ export class StateAnalyzer {
     // Just give me all the snake body points concatted together in one array for my convenience please
     static getTakenPoints() {
         let returnArr: IPoint[] = [];
-        StateAnalyzer.getSnakes().forEach((snake) => {
+        StateAnalyzer.getAllSnakes().forEach((snake) => {
         returnArr = returnArr.concat(snake.body);
         });
         return returnArr;
@@ -421,7 +427,7 @@ export class StateAnalyzer {
     }
     static getSmallerHeadPoints(): IPoint[] {
         const myLength = this.getMyLength();
-        const snakes = this.getSnakes();
+        const snakes = this.getEnemySnakes();
         const heads: IPoint[] = [];
         snakes.forEach((snake) => {
             if (snake.body.length < myLength) {
