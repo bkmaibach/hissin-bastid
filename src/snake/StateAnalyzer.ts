@@ -40,7 +40,7 @@ export class StateAnalyzer {
 
     static isSnakeDigesting(snakeId: string) {
         // NOTE: why not see if current head is at past food?
-        
+
         // const current = this.getState(0);
         // const previous = this.getState(1);
         const snakeHeadBefore = this.snakeHead(snakeId, 1);
@@ -54,8 +54,8 @@ export class StateAnalyzer {
             const negativeOneIfAbsent = getIndexOfValue(foodPoints, snakeHeadAfter);
             return (negativeOneIfAbsent != -1);
         }
-
     }
+
     static getNeighborsWithFood(point: IPoint, turnsAgo: number): IPoint[] {
         const neighbors = this.getRectilinearNeighbors(point);
         const foodPoints = this.getFoodPoints(turnsAgo);
@@ -190,7 +190,7 @@ export class StateAnalyzer {
                     move == "left" ? {x: x - 1, y} : undefined;
 
         if (newXY == undefined) {
-        throw "Move " + move + " not recognized";
+            throw "Move " + move + " not recognized";
         }
 
         const newX = newXY.x;
@@ -204,38 +204,46 @@ export class StateAnalyzer {
         SnakeLogger.info("looking '" + move + "', considering spot: " + JSON.stringify(newXY));
 
         // Check if its a wall
-        if (newX >= StateAnalyzer.getState(0).board.width
-        || newX < 0
-        || newY >= StateAnalyzer.getState(0).board.height
-        || newY < 0) {
-            if (returnVal.contents == ECellContents.unknown) returnVal.contents = ECellContents.wall;
+        if (
+            newX >= StateAnalyzer.getState(0).board.width ||
+            newX < 0 ||
+            newY >= StateAnalyzer.getState(0).board.height ||
+            newY < 0
+        ) {
             SnakeLogger.info("  Move found to collide with wall");
+            returnVal.contents = ECellContents.wall;
+            return returnVal
         }
 
         // Check if it's a part of any snake body
         StateAnalyzer.getAllSnakes().forEach((boardSnake: ISnake) => {
-        for (let i = 0; i < boardSnake.body.length; i++) {
-        if (_.isEqual(boardSnake.body[i], newXY)) {
-            if (returnVal.contents == ECellContents.unknown) {
-                SnakeLogger.info("  Move found to contain the body of snake: " + boardSnake.name);
-                returnVal.contents = ECellContents.body;
-            }
-            if (i == 0) {
-                // special note that body point is a head
-                returnVal.head = true;
-                SnakeLogger.info("    It contains this snakes head");
-            }
-            if (i == boardSnake.body.length - 1) {
-                returnVal.tip = true;
-                SnakeLogger.info("    It contains a snake tip");
-                if (!StateAnalyzer.isSnakeDigesting(boardSnake.id)) {
-                    SnakeLogger.info("      But it is a safeTip");
-                    returnVal.safeTip = true;
+            for (let i = 0; i < boardSnake.body.length; i++) {
+                if (_.isEqual(boardSnake.body[i], newXY)) {
+                    if (returnVal.contents == ECellContents.unknown) {
+                        SnakeLogger.info("  Move found to contain the body of snake: " + boardSnake.name);
+                        returnVal.contents = ECellContents.body;
+                    }
+                    if (i == 0) {
+                        // special note that body point is a head
+                        returnVal.head = true;
+                        SnakeLogger.info("    It contains this snakes head");
+                    }
+                    if (i == boardSnake.body.length - 1) {
+                        returnVal.tip = true;
+                        SnakeLogger.info("    It contains a snake tip");
+                        if (!StateAnalyzer.isSnakeDigesting(boardSnake.id)) {
+                            SnakeLogger.info("      But it is a safeTip");
+                            returnVal.safeTip = true;
+                        }
+                    }
+                    return
                 }
             }
-        }
-        }
         });
+
+        if (returnVal.contents !== ECellContents.unknown) {
+            return returnVal;
+        }
 
         // Check if it's contested
         const neighbors = StateAnalyzer.getRectilinearNeighbors(newXY);
@@ -261,8 +269,8 @@ export class StateAnalyzer {
 
         // If we still haven't changed it from unknown, the status
         if (returnVal.contents == ECellContents.unknown) {
-        returnVal.contents = ECellContents.empty;
-        SnakeLogger.info("Move destination is free");
+            returnVal.contents = ECellContents.empty;
+            SnakeLogger.info("Move destination is free");
         }
 
         // Also put in if the point is in the food list.
