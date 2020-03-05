@@ -170,8 +170,7 @@ export class StateAnalyzer {
     // Give me the id of a snake and a move it wants to make ("up" or "left" etc)
     // And I will give you some info about that move
     // See IMoveInfo to see what the shape of this return data looks like
-    static moveInfo (snakeId: string, move: EMoveDirections): IMoveInfo {
-
+    static moveInfo (move: EMoveDirections): IMoveInfo {
         // The move info must always have a ".status" property, which must be one of
         // EmoveTypes.unknown (or just "unknown" as a string if you prefer, tomayto tomahto)
         // "uncontested" - empty and safe
@@ -183,8 +182,7 @@ export class StateAnalyzer {
         // If theres a bug
         const returnVal: IMoveInfo = { contents: ECellContents.unknown, snakeLengths: [0] };
 
-        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.id == snakeId)[0];
-        const { x, y } = snake.body[0];
+        const { x, y } = StateAnalyzer.snakeHead(StateAnalyzer.getMyId())
 
         const newXY = move == "up" ? {x, y: y - 1} :
                     move == "right" ? {x: x + 1, y} :
@@ -299,13 +297,12 @@ export class StateAnalyzer {
     // 6. ...up?  good luck
     static safeMove(): EMoveDirections {
         SnakeLogger.info("SAFEMOVE DEFAULT ENGAGED");
-        const myId = StateAnalyzer.getMyId();
         const moves = [EMoveDirections.left, EMoveDirections.right, EMoveDirections.up, EMoveDirections.down];
         const moveInfos: IMoveInfo[] = [];
 
         // Basically we just get the move infos for each neighbor
         moves.forEach((move) => {
-            moveInfos.push(StateAnalyzer.moveInfo(myId, move));
+            moveInfos.push(StateAnalyzer.moveInfo(move));
         });
 
         // Check the move infos multiple times over, return out and finish if we find something
