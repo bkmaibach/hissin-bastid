@@ -38,13 +38,13 @@ export class StateAnalyzer {
         }
     }
 
-    static isSnakeDigesting(snakeName: string) {
+    static isSnakeDigesting(snakeId: string) {
         // NOTE: why not see if current head is at past food?
         
         // const current = this.getState(0);
         // const previous = this.getState(1);
-        const snakeHeadBefore = this.snakeHead(snakeName, 1);
-        const snakeHeadAfter = this.snakeHead(snakeName, 0);
+        const snakeHeadBefore = this.snakeHead(snakeId, 1);
+        const snakeHeadAfter = this.snakeHead(snakeId, 0);
         // NOTE: snakeHeadBefore and After are both current turn
         const wasNextToFood = this.nextToFood(snakeHeadBefore, 1);
         if (!wasNextToFood) {
@@ -65,10 +65,10 @@ export class StateAnalyzer {
         return result;
     }
 
-    static snakeHead(snakeName: string, turnsAgo: number): IPoint {
+    static snakeHead(snakeId: string, turnsAgo: number): IPoint {
         // NOTE: turnsAgo is not used
         const snakeArray = this.getAllSnakes();
-        const snake = snakeArray.filter((snake) => snake.name == snakeName )[0];
+        const snake = snakeArray.filter((snake) => snake.id == snakeId )[0];
         return snake.body[0];
     }
 
@@ -134,8 +134,8 @@ export class StateAnalyzer {
     }
 
     // How long is a snake?
-    static getSnakeLength = (name: string) => {
-        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.name == name)[0];
+    static getSnakeLength = (id: string) => {
+        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.id == id)[0];
         return snake.body.length;
     }
 
@@ -167,10 +167,10 @@ export class StateAnalyzer {
     }
 
     // This one is fancy, and very helpful for determining the safety of a move.
-    // Give me the name of a snake and a move it wants to make ("up" or "left" etc)
+    // Give me the id of a snake and a move it wants to make ("up" or "left" etc)
     // And I will give you some info about that move
     // See IMoveInfo to see what the shape of this return data looks like
-    static moveInfo (snakeName: string, move: EMoveDirections): IMoveInfo {
+    static moveInfo (snakeId: string, move: EMoveDirections): IMoveInfo {
 
         // The move info must always have a ".status" property, which must be one of
         // EmoveTypes.unknown (or just "unknown" as a string if you prefer, tomayto tomahto)
@@ -183,7 +183,7 @@ export class StateAnalyzer {
         // If theres a bug
         const returnVal: IMoveInfo = { contents: ECellContents.unknown, snakeLengths: [0] };
 
-        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.name == snakeName)[0];
+        const snake = StateAnalyzer.getState(0).board.snakes.filter((snake: ISnake) => snake.id == snakeId)[0];
         const { x, y } = snake.body[0];
 
         const newXY = move == "up" ? {x, y: y - 1} :
@@ -215,7 +215,7 @@ export class StateAnalyzer {
         }
 
         // Check if it's a part of any snake body
-        StateAnalyzer.getState(0).board.snakes.forEach((boardSnake: ISnake) => {
+        StateAnalyzer.getAllSnakes().forEach((boardSnake: ISnake) => {
         for (let i = 0; i < boardSnake.body.length; i++) {
         if (_.isEqual(boardSnake.body[i], newXY)) {
             if (returnVal.contents == ECellContents.unknown) {
@@ -230,7 +230,7 @@ export class StateAnalyzer {
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
                 SnakeLogger.info("    It contains a snake tip");
-                if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)) {
+                if (!StateAnalyzer.isSnakeDigesting(boardSnake.id)) {
                     SnakeLogger.info("      But it is a safeTip");
                     returnVal.safeTip = true;
                 }
@@ -299,13 +299,13 @@ export class StateAnalyzer {
     // 6. ...up?  good luck
     static safeMove(): EMoveDirections {
         SnakeLogger.info("SAFEMOVE DEFAULT ENGAGED");
-        const myName = StateAnalyzer.getMyName();
+        const myId = StateAnalyzer.getMyId();
         const moves = [EMoveDirections.left, EMoveDirections.right, EMoveDirections.up, EMoveDirections.down];
         const moveInfos: IMoveInfo[] = [];
 
         // Basically we just get the move infos for each neighbor
         moves.forEach((move) => {
-            moveInfos.push(StateAnalyzer.moveInfo(myName, move));
+            moveInfos.push(StateAnalyzer.moveInfo(myId, move));
         });
 
         // Check the move infos multiple times over, return out and finish if we find something
@@ -379,7 +379,6 @@ export class StateAnalyzer {
 
     // Is this point next to a snake that's bigger than us?
     static pointIsContestedByLargerSnake (point: IPoint): boolean {
-        const myName = StateAnalyzer.getMyName();
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
         let returnVal = false;
         StateAnalyzer.getEnemySnakes().forEach((snake) => {

@@ -82,7 +82,7 @@ export const TailDodger = class {
                 if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
                     const stepsToOccupy = i;
                     let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
-                    if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
+                    if (StateAnalyzer.isSnakeDigesting(snakes[j].id)) {
                         SnakeLogger.info("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
                         stepsToVacate++;
                     }
