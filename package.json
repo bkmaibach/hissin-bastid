@@ -9,6 +9,7 @@
   "author": "Keith Maibach",
   "license": "MIT",
   "scripts": {
+    "postinstall": "mkdir -p logs/game",
     "start": "ts-node src/index.ts",
     "start4": "PORT=9001 npm run serve & PORT=9002 npm run serve & PORT=9003 npm run serve & PORT=9004 npm run serve &",
     "stop4": "fuser -k 9001/tcp & fuser -k 9002/tcp & fuser -k 9003/tcp & fuser -k 9004/tcp",
