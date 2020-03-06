@@ -9,6 +9,7 @@
   "author": "Keith Maibach",
   "license": "MIT",
   "scripts": {
+    "postinstall": "mkdir -p logs/game",
     "start": "ts-node src/index.ts",
     "start4": "PORT=9001 npm run serve & PORT=9002 npm run serve & PORT=9003 npm run serve & PORT=9004 npm run serve &",
     "stop4": "fuser -k 9001/tcp & fuser -k 9002/tcp & fuser -k 9003/tcp & fuser -k 9004/tcp",
@@ -41,11 +42,11 @@
     "errorhandler": "^1.5.0",
     "express": "^4.16.4",
     "l1-path-finder": "^1.0.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.15",
     "ndarray": "^1.0.18",
-    "winston": "^2.4.4",
     "ts-node": "^5.0.1",
-    "typescript": "^2.9.2"
+    "typescript": "^2.9.2",
+    "winston": "^2.4.4"
   },
   "devDependencies": {
     "@types/async": "^2.0.50",
@@ -76,10 +77,10 @@
     "@types/supertest": "^2.0.6",
     "@types/winston": "^2.4.4",
     "concurrently": "^3.6.1",
-    "jest": "^22.4.4",
+    "jest": "^25.1.0",
     "nodemon": "^1.18.7",
     "shelljs": "^0.8.3",
-    "ts-jest": "^22.4.6",
+    "ts-jest": "^25.2.1",
     "tslint": "^5.11.0",
     "typescript": "^2.9.2"
   },
