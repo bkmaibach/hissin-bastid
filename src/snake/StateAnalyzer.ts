@@ -1,9 +1,7 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
 import { getIndexOfValue } from "../util/helpers";
-import * as data from "../data/data";
 import * as _ from "lodash";
 import { SnakeLogger } from "../util/SnakeLogger";
-// import { logger } from "../../winston";
 
 /*
 Every time our app is asked for a move, we receive a "request body" that contains all the information about the board

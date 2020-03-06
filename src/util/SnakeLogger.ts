@@ -1,8 +1,6 @@
 import winston from "winston";
 import { Logger } from "winston";
-import { ENVIRONMENT } from "./secrets";
 import { StateAnalyzer } from "../snake/StateAnalyzer";
-// import { createFile } from "../data/data";
 
 let filename: string;
 

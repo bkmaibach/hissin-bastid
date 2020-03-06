@@ -1,11 +1,8 @@
 import { StateAnalyzer } from "./StateAnalyzer";
-import { request } from "http";
-import * as data from "../data/data";
 import { SnakeLogger } from "../util/SnakeLogger";
 import { TailDodger } from "./TailDodger" ;
-import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard, IScoredPoint } from "./types";
+import { IPoint } from "./types";
 import * as _ from "lodash";
-import { isArray } from "util";
 
 export const PathPrioritizer = class {
 
