@@ -73,7 +73,7 @@ export const TailDodger = class {
         const dist = planner.search((this.snakeHead.x), (this.snakeHead.y),  (endXY.x), (endXY.y),  path);
         const steps = this.stepsInPath(path);
 
-        const snakes = StateAnalyzer.getSnakes();
+        const snakes = StateAnalyzer.getAllSnakes();
         for (let i = 1, stepsLength = steps.length; i < stepsLength; i++) {
 
             for (let j = 0, numSnakes = snakes.length; j < numSnakes; j++) {
@@ -82,7 +82,7 @@ export const TailDodger = class {
                 if (possibleCollisionIndex > -1  && !this.isKnownTailDodge(steps[i])) {
                     const stepsToOccupy = i;
                     let stepsToVacate = snakes[j].body.length - possibleCollisionIndex;
-                    if (StateAnalyzer.isSnakeDigesting(snakes[j].name)) {
+                    if (StateAnalyzer.isSnakeDigesting(snakes[j].id)) {
                         SnakeLogger.info("Digesting" + snakes[j].name + " means an extra step is needed to vacate projected collision point");
                         stepsToVacate++;
                     }

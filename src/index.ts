@@ -2,6 +2,8 @@ import bodyParser from "body-parser";
 import express from "express";
 import * as path from "path";
 
+import { IPoint, EMoveDirections } from "./snake/types";
+
 import { fallbackHandler,
   notFoundHandler,
   genericErrorHandler,
@@ -9,7 +11,6 @@ import { fallbackHandler,
 } from "./handlers";
 import { StateAnalyzer } from "./snake/StateAnalyzer";
 import { PathPrioritizer } from "./snake/PathPrioritizer";
-import { IPoint, EMoveDirections } from "./snake/types";
 import { SnakeLogger } from "./util/SnakeLogger";
 
 const app = express();
@@ -21,36 +22,27 @@ app.enable("verbose errors");
 app.use(bodyParser.json());
 
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
-// Handle POST request to "/start"
+
 app.post("/start", async (request, response) => {
   const snakeName = request.body.you.name;
   const gameID = request.body.game.id;
   SnakeLogger.init(snakeName, gameID);
   SnakeLogger.debug("Enter /start");
-  // forward the initial request to the state analyzer upon start
   // All this part serves to do is choose our colour. If the program sees its on heroku (production)
-  // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
+  // It will choose our official colour. Else server automatically assigns color at random, useful
+  // for development so we can distinguish a bunch at once.
 
-  filename = gameID + "_" + snakeName;
-
+  // forward the initial request to the state analyzer upon start
   StateAnalyzer.update(request.body);
-  let hexString;
-  if (process.env.NODE_ENV == "production") {
-    hexString = "11FF55";
-  } else {
-    // Random hex string
-    const number = Math.floor(Math.random() * Math.floor(16000000));
-    hexString = number.toString(16);
-    if (hexString.length % 2) {
-      hexString = "0" + hexString;
-    }
-  }
-  // Response data
+  // NOTE: adding this state is redundant with move 0?
+
   const data = {
-    color: "#" + hexString,
     headType: "fang",
     tailType: "hook"
-  };
+  }
+  if (process.env.NODE_ENV == "production") {
+    data.color = "#11FF55";
+  }
   return response.json(data);
 });
 
@@ -64,9 +56,6 @@ app.post("/move", (request, response) => {
 
     const pathPrioritizer = new PathPrioritizer();
 
-    // Our move generation is currently made of 2 questions:
-    // Where do we go? and
-    // How do we get there?
     let path: IPoint[];
     let move: EMoveDirections;
     const turn = StateAnalyzer.getTurnNumber();
@@ -87,21 +76,6 @@ app.post("/move", (request, response) => {
       move = StateAnalyzer.safeMove();
     }
 
-
-    // if (paths !== [] && typeof paths[0] != "undefined" && typeof paths[0][0] != "undefined") {
-    //   // path = paths[0];
-    //   // move = StateAnalyzer.getMove(path[0], path[1]);
-    //   for (let i = 0; i < paths.length; i++) {
-    //     path = paths[i];
-    //     if (typeof path != "undefined") {
-    //       move = StateAnalyzer.getMove(path[0], path[1]);
-    //       break;
-    //     }
-    //   }
-    // } else {
-    //   move = StateAnalyzer.safeMove();
-    // }
-
     const moveEndTime = new Date().getTime();
     SnakeLogger.info("turn: " + JSON.stringify(turn));
     SnakeLogger.info("current xy: " + JSON.stringify(myPosition));
@@ -112,7 +86,7 @@ app.post("/move", (request, response) => {
     return response.json({move});
 
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 
 });
