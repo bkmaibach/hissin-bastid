@@ -1,5 +1,5 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
-import { getIndexOfValue } from "../util/helpers";
+import { pointIsInArray } from "../util/helpers";
 import * as _ from "lodash";
 import { SnakeLogger } from "../util/SnakeLogger";
 
@@ -39,28 +39,16 @@ export class StateAnalyzer {
     }
 
     static isSnakeDigesting(snakeId: string) {
-        // NOTE: why not see if current head is at past food?
-
-        // const current = this.getState(0);
-        // const previous = this.getState(1);
-        const snakeHeadBefore = this.snakeHead(snakeId, 1);
-        const snakeHeadAfter = this.snakeHead(snakeId, 0);
-        // NOTE: snakeHeadBefore and After are both current turn
-        const wasNextToFood = this.nextToFood(snakeHeadBefore, 1);
-        if (!wasNextToFood) {
-            return false;
-        } else {
-            const foodPoints = this.getNeighborsWithFood(snakeHeadBefore, 1);
-            const negativeOneIfAbsent = getIndexOfValue(foodPoints, snakeHeadAfter);
-            return (negativeOneIfAbsent != -1);
-        }
+        const snakeHead = this.snakeHead(snakeId, 0);
+        const lastTurnFoods = this.getFoodPoints(1);
+        return pointIsInArray(snakeHead, lastTurnFoods);
     }
 
     static getNeighborsWithFood(point: IPoint, turnsAgo: number): IPoint[] {
         const neighbors = this.getRectilinearNeighbors(point);
         const foodPoints = this.getFoodPoints(turnsAgo);
         const result = neighbors.filter((neighborPoint) => {
-            return getIndexOfValue(foodPoints, neighborPoint) > -1;
+            return pointIsInArray(neighborPoint, foodPoints);
         });
         return result;
     }
@@ -253,8 +241,8 @@ export class StateAnalyzer {
             // SnakeLogger.info("    Considering point " + JSON.stringify(newXY));
             SnakeLogger.info("    neighbors of this point: " + JSON.stringify(neighbors));
             SnakeLogger.info("    Snake head is at" + JSON.stringify(boardSnake.body[0]));
-            SnakeLogger.info("    getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
-            if (getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
+            SnakeLogger.info("    pointIsInArray(boardSnake.body[0], neighbors) == " + pointIsInArray(boardSnake.body[0], neighbors));
+            if (pointIsInArray(boardSnake.body[0], neighbors)) {
                 SnakeLogger.info("      Move found to be contested by: " + boardSnake.name);
                 returnVal.contested = true;
                 if (!returnVal.snakeLengths) {
@@ -274,8 +262,7 @@ export class StateAnalyzer {
         }
 
         // Also put in if the point is in the food list.
-        // Notice the getIndexOfValue function returns -1 when it can't find the index in the list
-        returnVal.food = getIndexOfValue(StateAnalyzer.getState(0).board.food, newXY) > -1;
+        returnVal.food = pointIsInArray(newXY, StateAnalyzer.getState(0).board.food);
 
         return returnVal;
     }
@@ -374,10 +361,10 @@ export class StateAnalyzer {
         let returnVal = false;
         // For each neighboring point is it in the food list blah blah
         neighbors.forEach((neighborPoint) => {
-        if (getIndexOfValue(foodPoints, neighborPoint) > -1) {
-            returnVal = true;
-            return;
-        }
+            if (pointIsInArray(neighborPoint, foodPoints)) {
+                returnVal = true;
+                return;
+            }
         });
         return returnVal;
     }
@@ -391,7 +378,7 @@ export class StateAnalyzer {
             // SnakeLogger.info("checking snake " + snake.name);
             // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
             // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
-            if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
+            if (pointIsInArray(snake.body[0], neighbors)) {
                 // SnakeLogger.info("snake head was found in neighbor list");
                 if (snake.body.length >= StateAnalyzer.getMyLength()) {
                     SnakeLogger.info("Snake " + snake.name + " contesting " + JSON.stringify(point) + " is too large to ignore");
@@ -415,7 +402,7 @@ export class StateAnalyzer {
     // Is this point a part of a snake body?
     static pointIsTaken(point: IPoint) {
         const takenPoints = StateAnalyzer.getTakenPoints();
-        return (getIndexOfValue(takenPoints, point) > -1);
+        return pointIsInArray(point, takenPoints);
     }
 
     static getMyTailTip(): IPoint {
@@ -465,7 +452,7 @@ export class StateAnalyzer {
 
     static isFoodPoint(point: IPoint): boolean {
         const foodPoints = this.getFoodPoints(0);
-        return getIndexOfValue(foodPoints, point) > -1;
+        return pointIsInArray(point, foodPoints);
     }
 
     static getCorners(): IPoint[] {
@@ -481,7 +468,7 @@ export class StateAnalyzer {
         const maxX = StateAnalyzer.getBoardWidth() - 1;
         const maxY = StateAnalyzer.getBoardHeight() - 1;
         eightNeighbors.forEach((cell) => {
-            if (getIndexOfValue(bodyPoints, cell) > -1 || cell.x > maxX || cell.y > maxY || cell.x < 0 || cell.y < 0) {
+            if (pointIsInArray(cell, bodyPoints) || cell.x > maxX || cell.y > maxY || cell.x < 0 || cell.y < 0) {
                 howSurrounded++;
             }
         });

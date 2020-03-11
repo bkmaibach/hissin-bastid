@@ -1,5 +1,5 @@
 import { IPoint } from "./types";
-import { getIndexOfValue } from "../util/helpers";
+import { getIndexOfValue, pointIsInArray } from "../util/helpers";
 import { StateAnalyzer } from "./StateAnalyzer";
 import * as _ from "lodash";
 import ndarray from "ndarray";
@@ -159,7 +159,7 @@ export const TailDodger = class {
     }
 
     isKnownTailDodge(xy: IPoint) {
-        return getIndexOfValue(this.knownTailDodges, xy) > -1;
+        return pointIsInArray(xy, this.knownTailDodges);
     }
 
     stepsInPath (plannerPath: number[]): IPoint[] {
