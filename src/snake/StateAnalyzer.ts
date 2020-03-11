@@ -65,9 +65,8 @@ export class StateAnalyzer {
         return result;
     }
 
-    static snakeHead(snakeId: string, turnsAgo: number): IPoint {
-        // NOTE: turnsAgo is not used
-        const snakeArray = this.getAllSnakes();
+    static snakeHead(snakeId: string, turnsAgo = 0): IPoint {
+        const snakeArray = this.getAllSnakes(turnsAgo);
         const snake = snakeArray.filter((snake) => snake.id == snakeId )[0];
         return snake.body[0];
     }
@@ -92,8 +91,8 @@ export class StateAnalyzer {
     }
 
     // Give me an array of objects, each object contains all info on a snake ie health
-    static getAllSnakes() {
-        return StateAnalyzer.getState(0).board.snakes;
+    static getAllSnakes(turnsAgo = 0) {
+        return StateAnalyzer.getState(turnsAgo).board.snakes;
     }
 
     static getEnemySnakes() {
