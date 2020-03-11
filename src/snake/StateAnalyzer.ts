@@ -96,9 +96,9 @@ export class StateAnalyzer {
     }
 
     static getEnemySnakes() {
-        const allSnakes = StateAnalyzer.getAllSnakes()
-        const myId = StateAnalyzer.getMyId()
-        return allSnakes.filter(snake => snake.id !== myId)
+        const allSnakes = StateAnalyzer.getAllSnakes();
+        const myId = StateAnalyzer.getMyId();
+        return allSnakes.filter(snake => snake.id !== myId);
     }
 
     // How long am I?
@@ -181,7 +181,7 @@ export class StateAnalyzer {
         // If theres a bug
         const returnVal: IMoveInfo = { contents: ECellContents.unknown, snakeLengths: [0] };
 
-        const { x, y } = StateAnalyzer.snakeHead(StateAnalyzer.getMyId())
+        const { x, y } = StateAnalyzer.snakeHead(StateAnalyzer.getMyId());
 
         const newXY = move == "up" ? {x, y: y - 1} :
                     move == "right" ? {x: x + 1, y} :
@@ -211,7 +211,7 @@ export class StateAnalyzer {
         ) {
             SnakeLogger.info("  Move found to collide with wall");
             returnVal.contents = ECellContents.wall;
-            return returnVal
+            return returnVal;
         }
 
         // Check if it's a part of any snake body
@@ -235,7 +235,7 @@ export class StateAnalyzer {
                             returnVal.safeTip = true;
                         }
                     }
-                    return
+                    return;
                 }
             }
         });

@@ -14,7 +14,6 @@ import { PathPrioritizer } from "./snake/PathPrioritizer";
 import { SnakeLogger } from "./util/SnakeLogger";
 
 const app = express();
-let filename: string;
 // For deployment to Heroku, the port needs to be set using ENV, so
 // we check for the port number in process.env
 app.set("port", (process.env.PORT || 8080));
@@ -38,10 +37,12 @@ app.post("/start", async (request, response) => {
 
   const data = {
     headType: "fang",
-    tailType: "hook"
-  }
+    tailType: "hook",
+    color: "#11FF55"
+  };
+
   if (process.env.NODE_ENV == "production") {
-    data.color = "#11FF55";
+    // data.color = "#11FF55";
   }
   return response.json(data);
 });
