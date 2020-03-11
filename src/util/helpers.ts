@@ -11,6 +11,10 @@ export function getIndexOfValue(array: IPoint[], entry: IPoint) {
     return -1;
 }
 
+export function isPointInArray(point: IPoint, array: IPoint[]): boolean {
+    return array.some(arrayItem => _.isEqual(arrayItem, point));
+}
+
 export function shuffle(array: any[]) {
     let currentIndex = array.length, temporaryValue, randomIndex;
 

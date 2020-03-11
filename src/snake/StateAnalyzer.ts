@@ -1,5 +1,5 @@
 import { IGameState,  ECellContents, IMoveInfo, EMoveDirections, IPoint, ISnake, IBoard } from "./types";
-import { getIndexOfValue } from "../util/helpers";
+import { getIndexOfValue, isPointInArray } from "../util/helpers";
 import * as _ from "lodash";
 import { SnakeLogger } from "../util/SnakeLogger";
 
@@ -39,21 +39,9 @@ export class StateAnalyzer {
     }
 
     static isSnakeDigesting(snakeId: string) {
-        // NOTE: why not see if current head is at past food?
-
-        // const current = this.getState(0);
-        // const previous = this.getState(1);
-        const snakeHeadBefore = this.snakeHead(snakeId, 1);
-        const snakeHeadAfter = this.snakeHead(snakeId, 0);
-        // NOTE: snakeHeadBefore and After are both current turn
-        const wasNextToFood = this.nextToFood(snakeHeadBefore, 1);
-        if (!wasNextToFood) {
-            return false;
-        } else {
-            const foodPoints = this.getNeighborsWithFood(snakeHeadBefore, 1);
-            const negativeOneIfAbsent = getIndexOfValue(foodPoints, snakeHeadAfter);
-            return (negativeOneIfAbsent != -1);
-        }
+        const snakeHead = this.snakeHead(snakeId, 0);
+        const lastTurnFoods = this.getFoodPoints(1);
+        return isPointInArray(snakeHead, lastTurnFoods);
     }
 
     static getNeighborsWithFood(point: IPoint, turnsAgo: number): IPoint[] {
