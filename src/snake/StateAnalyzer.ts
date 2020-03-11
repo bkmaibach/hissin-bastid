@@ -65,9 +65,8 @@ export class StateAnalyzer {
         return result;
     }
 
-    static snakeHead(snakeId: string, turnsAgo: number): IPoint {
-        // NOTE: turnsAgo is not used
-        const snakeArray = this.getAllSnakes();
+    static snakeHead(snakeId: string, turnsAgo = 0): IPoint {
+        const snakeArray = this.getAllSnakes(turnsAgo);
         const snake = snakeArray.filter((snake) => snake.id == snakeId )[0];
         return snake.body[0];
     }
@@ -92,14 +91,14 @@ export class StateAnalyzer {
     }
 
     // Give me an array of objects, each object contains all info on a snake ie health
-    static getAllSnakes() {
-        return StateAnalyzer.getState(0).board.snakes;
+    static getAllSnakes(turnsAgo = 0) {
+        return StateAnalyzer.getState(turnsAgo).board.snakes;
     }
 
     static getEnemySnakes() {
-        const allSnakes = StateAnalyzer.getAllSnakes()
-        const myId = StateAnalyzer.getMyId()
-        return allSnakes.filter(snake => snake.id !== myId)
+        const allSnakes = StateAnalyzer.getAllSnakes();
+        const myId = StateAnalyzer.getMyId();
+        return allSnakes.filter(snake => snake.id !== myId);
     }
 
     // How long am I?
@@ -182,7 +181,7 @@ export class StateAnalyzer {
         // If theres a bug
         const returnVal: IMoveInfo = { contents: ECellContents.unknown, snakeLengths: [0] };
 
-        const { x, y } = StateAnalyzer.snakeHead(StateAnalyzer.getMyId())
+        const { x, y } = StateAnalyzer.snakeHead(StateAnalyzer.getMyId());
 
         const newXY = move == "up" ? {x, y: y - 1} :
                     move == "right" ? {x: x + 1, y} :
@@ -212,7 +211,7 @@ export class StateAnalyzer {
         ) {
             SnakeLogger.info("  Move found to collide with wall");
             returnVal.contents = ECellContents.wall;
-            return returnVal
+            return returnVal;
         }
 
         // Check if it's a part of any snake body
@@ -236,7 +235,7 @@ export class StateAnalyzer {
                             returnVal.safeTip = true;
                         }
                     }
-                    return
+                    return;
                 }
             }
         });
