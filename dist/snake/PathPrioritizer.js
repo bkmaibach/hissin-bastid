@@ -8,7 +8,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const StateAnalyzer_1 = require("./StateAnalyzer");
-const SnakeLogger_1 = require("../util/SnakeLogger");
 const TailDodger_1 = require("./TailDodger");
 const _ = __importStar(require("lodash"));
 exports.PathPrioritizer = class {
@@ -30,7 +29,7 @@ exports.PathPrioritizer = class {
         if (!_.isEqual(tailTip, myPosition) && turn >= 2) {
             tailPaths = [dodger.getShortestPath(tailTip)];
         }
-        SnakeLogger_1.SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
+        ////        SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
         let prioritizedPaths;
         if (myHunger < 70) {
             const primaryPaths = foodPaths.concat(agressionPaths);
@@ -39,15 +38,15 @@ exports.PathPrioritizer = class {
             if (sortedPaths.length === 0) {
                 return sortedPaths;
             }
-            SnakeLogger_1.SnakeLogger.info("foodPaths is " + JSON.stringify(foodPaths));
-            SnakeLogger_1.SnakeLogger.info("agressionPaths is " + JSON.stringify(agressionPaths));
-            SnakeLogger_1.SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
-            SnakeLogger_1.SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
+            ////            SnakeLogger.info("foodPaths is " + JSON.stringify(foodPaths));
+            ////            SnakeLogger.info("agressionPaths is " + JSON.stringify(agressionPaths));
+            ////            SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
+            ////            SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
                 const endPoint = path[path.length - 1];
                 return StateAnalyzer_1.StateAnalyzer.howSurrounded(endPoint) >= 3 && StateAnalyzer_1.StateAnalyzer.isFoodPoint(endPoint);
             });
-            SnakeLogger_1.SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
+            ////            SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
         }
         else {
             const primaryPaths = foodPaths;

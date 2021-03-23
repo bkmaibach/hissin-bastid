@@ -32,13 +32,13 @@ export const MoveGenerator = class {
     pathsScored = 0;
 
     constructor() {
-        SnakeLogger.info("Constructing MoveGenerator");
+////        SnakeLogger.info("Constructing MoveGenerator");
         this.currentBestScoredPath = {path: [{x: 0, y: 0}], score: 0};
         this.active = true;
     }
 
     commencePathScoring() {
-        SnakeLogger.info("Commencing path scoring");
+////        SnakeLogger.info("Commencing path scoring");
         const startMs = new Date().getTime();
         const foodPoints = StateAnalyzer.getFoodPoints(0);
         const smallerHeadPoints = StateAnalyzer.getSmallerHeadPoints();
@@ -48,7 +48,7 @@ export const MoveGenerator = class {
             try {
                 this.foodPaths.push(this.dodger.getShortestPath(point));
             } catch (e) {
-                SnakeLogger.error(e);
+////                SnakeLogger.error(e);
             }
         });
 
@@ -56,7 +56,7 @@ export const MoveGenerator = class {
             try {
                 this.agressionPaths.push(this.dodger.getShortestPath(point));
             } catch (e) {
-                SnakeLogger.error(e);
+////                SnakeLogger.error(e);
             }
         });
 
@@ -64,13 +64,13 @@ export const MoveGenerator = class {
             try {
                 this.suicidePaths.push(this.dodger.getShortestPath(point));
             } catch (e) {
-                SnakeLogger.error(e);
+////                SnakeLogger.error(e);
             }
         });
 
         const endInitMs = new Date().getTime();
 
-        SnakeLogger.info("Init complete after " + (endInitMs - startMs) + " ms");
+////        SnakeLogger.info("Init complete after " + (endInitMs - startMs) + " ms");
         this.spiralScore();
     }
 
@@ -100,10 +100,10 @@ export const MoveGenerator = class {
                     const startMs = new Date().getTime();
                     this.generateScoredPath(point).then( (result) => {
                         const endMs = new Date().getTime();
-                        SnakeLogger.debug("Score generation then block reached (" + (endMs - startMs) + " ms)");
+////                        SnakeLogger.debug("Score generation then block reached (" + (endMs - startMs) + " ms)");
 
                     } ).catch((e: Error) => {
-                        SnakeLogger.error(e.message);
+////                        SnakeLogger.error(e.message);
                     });
 
 
@@ -124,7 +124,7 @@ export const MoveGenerator = class {
         let move: EMoveDirections;
         if ( this.currentBestScoredPath.score != 0) {
             const path = this.currentBestScoredPath.path;
-            SnakeLogger.info("Chosen path projection: " + JSON.stringify(path));
+////            SnakeLogger.info("Chosen path projection: " + JSON.stringify(path));
             move = StateAnalyzer.getMove(path[0], path[1]);
           } else {
             move = StateAnalyzer.safeMove();
@@ -134,7 +134,7 @@ export const MoveGenerator = class {
 
     generateScoredPath(endPoint: IPoint): Promise<IScoredPath> {
         return new Promise ((resolve, reject) => {
-            SnakeLogger.info("Scoring path to point " + JSON.stringify(endPoint));
+////            SnakeLogger.info("Scoring path to point " + JSON.stringify(endPoint));
             const startMs = new Date().getTime();
             let path: IPoint[];
             try {
@@ -157,7 +157,7 @@ export const MoveGenerator = class {
 
             const foodProximityFactor = (foodPathCommonality / this.stepReferenceScalar);
             const foodProximityTerm = foodProximityFactor * this.foodProximityWeight * (1 + (StateAnalyzer.getMyHunger()) / 33);
-            SnakeLogger.info("foodProximityTerm is " +  foodProximityTerm + " for path to " + JSON.stringify(path[path.length - 1]));
+////            SnakeLogger.info("foodProximityTerm is " +  foodProximityTerm + " for path to " + JSON.stringify(path[path.length - 1]));
 
             let divideMeByLength: number = 0;
             for (let i = 0; i < path.length; i++) {
@@ -169,7 +169,7 @@ export const MoveGenerator = class {
             // const centerProximityFactor = 1 - (distanceFromCenter / this.stepReferenceScalar);
 
             const centerProximityTerm = centerProximityFactor * this.centreProximityWeight;
-            SnakeLogger.info("centerProximityTerm is " +  centerProximityTerm + " for path to " + JSON.stringify(path[path.length - 1]));
+////            SnakeLogger.info("centerProximityTerm is " +  centerProximityTerm + " for path to " + JSON.stringify(path[path.length - 1]));
 
             let agressionPathCommonality = 0;
             this.agressionPaths.forEach( (agressionPath) => {
@@ -180,7 +180,7 @@ export const MoveGenerator = class {
 
             const agressionFactor = (agressionPathCommonality / this.stepReferenceScalar);
             const agressionTerm = agressionFactor * this.agressionWeight;
-            SnakeLogger.info("agressionTerm is " +  agressionTerm + " for path to " + JSON.stringify(path[path.length - 1]));
+////            SnakeLogger.info("agressionTerm is " +  agressionTerm + " for path to " + JSON.stringify(path[path.length - 1]));
 
             let nonAvoidancePathCommonality = 0;
             this.suicidePaths.forEach( (nonAvoidancePath) => {
@@ -190,18 +190,18 @@ export const MoveGenerator = class {
             });
             const avoidanceFactor = 1 - (nonAvoidancePathCommonality / this.stepReferenceScalar);
             const avoidanceTerm = avoidanceFactor * this.avoidanceWeight;
-            SnakeLogger.info("avoidanceTerm is " +  avoidanceTerm + " for path to " + JSON.stringify(path[path.length - 1]));
+////            SnakeLogger.info("avoidanceTerm is " +  avoidanceTerm + " for path to " + JSON.stringify(path[path.length - 1]));
 
             // Add a bias?
             const bias = 0;
             const summedScore = selfProximityTerm + foodProximityTerm + centerProximityTerm + agressionTerm + avoidanceTerm;
             const endMs = new Date().getTime();
-            SnakeLogger.info("summedScore for path to endPoint " + JSON.stringify(endPoint) + " is " + summedScore + " (" + (endMs - startMs) + " ms)");
+////            SnakeLogger.info("summedScore for path to endPoint " + JSON.stringify(endPoint) + " is " + summedScore + " (" + (endMs - startMs) + " ms)");
             const result = {path, score: summedScore + bias};
             this.scoredPaths.push(result);
             this.pathsScored++;
             if (result.score > this.currentBestScoredPath.score) {
-                SnakeLogger.info("The new best path with a score of " + result.score + " is " + JSON.stringify(result));
+////                SnakeLogger.info("The new best path with a score of " + result.score + " is " + JSON.stringify(result));
                 this.currentBestScoredPath = result;
             }
 

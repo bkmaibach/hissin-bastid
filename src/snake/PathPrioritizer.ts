@@ -36,7 +36,7 @@ export const PathPrioritizer = class {
             tailPaths = [dodger.getShortestPath(tailTip)];
         }
 
-        SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
+////        SnakeLogger.info(foodPaths.length + agressionPaths.length + tailPaths.length + " paths found in " + (endTime - startTime) + " milliseconds");
 
         let prioritizedPaths: IPoint[][];
 
@@ -48,10 +48,10 @@ export const PathPrioritizer = class {
                 return sortedPaths;
             }
 
-            SnakeLogger.info("foodPaths is " + JSON.stringify(foodPaths));
-            SnakeLogger.info("agressionPaths is " + JSON.stringify(agressionPaths));
-            SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
-            SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
+////            SnakeLogger.info("foodPaths is " + JSON.stringify(foodPaths));
+////            SnakeLogger.info("agressionPaths is " + JSON.stringify(agressionPaths));
+////            SnakeLogger.info("primaryPaths is " + JSON.stringify(primaryPaths));
+////            SnakeLogger.info("tailPaths is " + JSON.stringify(tailPaths));
 
 
             prioritizedPaths = this.deprioritizePaths(sortedPaths, (path) => {
@@ -60,7 +60,7 @@ export const PathPrioritizer = class {
             });
 
 
-            SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
+////            SnakeLogger.info("prioritizedPaths is " + JSON.stringify(prioritizedPaths));
 
         } else {
             const primaryPaths = foodPaths;

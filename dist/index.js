@@ -23,7 +23,6 @@ const express_1 = __importDefault(require("express"));
 const path = __importStar(require("path"));
 const handlers_1 = require("./handlers");
 const StateAnalyzer_1 = require("./snake/StateAnalyzer");
-const SnakeLogger_1 = require("./util/SnakeLogger");
 const MoveGenerator_1 = require("./snake/MoveGenerator");
 const app = express_1.default();
 let filename;
@@ -33,51 +32,48 @@ app.set("port", (process.env.PORT || 9001));
 app.enable("verbose errors");
 app.use(body_parser_1.default.json());
 // --- SNAKE LOGIC GOES BELOW THIS LINE ---
+app.get('/', (request, response) => {
+    var battlesnakeInfo = {
+        apiversion: '1',
+        author: 'bkmaibach',
+        color: "#11FF55",
+        headType: "fang",
+        tailType: "hook"
+    };
+    response.status(200).json(battlesnakeInfo);
+});
 // Handle POST request to "/start"
 app.post("/start", (request, response) => __awaiter(this, void 0, void 0, function* () {
     const snakeName = request.body.you.name;
     const gameID = request.body.game.id;
-    SnakeLogger_1.SnakeLogger.init(snakeName, gameID);
+    ////  SnakeLogger.init(snakeName, gameID);
     // SnakeLogger.debug("Enter /start");
     // forward the initial request to the state analyzer upon start
     // All this part serves to do is choose our colour. If the program sees its on heroku (production)
     // It will choose our official colour. Else itll just do random for development so we can distinguish a bunch at once.
     filename = gameID + "_" + snakeName;
     StateAnalyzer_1.StateAnalyzer.update(request.body);
-    let hexString;
-    if (process.env.NODE_ENV == "production") {
-        hexString = "11FF55";
-    }
-    else {
-        // Random hex string
-        const number = Math.floor(Math.random() * Math.floor(16000000));
-        hexString = number.toString(16);
-        if (hexString.length % 2) {
-            hexString = "0" + hexString;
-        }
-    }
-    // Response data
-    const data = {
-        color: "#" + hexString,
-        headType: "fang",
-        tailType: "hook"
-    };
-    return response.json(data);
+    response.status(200).send('ok');
 }));
 app.post("/move", (request, response) => __awaiter(this, void 0, void 0, function* () {
+    console.log('Move requested');
     const moveStartTime = new Date().getTime();
     // Everything is wrapped in a try/catch so our app doesn't crash if something goes wrong
     try {
         // update the Analyzer with the new moves, first thing, right away. Don't call this function anywhere else!
         StateAnalyzer_1.StateAnalyzer.update(request.body);
-        SnakeLogger_1.SnakeLogger.debug("Enter /move");
+        ////    SnakeLogger.debug("Enter /move");
         const moveGen = new MoveGenerator_1.MoveGenerator();
         moveGen.commencePathScoring();
-        yield sleep(240);
+        yield sleep(200);
         let move;
         move = moveGen.getMove();
-        SnakeLogger_1.SnakeLogger.info("Timeout reached! Using move " + move);
-        return response.json({ move });
+        const moveEndTime = new Date().getTime();
+        console.log("Timeout reached! Using move " + move + " after " + (moveEndTime - moveStartTime) + ' ms');
+        ////    SnakeLogger.info("Timeout reached! Using move " + move);
+        response.status(200).send({
+            move: move
+        });
         // setTimeout(() => {
         //   move = moveGen.getMove();
         //   SnakeLogger.info("Timeout reached! Using move " + move);
@@ -85,7 +81,7 @@ app.post("/move", (request, response) => __awaiter(this, void 0, void 0, functio
         // }, 245);
     }
     catch (e) {
-        SnakeLogger_1.SnakeLogger.error(e);
+        ////    SnakeLogger.error(e);
     }
 }));
 function sleep(ms) {
@@ -94,13 +90,13 @@ function sleep(ms) {
     });
 }
 app.post("/end", (request, response) => {
-    SnakeLogger_1.SnakeLogger.debug("Enter /end");
+    ////  SnakeLogger.debug("Enter /end");
     // NOTE: Any cleanup when a game is complete.
     // So we can run multiple games without re-starting app.
     return response.json({});
 });
 app.post("/ping", (request, response) => {
-    SnakeLogger_1.SnakeLogger.info("Enter /ping");
+    ////  SnakeLogger.info("Enter /ping");
     // Used for checking if this snake is still alive.
     return response.json({});
 });

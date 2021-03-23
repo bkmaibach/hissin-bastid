@@ -102,10 +102,10 @@ export class StateAnalyzer {
     // return false if no food on board
     static isThereFood() {
         if (StateAnalyzer.getState(0).board.food[0] == undefined) {
-            SnakeLogger.info("There is no food");
+////            SnakeLogger.info("There is no food");
             return false;
         } else {
-            SnakeLogger.info("Food is here: " + StateAnalyzer.getState(0).board.food[0]);
+////            SnakeLogger.info("Food is here: " + StateAnalyzer.getState(0).board.food[0]);
             return true;
         }
     }
@@ -173,9 +173,9 @@ export class StateAnalyzer {
         // The XY that we are looking at has been determined using "left" or whatever
         // Logging checkpoint
 
-        SnakeLogger.info(this.getTurnNumber().toString());
-        SnakeLogger.info("My position: " + JSON.stringify(this.getMyPosition()));
-        SnakeLogger.info("considering spot: " + JSON.stringify(newXY));
+////        SnakeLogger.info(this.getTurnNumber().toString());
+////        SnakeLogger.info("My position: " + JSON.stringify(this.getMyPosition()));
+////        SnakeLogger.info("considering spot: " + JSON.stringify(newXY));
 
         // Check if its a wall
         if (newX >= StateAnalyzer.getState(0).board.width
@@ -183,7 +183,7 @@ export class StateAnalyzer {
         || newY >= StateAnalyzer.getState(0).board.height
         || newY < 0) {
             if (returnVal.contents == ECellContents.unknown) returnVal.contents = ECellContents.wall;
-            SnakeLogger.info("Move found to collide with wall");
+////            SnakeLogger.info("Move found to collide with wall");
         }
 
         // Check if it's a part of any snake body
@@ -191,20 +191,20 @@ export class StateAnalyzer {
         for (let i = 0; i < boardSnake.body.length; i++) {
         if (_.isEqual(boardSnake.body[i], newXY)) {
             if (returnVal.contents == ECellContents.unknown) {
-                SnakeLogger.info("Move found to contain the body of snake: " + boardSnake.name);
+////                SnakeLogger.info("Move found to contain the body of snake: " + boardSnake.name);
                 returnVal.contents = ECellContents.body;
             }
             if (i == 0) {
                 // special note that body point is a head
                 returnVal.head = true;
-                SnakeLogger.info("It contains this snakes head");
+////                SnakeLogger.info("It contains this snakes head");
             }
             if (i == boardSnake.body.length - 1) {
                 returnVal.tip = true;
-                SnakeLogger.info("It contains a snake tip");
+////                SnakeLogger.info("It contains a snake tip");
                 if (!StateAnalyzer.isSnakeDigesting(boardSnake.name)
                 || boardSnake.name == StateAnalyzer.getMyName()) {
-                    SnakeLogger.info("But it is a safeTip");
+////                    SnakeLogger.info("But it is a safeTip");
                     returnVal.safeTip = true;
                 }
             }
@@ -223,7 +223,7 @@ export class StateAnalyzer {
             // SnakeLogger.info("Snake head is at" + JSON.stringify(boardSnake.body[0]));
             // SnakeLogger.info("getIndexOfValue(neighbors, boardSnake.body[0]) == " + getIndexOfValue(neighbors, boardSnake.body[0]));
             if (getIndexOfValue(neighbors, boardSnake.body[0]) > -1) {
-                SnakeLogger.info("Move found to be contested by: " + boardSnake.name);
+////                SnakeLogger.info("Move found to be contested by: " + boardSnake.name);
                 returnVal.contested = true;
                 if (!returnVal.snakeLengths) {
                     returnVal.snakeLengths = [];
@@ -239,7 +239,7 @@ export class StateAnalyzer {
         // If we still haven't changed it from unknown, the status
         if (returnVal.contents == ECellContents.unknown) {
             returnVal.contents = ECellContents.empty;
-            SnakeLogger.info("Move destination is free");
+////            SnakeLogger.info("Move destination is free");
         }
 
         // Also put in if the point is in the food list.
@@ -273,7 +273,7 @@ export class StateAnalyzer {
     // 5. An enemy snakes head, if he he's trapped he might do the same and we can take a bastard down with us.
     // 6. ...up?  good luck
     static safeMove(): EMoveDirections {
-        SnakeLogger.info("SAFEMOVE DEFAULT ENGAGED");
+////        SnakeLogger.info("SAFEMOVE DEFAULT ENGAGED");
         const myName = StateAnalyzer.getMyName();
         const moves = [EMoveDirections.left, EMoveDirections.right, EMoveDirections.up, EMoveDirections.down];
         const moveInfos: IMoveInfo[] = [];
@@ -288,7 +288,7 @@ export class StateAnalyzer {
             if (moveInfos[i].contents == ECellContents.empty
                 || (moveInfos[i].safeTip)) {
                 if (moveInfos[i].contested && StateAnalyzer.getMyLength() > Math.max(...moveInfos[i].snakeLengths)) {
-                    SnakeLogger.info("Taking point contested by smaller snake by moving: " + moves[i]);
+////                    SnakeLogger.info("Taking point contested by smaller snake by moving: " + moves[i]);
                     // Best pickins
                     return moves[i];
                 }
@@ -299,7 +299,7 @@ export class StateAnalyzer {
         for (let i = 0; i < 4; i++) {
             if (!moveInfos[i].contested && (moveInfos[i].contents == ECellContents.empty
                 || moveInfos[i].safeTip)) {
-                SnakeLogger.info("Taking empty or safe tip point by moving: " + moves[i]);
+////                SnakeLogger.info("Taking empty or safe tip point by moving: " + moves[i]);
                 // Will do fine
                 return moves[i];
             }
@@ -308,7 +308,7 @@ export class StateAnalyzer {
         // Taking empty or safetip spot, possibly contested
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].contents == ECellContents.empty || moveInfos[i].safeTip) {
-                SnakeLogger.info("Taking empty point that might not end so well: " + moves[i]);
+////                SnakeLogger.info("Taking empty point that might not end so well: " + moves[i]);
                 // Scraping the bottom of the barrell...
                 return moves[i];
             }
@@ -317,7 +317,7 @@ export class StateAnalyzer {
         // Taking tip spot
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].tip) {
-                SnakeLogger.info("Taking a not-so-safe tip: " + moves[i]);
+////                SnakeLogger.info("Taking a not-so-safe tip: " + moves[i]);
                 // Scraping the bottom of the barrel...
                 return moves[i];
             }
@@ -327,13 +327,13 @@ export class StateAnalyzer {
         for (let i = 0; i < 4; i++) {
             if (moveInfos[i].head) {
                 // AAAAAAAAAAAAAAAAAAAHHH!!!
-                SnakeLogger.info("Last resort kamikaze move into another snake head: " + moves[i]);
+////                SnakeLogger.info("Last resort kamikaze move into another snake head: " + moves[i]);
                 return moves[i];
             }
         }
 
         // Welp!
-        SnakeLogger.info("No safe move could be found, defaulting to up. Sorry snakey :[");
+////        SnakeLogger.info("No safe move could be found, defaulting to up. Sorry snakey :[");
         return EMoveDirections.up;
     }
 
@@ -356,7 +356,7 @@ export class StateAnalyzer {
     static pointIsContestedByLargerSnake (point: IPoint): boolean {
         const myName = StateAnalyzer.getMyName();
         if (point == undefined) {
-            SnakeLogger.debug("The point being checked for larger snake contestation is undefined");
+////            SnakeLogger.debug("The point being checked for larger snake contestation is undefined");
             return false;
         }
         const neighbors = StateAnalyzer.getRectilinearNeighbors(point);
@@ -367,9 +367,9 @@ export class StateAnalyzer {
             // SnakeLogger.info("point neighbors are" + JSON.stringify(neighbors));
             // SnakeLogger.info("snake head is at " + JSON.stringify(snake.body[0]));
             if (getIndexOfValue(neighbors, snake.body[0]) > -1) {
-                SnakeLogger.info("snake head was found in neighbor list");
+////                SnakeLogger.info("snake head was found in neighbor list");
                 if (snake.body.length >= StateAnalyzer.getMyLength()) {
-                    SnakeLogger.info("snake is too large to ignore");
+////                    SnakeLogger.info("snake is too large to ignore");
                     returnVal = true;
                     return;
                 }
@@ -420,7 +420,7 @@ export class StateAnalyzer {
         const smallerHeadPoints: IPoint[] = [];
         snakes.forEach((snake) => {
             if (snake.body.length < myLength) {
-                SnakeLogger.debug(snake.name + " length: " + snake.body.length + ", my length: " + myLength);
+////                SnakeLogger.debug(snake.name + " length: " + snake.body.length + ", my length: " + myLength);
                 smallerHeadPoints.push(snake.body[0]);
             }
         });
@@ -435,7 +435,7 @@ export class StateAnalyzer {
         const largerHeadPoints: IPoint[] = [];
         snakes.forEach((snake) => {
             if (snake.body.length > myLength) {
-                SnakeLogger.debug(snake.name + " length: " + snake.body.length + ", my length: " + myLength);
+////                SnakeLogger.debug(snake.name + " length: " + snake.body.length + ", my length: " + myLength);
                 largerHeadPoints.push(snake.body[0]);
             }
         });
