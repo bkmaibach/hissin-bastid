@@ -33,7 +33,7 @@
   "dependencies": {
     "@types/app-root-path": "^1.2.4",
     "app-root-path": "^2.1.0",
-    "async": "^2.6.1",
+    "async": "^2.6.4",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
