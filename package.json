@@ -44,7 +44,7 @@
     "express": "^4.16.4",
     "l1-path-finder": "^1.0.0",
     "lodash": "^4.17.21",
-    "mongoose": "^4.13.17",
+    "mongoose": "^4.13.21",
     "ndarray": "^1.0.18",
     "typegoose": "^5.9.1",
     "winston": "^2.4.4",
